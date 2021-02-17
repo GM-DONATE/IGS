@@ -20,15 +20,12 @@ jobs:
     - name: Create superfile
       run: |
         cd luapack
-        lua main.lua ../igs-core/lua/igs superfile.txt
+        lua main.lua ../addons/igs-core/lua/igs superfile.txt
         echo $HOME
         ls
     - name: Get current date
       id: date
-      run: |
-        echo "::set-output name=date::$(date +'%y%m%d-%H%M%S')"
-        pwd
-        ls
+      run: echo "::set-output name=date::$(date +'%y%m%d-%H%M%S')"
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
