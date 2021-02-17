@@ -20,9 +20,8 @@ jobs:
     - name: Create superfile
       run: |
         cd luapack
-        pwd
-        ls
-        lua main.lua igs-core/lua/igs superfile.txt
+        lua main.lua ../igs-core/lua/igs superfile.txt
+        echo $HOME
         ls
     - name: Get current date
       id: date
