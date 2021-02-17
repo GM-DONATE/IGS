@@ -1,0 +1,52 @@
+name: Release superfile
+
+on:
+#   push:
+#     tags:
+#       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  [push, pull_request]
+#   workflow_dispatch:
+
+jobs:
+  superfile:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Download lua
+      uses: leafo/gh-actions-lua@v8.0.0
+      with:
+        luaVersion: "5.3.5"
+    - name: Create superfile
+      run: |
+        cd luapack
+        pwd
+        ls
+        lua main.lua igs-core/lua/igs superfile.txt
+        ls
+    - name: Get current date
+      id: date
+      run: |
+        echo "::set-output name=date::$(date +'%y%m%d-%H%M%S')"
+        pwd
+        ls
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.date.outputs.date }}
+        release_name: Release ${{ steps.date.outputs.date }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./superfile.txt
+        asset_name: superfile.txt
+        asset_content_type: text/plain
