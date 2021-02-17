@@ -19,19 +19,14 @@ jobs:
       run: |
         cd luapack
         lua main.lua ../addons/igs-core/lua/igs superfile.txt
-        echo $HOME
-        ls
-    - name: Get current date
-      id: date
-      run: echo "::set-output name=date::$(date +'%y%m%d-%H%M%S')"
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.date.outputs.date }}
-        release_name: Release ${{ steps.date.outputs.date }}
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
     - name: Upload Release Asset
