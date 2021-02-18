@@ -57,7 +57,7 @@ end)
 
 concommand.Add("igsreload", function(pl)
 	if pl == NULL then -- console only
-		IGS.sh("launcher.lua")
+		IGS.sh("igs/launcher.lua")
 	end
 end)
 

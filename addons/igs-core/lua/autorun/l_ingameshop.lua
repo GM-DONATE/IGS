@@ -1,13 +1,43 @@
 IGS = IGS or {}
+IGS.FILEHASHES = IGS.FILEHASHES or {}
+
 IGS.Version = 200125 -- #TODO версия должна получаться и устанавливаться в самом главном файле (фетча этого с гита)
 
-file.CreateDir("igs/" .. IGS.Version)
 
+
+
+
+
+--[[-------------------------------------------------------------------------
+	Часть которая ниже должна быть в главном fetch файле
+---------------------------------------------------------------------------]]
 
 local i = {} -- lua files only
 i.sv = SERVER and include or function() end
 i.cl = SERVER and AddCSLuaFile or include
 i.sh = function(f) return i.cl(f) or i.sv(f) end
+
+local function contentIsSafe(content, true_crc)
+	local crc = util.CRC(content)
+	return crc == true_crc
+end
+
+local function include_data(sRealm, sPath)
+	local path_in_data = "igs/" .. IGS.Version .. "/" .. sPath:StripExtension() .. ".txt"
+
+	if (sRealm == "sh")
+	or (sRealm == "sv" and SERVER)
+	or (sRealm == "cl" and CLIENT) then
+		print(string.format("%s Иклюд с DATA. Путь: %s", sRealm, path_in_data))
+		local content  = file.Read(path_in_data, "DATA")
+		local true_crc = IGS.FILEHASHES[sPath]
+		local error_txt = "IGS Хеш файла " .. path_in_data .. " не соответствует требованиям"
+		assert(SERVER or contentIsSafe(content, true_crc), error_txt)
+
+		local executer = CompileString(content, path_in_data)
+		return executer()
+	end
+end
 
 -- "Костыль" для работы IGS.sh/sv/cl изнутри модульных _main.lua файлов
 -- с указанием относительного пути
@@ -31,16 +61,9 @@ local function incl(sRealm, sPath)
 		local fIncluder = i[sRealm]
 		return fIncluder(sPath)
 	elseif file.Exists(path_in_data, "DATA") then
-		if (sRealm == "sh")
-		or (sRealm == "sv" and SERVER)
-		or (sRealm == "cl" and CLIENT) then
-			print(string.format("%s Иклюд с DATA. Путь: %s", sRealm, path_in_data))
-			local content  = file.Read(path_in_data, "DATA")
-			local executer = CompileString(content, path_in_data)
-			return executer()
-		end
+		return include_data(sRealm, sPath)
 	else
-		print(string.format("IGS: Файл %s не найден. Путь: %s", iam_inside and ("внутри " .. iam_inside) or "", sPath))
+		print(string.format("IGS: Файл%s не найден. Путь: %s", iam_inside and (" внутри " .. iam_inside) or "", sPath))
 	end
 end
 
@@ -71,4 +94,109 @@ function IGS.load_modules(sBasePath) -- igs/modules
 	iam_inside = nil
 end
 
-IGS.sh("igs/launcher.lua")
+
+local function file_ForceWrite(path, content)
+	file.CreateDir(path:match("(.+)/"))
+	file.Write(path, content)
+end
+
+local function unpackSuperfile(content, extract_to)
+	local lines = string.Split(content, "\n")
+
+	for _,line in ipairs(lines) do
+		local path,code = line:match("^(.-) (.*)$")
+		if path then -- !last_line
+			file_ForceWrite(extract_to .. "/" .. path, code)
+		end
+	end
+end
+
+
+
+local function wrapFetch(url, cb)
+	http.Fetch(url, cb, function(err)
+		for i = 1,10 do print("\n\nIGS Не может выполнить HTTP запрос и загрузить скрипт\nURL: " .. url .."\nError: " .. err) end
+	end)
+end
+
+local function downloadAndRunSuperfile(url)
+	wrapFetch(url, function(code_lines)
+		unpackSuperfile(code_lines, "igs/" .. IGS.Version .. "/igs")
+		IGS.sh("igs/launcher.lua")
+	end)
+end
+
+local function findSuperfileUrl(cb)
+	if true then
+		cb("https://pastebin.com/raw/UvwGMfAZ")
+		return
+	end
+
+	wrapFetch("https://api.github.com/repos/wiremod/advdupe2/releases", function(json)
+		local t = util.JSONToTable(json)
+		IGS.Version = IGS.Version or t[1].tag_name
+
+		local found
+		for _,release in ipairs(t) do
+			if release.tag_name == IGS.Version then
+				found = release
+				break
+			end
+		end
+
+		if not found then
+			print("IGS Не может найти релизную версию для скачивания")
+			return
+		end
+
+		for _,asset in ipairs(found.assets) do
+			if asset.name == "superfile.txt" then
+				local superfile_url = asset.browser_download_url
+				cb(superfile_url)
+				return
+			end
+		end
+
+		print("IGS Не может найти superfile в дополнениях к релизу")
+	end)
+end
+
+if file.Exists("igs/launcher.lua", "LUA") then
+	print("IGS Загружаемся с lua")
+	IGS.sh("igs/launcher.lua")
+	return
+end
+
+-- else
+timer.Simple(0, function()
+	findSuperfileUrl(downloadAndRunSuperfile)
+end)
+
+-- if SERVER then
+-- 	util.AddNetworkString("IGS.FILEHASHES")
+
+-- 	local function net_WriteHashes()
+-- 		net.WriteUInt(table.Count(IGS.FILEHASHES), 16)
+-- 		for sPath,crc in pairs(IGS.FILEHASHES) do
+-- 			net.WriteString(sPath)
+-- 			net.WriteUInt(crc, 32)
+-- 		end
+-- 	end
+
+-- 	local function calcHashes()
+-- 	end
+
+-- 	net.Receive("IGS.FILEHASHES", function(_, pl)
+-- 		net.Start("IGS.FILEHASHES")
+-- 		if next(IGS.FILEHASHES) then
+-- 			net_WriteHashes()
+-- 		else
+-- 			findSuperfileUrl(downloadAndRunSuperfile)
+-- 		end
+-- 		net.Send(pl)
+-- 	end)
+-- end
+
+-- findSuperfileUrl(downloadAndRunSuperfile)
+
+

@@ -76,7 +76,7 @@ local function prepareSocket()
 		return
 	end
 
-	if IGS.Version > 210201 then
+	if tonumber(IGS.Version) > 210201 then
 		log.debug("Версия IGS {} (старше, чем 210201). Сами сообщим GMD, что слушаем сокет", IGS.Version)
 		return new()
 	else
