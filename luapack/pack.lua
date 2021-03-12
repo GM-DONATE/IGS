@@ -79,8 +79,8 @@ end
 function pack.minifyAndSaveFolder(path, save_to)
 	local files = file.Index(path)
 	for _,file_path in ipairs(files) do
-		local pref_pat  = string.PatternSafe(path)
-		local file_dest = save_to .. "/" .. file_path:match(pref_pat .. "/(.+)$"):gsub(".lua", ".txt")
+		-- local pref_pat  = string.PatternSafe(path)
+		local file_dest = save_to .. "/" .. file_path --:match(pref_pat .. "/(.+)$"):gsub(".lua", ".txt")
 
 		local minified = pack.minifyFile(file_path)
 		file.AdvWrite(file_dest, minified)
