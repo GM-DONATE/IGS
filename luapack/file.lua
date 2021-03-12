@@ -35,9 +35,10 @@ end
 
 function file.Write(path, data)
 	local f = io.open(path, "wb")
-	if not f then return end
+	if not f then return false end
 	f:write(data)
 	f:close()
+	return true
 end
 
 function file.CreateDir(path)
@@ -68,7 +69,7 @@ end
 function file.AdvWrite(sPath, sData)
 	-- bla2/bla3/kek.txt > bla2/bla3
 	file.CreateDir(sPath:match("(.+)/"))
-	file.Write(sPath, sData)
+	return file.Write(sPath, sData)
 end
 
 
