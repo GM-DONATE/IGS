@@ -1,4 +1,4 @@
-include("shared.lua")
+IGS.sh("shared.lua")
 
 -- #todo сделать такое же для подарка?
 

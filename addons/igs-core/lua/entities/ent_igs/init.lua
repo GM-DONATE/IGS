@@ -1,6 +1,5 @@
-AddCSLuaFile("cl_init.lua")
-AddCSLuaFile("shared.lua")
-include("shared.lua")
+IGS.sh("shared.lua")
+IGS.cl("cl_init.lua")
 
 function ENT:Initialize()
 	-- self:SetModel("models/props_junk/Shoe001a.mdl") -- ботинок

@@ -1,4 +1,4 @@
-include("shared.lua")
+IGS.sh("shared.lua")
 
 local UPPER_TEXT = Color(255,255,255)
 local LOWER_TEXT = Color(20, 150, 200)
