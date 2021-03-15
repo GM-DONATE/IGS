@@ -48,13 +48,12 @@ function IGS.WIN.Deposit(iRealSum)
 		end
 		self.real_m.Think = function()
 			local rub = tonumber(self.real_m:GetValue())
-			local igs = tonumber(self.curr_m:GetValue())
-
 			if cd then
 				self.purchase:SetText(
 					"Пополнить счет на " .. niceSum(rub,0) .. " руб"
 				)
 			else
+				local igs = tonumber(self.curr_m:GetValue())
 				self.purchase:SetText(
 					"Пополнить на " .. IGS.SignPrice( niceSum(igs,0) ) ..
 					" за " .. niceSum(rub,0) .. " руб"
