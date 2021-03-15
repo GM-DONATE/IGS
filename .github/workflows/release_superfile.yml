@@ -23,7 +23,7 @@ jobs:
       run: |
         cd luapack
         lua main.lua ../addons/igs-core/lua superfile.txt
-    - id: release
+    - id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
