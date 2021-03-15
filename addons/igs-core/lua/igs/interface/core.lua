@@ -32,6 +32,7 @@ end
 hook.Add("DarkRPFinishedLoading","SupressDarkRPF1",function()
 	if IGS.C.MENUBUTTON ~= KEY_F1 then return end
 
+	local GM = GM or GAMEMODE
 	function GM:ShowHelp() end
 end)
 

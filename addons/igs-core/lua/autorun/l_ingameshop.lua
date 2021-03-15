@@ -11,13 +11,19 @@
 
 IGS = IGS or {}
 
+local function log(s)
+	if VERBOSE then
+		print("[IGS] " .. s)
+	end
+end
+
 local i = {} -- lua files only
 i.sv = SERVER and include or function() end
 i.cl = SERVER and AddCSLuaFile or include
 i.sh = function(f) return i.cl(f) or i.sv(f) end
 
 
-local function include_data(sRealm, sAbsolutePath)
+local function include_mount(sRealm, sAbsolutePath)
 	if (sRealm == "sh")
 	or (sRealm == "sv" and SERVER)
 	or (sRealm == "cl" and CLIENT) then
@@ -39,11 +45,13 @@ local function incl(sRealm, sPath)
 	-- /\ Мб внутри модуля уже указан full путь, а не относительный
 	-- (обычно путь к _main.lua)
 
+	-- print(sAbsolutePath)
+
 	if IGS.CODEMOUNT and IGS.CODEMOUNT[sAbsolutePath] then -- 1st check for lua load (not web)
-		print(string.format("%s Иклюд с MOUNT. Путь: %s", sRealm, sAbsolutePath))
-		return include_data(sRealm, sAbsolutePath)
+		log(string.format("%s Иклюд с MOUNT. Путь: %s", sRealm, sAbsolutePath))
+		return include_mount(sRealm, sAbsolutePath)
 	else
-		print(string.format("%s Иклюд с LUA. Путь: %s", sRealm, sAbsolutePath))
+		log(string.format("%s Иклюд с LUA. Путь: %s", sRealm, sAbsolutePath))
 		local fIncluder = i[sRealm]
 		return fIncluder(sAbsolutePath)
 	end
@@ -64,6 +72,18 @@ local function findKeys(arr, patt)
 	return found
 end
 
+-- Тяжелая, но пока в оптимизации не нуждается
+-- При выборке модулей и энтити элементы повторяются
+local function unique(arr)
+	local ret = {}
+	for _,v in ipairs(arr) do
+		if not table.HasValue(ret, v) then
+			table.insert(ret, v)
+		end
+	end
+	return ret
+end
+
 local function findInMount(patt)
 	return IGS.CODEMOUNT and findKeys(IGS.CODEMOUNT, patt) or {}
 end
@@ -80,6 +100,7 @@ end
 
 function IGS.load_modules(sBasePath) -- igs/modules
 	local data_modules  = findInMount("^" .. sBasePath .. "/([^/]*)/_main%.lua$")
+	data_modules = unique(data_modules)
 	local _,lua_modules = file.Find(sBasePath .. "/*","LUA")
 	table.Add(data_modules, lua_modules)
 
@@ -104,9 +125,10 @@ local function parseSuperfile(content)
 end
 
 local function loadEntities()
-	local ents_path = "igs/" .. IGS.Version .. "/lua/entities"
-	local _,dirs = file.Find(ents_path .. "/*", "DATA")
-	for _,ent_class in ipairs(dirs) do
+	local entities = findInMount("^entities/([^/]*)/(.*%.lua)$")
+	entities = unique(entities)
+
+	for _,ent_class in ipairs(entities) do
 		iam_inside = "entities/" .. ent_class
 		ENT = {}
 		ENT.Folder = iam_inside
@@ -128,7 +150,7 @@ end
 
 -- Здесь также определяется версия
 local function findSuperfileUrl(cb, version_)
-	wrapFetch("https://api.github.com/repos/wiremod/advdupe2/releases", function(json)
+	wrapFetch("https://api.github.com/repos/GM-DONATE/IGS/releases", function(json)
 		local t = util.JSONToTable(json)
 		version_ = version_ or t[1].tag_name -- or latest
 
@@ -175,12 +197,12 @@ local function downloadAndRunCode(url)
 end
 
 local function loadFromWeb()
-	-- findSuperfileUrl(function(url, ver)
-		local url, ver = "https://pastebin.com/raw/EYw95gsp", "200125"
+	findSuperfileUrl(function(url, ver)
+		-- local url, ver = "https://pastebin.com/raw/EYw95gsp", "200125"
 		IGS.CODEURL = url
 		IGS.Version = ver
 		downloadAndRunCode(url)
-	-- end, IGS_FORCE_VERSION)
+	end, IGS_FORCE_VERSION)
 end
 
 

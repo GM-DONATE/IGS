@@ -101,7 +101,7 @@ end
 
 
 hook.Add("IGS.PlayerDonate","TopDonateEcho",function(pl, sum)
-	if IGS.C.TopDon_Echo and dat.method == "pay" then
+	if IGS.C.TopDon_Echo then
 		charge(pl, sum)
 	end
 end)
