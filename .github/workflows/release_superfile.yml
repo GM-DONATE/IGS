@@ -23,22 +23,12 @@ jobs:
       run: |
         cd luapack
         lua main.lua ../addons/igs-core/lua superfile.txt
-    - id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - id: release
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        body: ${{steps.changelog.outputs.changelog}}
         draft: true
         prerelease: false
-        body: ${{steps.changelog.outputs.changelog}}
-    - id: upload-release-asset
-      uses: actions/upload-release-asset@v1
+        files: luapack/superfile.txt
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: luapack/superfile.txt
-        asset_name: superfile.txt
-        asset_content_type: text/plain
