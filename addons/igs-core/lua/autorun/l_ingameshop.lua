@@ -11,11 +11,18 @@
 
 IGS = IGS or {}
 
-local function log(s)
-	if VERBOSE then
-		print("[IGS] " .. s)
+local function log(patt, ...)
+	if cookie.GetNumber("igsverbose", 0) == 1 then
+		print(string.format("[IGS] " .. patt, ...))
 	end
 end
+
+concommand.Add("igsverbose", function(pl)
+	if IsValid(pl) then return end
+	local enable = cookie.GetNumber("igsverbose", 0) == 0
+	cookie.Set("igsverbose", enable and 1 or 0)
+	print("IGS Logging now is " .. (enable and "on" or "off"))
+end)
 
 local i = {} -- lua files only
 i.sv = SERVER and include or function() end
@@ -48,10 +55,10 @@ local function incl(sRealm, sPath)
 	-- print(sAbsolutePath)
 
 	if IGS.CODEMOUNT and IGS.CODEMOUNT[sAbsolutePath] then -- 1st check for lua load (not web)
-		log(string.format("%s Иклюд с MOUNT. Путь: %s", sRealm, sAbsolutePath))
+		log("%s Иклюд с MOUNT. Путь: %s", sRealm, sAbsolutePath)
 		return include_mount(sRealm, sAbsolutePath)
 	else
-		log(string.format("%s Иклюд с LUA. Путь: %s", sRealm, sAbsolutePath))
+		log("%s Иклюд с LUA. Путь: %s", sRealm, sAbsolutePath)
 		local fIncluder = i[sRealm]
 		return fIncluder(sAbsolutePath)
 	end
@@ -143,34 +150,64 @@ local function loadEntities()
 end
 
 local function wrapFetch(url, cb)
+	log("fetch(%s)", url)
 	http.Fetch(url, cb, function(err)
 		for i = 1,10 do print("\n\nIGS Не может выполнить HTTP запрос и загрузить скрипт\nURL: " .. url .."\nError: " .. err) end
 	end)
 end
 
--- Здесь также определяется версия
-local function findSuperfileUrl(cb, version_)
-	wrapFetch("https://api.github.com/repos/GM-DONATE/IGS/releases", function(json)
-		local t = util.JSONToTable(json)
-		version_ = version_ or t[1].tag_name -- or latest
+-- local function findMajorFresher(releases, ver) end
+-- local function findFresherAtAll(releases) end
 
-		local found
-		for _,release in ipairs(t) do
-			if release.tag_name == version_ then
-				found = release
-				break
-			end
+local function filter(arr, f)
+	local t = {}
+	for _,v in ipairs(arr) do
+		if f(v) then t[#t + 1] = v end
+	end
+	return t
+end
+
+-- #todo вынести check updates в другое место и не заниматься этим здесь
+-- это говнит и без того запашной код
+local function findSuperfileUrl(cb, major_version_)
+	log("Ищем ссылку для скачивания %s", major_version_ or "последней версии")
+	local repo = IGS_REPO or "GM-DONATE/IGS"
+	wrapFetch("https://api.github.com/repos/" .. repo .. "/releases", function(json)
+		local releases = util.JSONToTable(json)
+
+		local releases_copy = table.Copy(releases) -- свежайшие версии сначала
+		table.sort(releases_copy, function(a, b)
+			PRINT(a.tag_name, b.tag_name)
+			return tonumber(a.tag_name) > tonumber(b.tag_name)
+		end)
+
+		local suitable = major_version_ and filter(releases_copy, function(release)
+			return math.floor(release.tag_name) == math.floor(major_version_) -- 12345.6 >> 12345
+		end) or {}
+
+		-- среди той что форсим (если форсим)
+		local freshest_suitable = suitable[1]
+		local freshest_version  = releases_copy[1]
+		log("suitable ver %s", freshest_suitable and freshest_suitable.tag_name)
+		log("freshest ver %s", freshest_version  and freshest_version.tag_name)
+
+
+		if major_version_ and not freshest_suitable then
+			print("IGS Не можем найти " .. major_version_ .. " версию для скачивания")
+			return
 		end
 
-		if not found then
+		if not freshest_version then
 			print("IGS Не может найти релизную версию для скачивания")
 			return
 		end
 
+		local found = major_version_ and freshest_suitable or freshest_version
 		for _,asset in ipairs(found.assets) do
 			if asset.name == "superfile.txt" then
 				local superfile_url = asset.browser_download_url
-				cb(superfile_url, version_) -- https://pastebin.com/raw/XHx8PQNL
+				log("Нашли версию %s. Ссылка: %s", found.tag_name, superfile_url)
+				cb(superfile_url, found, freshest_version)
 				return
 			end
 		end
@@ -183,9 +220,13 @@ end
 
 
 local function downloadAndRunCode(url)
-	wrapFetch(url, function(content)
-		IGS.CODEMOUNT = parseSuperfile(content)
+	wrapFetch(url, function(content, _, _, http_code)
+		if http_code ~= 200 then
+			print("IGS Версия удалена с GitHub или проблема доступа")
+			return
+		end
 
+		IGS.CODEMOUNT = parseSuperfile(content)
 		IGS.sh("igs/launcher.lua")
 		loadEntities()
 
@@ -196,18 +237,39 @@ local function downloadAndRunCode(url)
 	end)
 end
 
-local function loadFromWeb()
-	findSuperfileUrl(function(url, ver)
+local function announceNewVersion(new_version)
+	timer.Create("igs_new_version_announce", 10, 5, function()
+		local repo = IGS_REPO or "GM-DONATE/IGS"
+		local info_url = "https://github.com/" .. repo .. "/releases/tag/" .. math.floor(new_version)
+		print("IGS Доступна новая версия: " .. new_version .. "\nИнформация здесь: " .. info_url)
+	end)
+end
+
+local function loadFromWeb() -- #todo да убрать бля отсюда проверку обновлений
+	findSuperfileUrl(function(url, found, freshest_version)
+		local ver = found.tag_name
+		cookie.Set("igsversion", ver)
 		-- local url, ver = "https://pastebin.com/raw/EYw95gsp", "200125"
 		IGS.CODEURL = url
 		IGS.Version = ver
 		downloadAndRunCode(url)
-	end, IGS_FORCE_VERSION)
+
+		local has_updates = tonumber(freshest_version.tag_name) > tonumber(found.tag_name)
+		if has_updates then
+			announceNewVersion(freshest_version.tag_name)
+		end
+	end, IGS_FORCE_VERSION or cookie.GetString("igsversion"))
 end
 
+concommand.Add("igsflushversion", function(pl)
+	if IsValid(pl) then print("console only") return end
+	cookie.Set("igsversion", nil)
+	print("OK. После перезагрузки сервер скачает новую версию")
+end)
 
 
-if file.Exists("igs/launcher.lua", "LUA") then
+
+if not IGS_FORCE_WEB and file.Exists("igs/launcher.lua", "LUA") then
 	print("IGS Загружаемся с lua")
 	IGS.Version = "666"
 	IGS.sh("igs/launcher.lua")
@@ -215,10 +277,6 @@ if file.Exists("igs/launcher.lua", "LUA") then
 end
 
 
--- нет смысла на проде перескачивать сервер.
--- Это наоборот может привести к разным версиям CL и SV
--- убрать \/ если /\ станет проблемой
--- if IGS.CODEMOUNT then return end
 
 if SERVER then
 	timer.Simple(0, loadFromWeb)
