@@ -177,7 +177,6 @@ local function findSuperfileUrl(cb, major_version_)
 
 		local releases_copy = table.Copy(releases) -- свежайшие версии сначала
 		table.sort(releases_copy, function(a, b)
-			PRINT(a.tag_name, b.tag_name)
 			return tonumber(a.tag_name) > tonumber(b.tag_name)
 		end)
 
