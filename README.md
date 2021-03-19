@@ -7,7 +7,7 @@
 # InGameShop (IGS)
 **Внутриигровой магазин от gm-donate.ru** — аддон для Garry's Mod, который добавляет на сервер меню, через которое игроки могут сделать пожертвование и обменять полученные баллы на виртуальные привилегии: группы прав, оружие, модельки, хвосты, транспорт и т.д.
 
-<img align="left" width="550" height="350" src="https://user-images.githubusercontent.com/9200174/111821738-aad96c80-88eb-11eb-91ba-a98a2c3d770a.png">
+<img align="left" width="450" src="https://user-images.githubusercontent.com/9200174/111821738-aad96c80-88eb-11eb-91ba-a98a2c3d770a.png">
 
 ## Инструкция по установке
 1. Создайте проект [на сайте](https://gm-donate.ru/panel/)
