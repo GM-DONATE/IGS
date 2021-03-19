@@ -331,6 +331,10 @@ end)
 
 local function IGS_DropItem(pl,invId,cb)
 	if not (IGS.C.Inv_Enabled and IGS.C.Inv_AllowDrop) then return end
+	local canDrop = hook.Run("IGS.PlayerCanDropGift", pl, invId)
+	if canDrop == false then
+		return
+	end
 
 	IGS.PlayerEjectItem(function(ent)
 		if (not ent) then return end -- ошибка
