@@ -132,8 +132,9 @@ local function parseSuperfile(content)
 end
 
 local function loadEntities()
+	log("Загрузка энтити")
 	local entities = findInMount("^entities/([^/]*)/(.*%.lua)$")
-	entities = unique(entities)
+	entities = unique(entities) -- {ent_igs, npc_igs}
 
 	for _,ent_class in ipairs(entities) do
 		iam_inside = "entities/" .. ent_class
@@ -232,6 +233,7 @@ local function downloadAndRunCode(url)
 		if CLIENT then -- костыль, но другого способа не вижу
 			hook.GetTable()["InitPostEntity"]["IGS.nw.InitPostEntity"]()
 			hook.GetTable()["DarkRPFinishedLoading"]["SupressDarkRPF1"]()
+			RunConsoleCommand("spawnmenu_reload") -- npc_igs
 		end
 	end)
 end
