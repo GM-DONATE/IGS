@@ -3,7 +3,11 @@ IGS.cl("cl_init.lua")
 
 function ENT:Initialize()
 	-- self:SetModel("models/props_junk/Shoe001a.mdl") -- ботинок
-	self:SetModel("models/christmas_gift2/christmas_gift2.mdl") -- подарок
+	-- self:SetModel("models/christmas_gift2/christmas_gift2.mdl") -- подарок
+
+	self:SetModel("models/dav0r/hoverball.mdl")
+	self:SetModelScale(1.5)
+	self:SetAngles(Angle(90, 0, 0))
 
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -14,7 +18,7 @@ end
 
 -- Чтобы нельзя было убить NPC
 function ENT:OnTakeDamage()
-    return 0
+	return 0
 end
 
 function ENT:Use(_, caller)
