@@ -55,9 +55,10 @@ concommand.Add("addfunds",function(pl,_,_,argss)
 end)
 
 
-concommand.Add("igsreload", function(pl)
+concommand.Add("igsreload", function(pl, _, args)
 	if pl == NULL then -- console only
-		IGS.sh("igs/launcher.lua")
+		print(args[1]  and "Super Reload" or "Casual Reload")
+		IGS.sh(args[1] and "autorun/l_ingameshop.lua" or "igs/launcher.lua")
 	end
 end)
 
