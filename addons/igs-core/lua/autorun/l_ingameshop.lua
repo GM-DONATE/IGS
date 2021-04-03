@@ -270,7 +270,7 @@ end)
 
 
 
-if not IGS_FORCE_WEB and file.Exists("igs/launcher.lua", "LUA") then
+if file.Exists("igs/launcher.lua", "LUA") and not IGS_FORCE_WEB then
 	print("IGS Загружаемся с lua")
 	IGS.Version = "666"
 	IGS.sh("igs/launcher.lua")
