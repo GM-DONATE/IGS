@@ -30,7 +30,8 @@ function IGS.RawQuery(sMethod, tParams, fOnSuccess, fOnError)
 	end
 
 	-- prt({"Sign: %s" .. IGS.GetSign(tParams), tParams})
-	http.Post("https://gm-donate.ru/api" .. sMethod, tParams, fOnSuccess, fOnError, {
+	local api_url = IGS_API_ENDPOINT or "https://gm-donate.ru/api"
+	http.Post(api_url .. sMethod, tParams, fOnSuccess, fOnError, {
 		sign    = IGS.GetSign(tParams),
 		project = tostring(IGS.C.ProjectID)
 	})
