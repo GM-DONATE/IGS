@@ -34,9 +34,16 @@ local function include_mount(sRealm, sAbsolutePath)
 	if (sRealm == "sh")
 	or (sRealm == "sv" and SERVER)
 	or (sRealm == "cl" and CLIENT) then
+		-- Чистый RunString не воспринимает return внутри файлов
+		-- Но CompileString 9 апреля 2021 теоретически был причиной ошибок
+		-- Пока пусть будет RunString без ретурна
+		-- Заметки: https://t.me/c/1353676159/55852
+
+		-- local executer = CompileString(content, sAbsolutePath)
+		-- return executer()
+
 		local content  = IGS.CODEMOUNT[sAbsolutePath]
-		local executer = CompileString(content, sAbsolutePath)
-		return executer()
+		RunString(content, sAbsolutePath)
 	end
 end
 
