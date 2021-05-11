@@ -11,6 +11,9 @@ local error_no_igsmod =
 	"ABTogoHaT He HacTpoeH: Hy}{Ho ycTaHoBuTb igsmodificator. " ..
 	"(CKa4auTe ero c cauTa gm-donate.ru/panel)"
 
+local error_invalid_credentials =
+	"Не указаны или неверно указаны данные проекта в файле config_sv.lua"
+
 local DELIMITER = "{up}"
 function IGS.GetSign(tParams)
 	local s = ""
@@ -26,6 +29,11 @@ function IGS.RawQuery(sMethod, tParams, fOnSuccess, fOnError)
 
 	if not IGS.C.ProjectKey then
 		IGS.print(Color(255,0,0), error_no_igsmod)
+		return
+	end
+
+	if #IGS.C.ProjectKey ~= 32 or IGS.C.ProjectKey:match("^[a-f0-9]+$") or IGS.C.ProjectID == 0 then
+		IGS.print(Color(255,0,0), error_invalid_credentials)
 		return
 	end
 

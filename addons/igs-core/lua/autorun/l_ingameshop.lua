@@ -18,7 +18,8 @@ local function log(patt, ...)
 end
 
 concommand.Add("igsverbose", function(pl)
-	if IsValid(pl) then return end
+	if SERVER and IsValid(pl) then return end
+
 	local enable = cookie.GetNumber("igsverbose", 0) == 0
 	cookie.Set("igsverbose", enable and 1 or 0)
 	print("IGS Logging now is " .. (enable and "on" or "off"))
@@ -224,7 +225,21 @@ local function findSuperfileUrl(cb, major_version_)
 end
 
 
+local function runAfterhooks()
+	if IGS.HOOKSFIRED then return end
 
+	log("Выполнение 'опоздавших' хуков и spawnmenu_reload")
+	if CLIENT then -- костыль, но другого способа не вижу
+		hook.GetTable()["InitPostEntity"]["IGS.nw.InitPostEntity"]()
+		hook.GetTable()["DarkRPFinishedLoading"]["SupressDarkRPF1"]()
+		RunConsoleCommand("spawnmenu_reload") -- npc_igs
+	else
+		hook.GetTable()["InitPostEntity"]["IGS.PermaSents"]()
+		-- "InitPostEntity", "InitializePermaProps"
+	end
+
+	IGS.HOOKSFIRED = true
+end
 
 local function downloadAndRunCode(url)
 	wrapFetch(url, function(content, _, _, http_code)
@@ -237,11 +252,7 @@ local function downloadAndRunCode(url)
 		IGS.sh("igs/launcher.lua")
 		loadEntities()
 
-		if CLIENT then -- костыль, но другого способа не вижу
-			hook.GetTable()["InitPostEntity"]["IGS.nw.InitPostEntity"]()
-			hook.GetTable()["DarkRPFinishedLoading"]["SupressDarkRPF1"]()
-			RunConsoleCommand("spawnmenu_reload") -- npc_igs
-		end
+		runAfterhooks()
 	end)
 end
 
