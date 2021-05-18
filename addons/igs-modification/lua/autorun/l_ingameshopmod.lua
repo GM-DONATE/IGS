@@ -13,7 +13,7 @@ timer.Simple(0, function()
 	if not Test_RS then print("[IGSmod] RunString doesn't work") end
 	Test_RS = nil
 
-	local blob = IGS_FORCE_VERSION or "main"
+	local blob = cookie.GetString("igsversion") or "main"
 	local repo = IGS_REPO or "GM-DONATE/IGS"
 	http.Fetch("https://raw.githubusercontent.com/" .. repo .. "/" .. blob ..
 		"/addons/igs-core/lua/autorun/l_ingameshop.lua", function(body)
