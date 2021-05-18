@@ -17,4 +17,24 @@ scc.addClientside("IGSDeposit", function(_, arg) IGS.WIN.Deposit(arg) end)
 scc.addClientside("IGSGroup",   function(_, arg) IGS.WIN.Group(arg)   end)
 
 
+
+
 IGS.PermaSaveFeature("npc_igs")
+
+local function runAfterhooks() -- #todo перенести эти выполнения в модули или вызывать локально if CODEMOUNT
+	if (not IGS.CODEMOUNT) or IGS.HOOKSFIRED then return end
+
+	print("Выполнение 'опоздавших' хуков и spawnmenu_reload")
+	if CLIENT then -- костыль, но другого способа не вижу
+		hook.GetTable()["InitPostEntity"]["IGS.nw.InitPostEntity"]()
+		hook.GetTable()["DarkRPFinishedLoading"]["SupressDarkRPF1"]()
+		RunConsoleCommand("spawnmenu_reload") -- npc_igs
+	else
+		hook.GetTable()["InitPostEntity"]["IGS.PermaSents"]()
+		-- "InitPostEntity", "InitializePermaProps"
+	end
+
+	IGS.HOOKSFIRED = true
+end
+
+hook.Add("IGS.Loaded", "afterhooks", runAfterhooks)

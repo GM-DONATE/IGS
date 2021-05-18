@@ -15,34 +15,38 @@ local error_invalid_credentials =
 	"Не указаны или неверно указаны данные проекта в файле config_sv.lua"
 
 local DELIMITER = "{up}"
-function IGS.GetSign(tParams)
+function IGS.GetSign(tParams, secret)
 	local s = ""
 	for _,v in SortedPairs(tParams) do
 		s = s .. tostring(v):Trim() .. DELIMITER
 	end
 
-	return hash.SHA256(s .. IGS.C.ProjectKey)
+	return hash.SHA256(s .. (secret or IGS.C.ProjectKey))
+end
+
+function IGS.DoRequest(project_id, secret, sMethod, tParams, fSucc, fErr)
+	tParams = map(tParams, tostring)
+
+	-- prt({"Sign: %s" .. IGS.GetSign(tParams), tParams})
+	local api_url = IGS_API_ENDPOINT or "https://gm-donate.ru/api"
+	http.Post(api_url .. sMethod, tParams, fSucc, fErr, {
+		sign    = IGS.GetSign(tParams, secret),
+		project = tostring(project_id)
+	})
 end
 
 function IGS.RawQuery(sMethod, tParams, fOnSuccess, fOnError)
-	tParams = map(tParams, tostring)
-
 	if not IGS.C.ProjectKey then
 		IGS.print(Color(255,0,0), error_no_igsmod)
 		return
 	end
 
-	if #IGS.C.ProjectKey ~= 32 or IGS.C.ProjectKey:match("^[a-f0-9]+$") or IGS.C.ProjectID == 0 then
+	if #IGS.C.ProjectKey ~= 32 or not IGS.C.ProjectKey:match("^[a-f0-9]+$") or IGS.C.ProjectID == 0 then
 		IGS.print(Color(255,0,0), error_invalid_credentials)
 		return
 	end
 
-	-- prt({"Sign: %s" .. IGS.GetSign(tParams), tParams})
-	local api_url = IGS_API_ENDPOINT or "https://gm-donate.ru/api"
-	http.Post(api_url .. sMethod, tParams, fOnSuccess, fOnError, {
-		sign    = IGS.GetSign(tParams),
-		project = tostring(IGS.C.ProjectID)
-	})
+	IGS.DoRequest(IGS.C.ProjectID, IGS.C.ProjectKey, sMethod, tParams, fOnSuccess, fOnError)
 end
 
 local function wrapResponse(sMethod, tParams, fOnSuccess, fOnError)

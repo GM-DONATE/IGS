@@ -1,14 +1,8 @@
 --[[-------------------------------------------------------------------------
-	Веб загрузчик IGS 13.03.2021, _AMD_ (c)
-	Кода мало, писался долго и здесь еще многому предстоит измениться
-
-	Изначально эта задача представлялась в 3 строки,
-		но в проекте до начала реализации накопилось несколько десятков нюансов,
-		которые четырежды в корне изменяли подход к реализации
-
-	Когда-нибудь возможно я даже расскажу в блоге несколько моментов
+	Веб загрузчик IGS 13.03.2021
+	https://blog.amd-nick.me/github-workshop-garrysmod/
+	Изначально эта задача представлялась в 3 строки
 ---------------------------------------------------------------------------]]
-
 IGS = IGS or {}
 
 local function log(patt, ...)
@@ -176,8 +170,6 @@ local function filter(arr, f)
 	return t
 end
 
--- #todo вынести check updates в другое место и не заниматься этим здесь
--- это говнит и без того запашной код
 local function findSuperfileUrl(cb, major_version_)
 	log("Ищем ссылку для скачивания %s", major_version_ or "последней версии")
 	local repo = IGS_REPO or "GM-DONATE/IGS"
@@ -215,30 +207,13 @@ local function findSuperfileUrl(cb, major_version_)
 			if asset.name == "superfile.txt" then
 				local superfile_url = asset.browser_download_url
 				log("Нашли версию %s. Ссылка: %s", found.tag_name, superfile_url)
-				cb(superfile_url, found, freshest_version)
+				cb(superfile_url, found)
 				return
 			end
 		end
 
 		print("IGS Не может найти superfile в дополнениях к релизу")
 	end)
-end
-
-
-local function runAfterhooks()
-	if IGS.HOOKSFIRED then return end
-
-	log("Выполнение 'опоздавших' хуков и spawnmenu_reload")
-	if CLIENT then -- костыль, но другого способа не вижу
-		hook.GetTable()["InitPostEntity"]["IGS.nw.InitPostEntity"]()
-		hook.GetTable()["DarkRPFinishedLoading"]["SupressDarkRPF1"]()
-		RunConsoleCommand("spawnmenu_reload") -- npc_igs
-	else
-		-- hook.GetTable()["InitPostEntity"]["IGS.PermaSents"]()
-		-- "InitPostEntity", "InitializePermaProps"
-	end
-
-	IGS.HOOKSFIRED = true
 end
 
 local function downloadAndRunCode(url)
@@ -251,33 +226,20 @@ local function downloadAndRunCode(url)
 		IGS.CODEMOUNT = parseSuperfile(content)
 		IGS.sh("igs/launcher.lua")
 		loadEntities()
-
-		runAfterhooks()
 	end)
 end
 
-local function announceNewVersion(new_version)
-	timer.Create("igs_new_version_announce", 10, 5, function()
-		local repo = IGS_REPO or "GM-DONATE/IGS"
-		local info_url = "https://github.com/" .. repo .. "/releases/tag/" .. math.floor(new_version)
-		print("IGS Доступна новая версия: " .. new_version .. "\nИнформация здесь: " .. info_url)
-	end)
-end
 
-local function loadFromWeb() -- #todo да убрать бля отсюда проверку обновлений
-	findSuperfileUrl(function(url, found, freshest_version)
+
+local function loadFromWeb()
+	findSuperfileUrl(function(url, found)
 		local ver = found.tag_name
 		cookie.Set("igsversion", ver)
 		-- local url, ver = "https://pastebin.com/raw/EYw95gsp", "200125"
 		IGS.CODEURL = url
 		IGS.Version = ver
 		downloadAndRunCode(url)
-
-		local has_updates = tonumber(freshest_version.tag_name) > tonumber(found.tag_name)
-		if has_updates then
-			announceNewVersion(freshest_version.tag_name)
-		end
-	end, IGS_FORCE_VERSION or cookie.GetString("igsversion"))
+	end, cookie.GetString("igsversion"))
 end
 
 concommand.Add("igsflushversion", function(pl)
@@ -323,7 +285,3 @@ else
 		end)
 	end)
 end
-
-
-
-

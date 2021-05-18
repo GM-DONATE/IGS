@@ -116,3 +116,37 @@ hook.Add("IGS.PaymentStatusUpdated","IGS.BroadcastCharge",function(pl,dat)
 		IGS.Notify(pl,"Мы можем помочь. Просто напишите нам gm-donate.ru/support")
 	end
 end)
+
+
+
+--[[-------------------------------------------------------------------------
+	Поиск новых версий
+---------------------------------------------------------------------------]]
+local function announceNewVersion(new_version)
+	timer.Create("igs_new_version_announce", 10, 5, function()
+		local repo = IGS_REPO or "GM-DONATE/IGS"
+		local info_url = "https://github.com/" .. repo .. "/releases/tag/" .. math.floor(new_version)
+		print("IGS Доступна новая версия: " .. new_version .. ". Установлена: " .. IGS.Version .. "\nИнформация здесь: " .. info_url)
+	end)
+end
+
+hook.Add("IGS.Initialized", "check_updates", function()
+	local repo = IGS_REPO or "GM-DONATE/IGS"
+	http.Fetch("https://api.github.com/repos/" .. repo .. "/releases", function(json)
+		local releases = util.JSONToTable(json)
+		if not releases[1] then print("IGS No releases") return end -- fork
+
+		table.sort(releases, function(a, b)
+			return tonumber(a.tag_name) > tonumber(b.tag_name)
+		end)
+
+		local freshest_version = math.floor(releases[1].tag_name)
+		local current_version  = math.floor(IGS.Version)
+
+		if freshest_version > current_version then
+			announceNewVersion(freshest_version)
+		end
+	end)
+end)
+-- hook.GetTable()["IGS.Initialized"]["check_updates"]()
+
