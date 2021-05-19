@@ -37,4 +37,5 @@ local function runAfterhooks() -- #todo перенести эти выполне
 	IGS.HOOKSFIRED = true
 end
 
+-- IGS.Loaded выполняется при условии IGS.nw.InitPostEntity
 hook.Add("IGS.Initialized", "afterhooks", runAfterhooks)

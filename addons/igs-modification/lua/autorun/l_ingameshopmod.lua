@@ -35,5 +35,5 @@ end)
 -- https://t.me/c/1353676159/55836
 hook.Add("IGS.Initialized", "IGS.MeasureLoadingTime", function()
 	print("[IGSmod] От скачивания до загрузки IGS прошло " .. (SysTime() - IGS_START_LOADING) .. " сек")
-	hook.Remove("IGS.Initialized", "IGS.MeasureLoadingTime")
+	-- hook.Remove("IGS.Initialized", "IGS.MeasureLoadingTime") -- hook либа от plib перестает выполнять следующие хуки из-за такого
 end)

@@ -33,8 +33,8 @@ end
 
 function IGS.PermaSaveFeature(class)
 	properties.Add(class .. "_perma_add", {
-		MenuLabel = "Сохранить",
-		Order = 999,
+		MenuLabel = "Сохранить на карте",
+		Order = 855,
 		MenuIcon = "icon16/bullet_disk.png",
 
 		Filter = function(self, ent, pl)
@@ -64,8 +64,8 @@ function IGS.PermaSaveFeature(class)
 	})
 
 	properties.Add(class .. "_perma_delete", {
-		MenuLabel = "Удалить",
-		Order = 999,
+		MenuLabel = "Удалить с карты",
+		Order = 856,
 		MenuIcon = "icon16/bin_closed.png",
 
 		Filter = function(self, ent, pl)
@@ -96,7 +96,14 @@ function IGS.PermaSaveFeature(class)
 end
 
 if SERVER then
-	hook.Add("InitPostEntity", "IGS.PermaSents", function()
+	hook.Add("IGS.Loaded", "IGS.PermaSents", function()
+	timer.Simple(20, function()
+		for _, ent in ipairs(ents.GetAll()) do
+			if ent.permaSentUID then
+				ent:Remove()
+			end
+		end
+
 		local map = getIndex()
 		for uid,class in pairs(map) do
 			if not scripted_ents.GetStored(class) then
@@ -110,5 +117,6 @@ if SERVER then
 
 			print("IGS.PermaSents: Заспавнили " .. class)
 		end
+	end)
 	end)
 end
