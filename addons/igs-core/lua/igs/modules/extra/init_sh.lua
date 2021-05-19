@@ -37,4 +37,4 @@ local function runAfterhooks() -- #todo перенести эти выполне
 	IGS.HOOKSFIRED = true
 end
 
-hook.Add("IGS.Loaded", "afterhooks", runAfterhooks)
+hook.Add("IGS.Initialized", "afterhooks", runAfterhooks)
