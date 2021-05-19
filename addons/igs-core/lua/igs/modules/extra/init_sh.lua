@@ -29,8 +29,8 @@ local function runAfterhooks() -- #todo перенести эти выполне
 		hook.GetTable()["InitPostEntity"]["IGS.nw.InitPostEntity"]()
 		hook.GetTable()["DarkRPFinishedLoading"]["SupressDarkRPF1"]()
 		RunConsoleCommand("spawnmenu_reload") -- npc_igs
-	else
-		hook.GetTable()["InitPostEntity"]["IGS.PermaSents"]()
+	-- else
+		-- hook.GetTable()["InitPostEntity"]["IGS.PermaSents"]()
 		-- "InitPostEntity", "InitializePermaProps"
 	end
 
