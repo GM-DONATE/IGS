@@ -22,7 +22,7 @@ jobs:
     - id: superfile
       run: |
         cd luapack
-        lua main.lua ../addons/igs-core/lua superfile.txt
+        lua main.lua ../addons/igs-core/lua superfile.json
     - id: igsmod
       run: |
         cd addons
@@ -34,7 +34,7 @@ jobs:
         draft: true
         prerelease: false
         files: |
-          luapack/superfile.txt
+          luapack/superfile.json
           addons/igs-mod.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
