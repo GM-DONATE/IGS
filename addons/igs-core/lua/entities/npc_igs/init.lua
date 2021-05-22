@@ -2,7 +2,7 @@ IGS.sh("shared.lua")
 IGS.cl("cl_init.lua")
 
 function ENT:Initialize()
-	self:SetModel("models/gman_high.mdl")
+	self:SetModel(IGS_NPC_MODEL or "models/gman_high.mdl")
 	self:SetHullType( HULL_HUMAN )
 	self:SetHullSizeNormal()
 	self:SetSolid( SOLID_BBOX )
@@ -28,4 +28,3 @@ function ENT:AcceptInput(name, activator, pl, data)
 		self:PlayerUse(pl)
 	end
 end
-

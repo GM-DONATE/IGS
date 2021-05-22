@@ -1,5 +1,3 @@
-CreateConVar("igs_version", IGS.Version, FCVAR_NOTIFY)
-
 --[[-------------------------------------------------------------------------
 	Чат команды
 ---------------------------------------------------------------------------]]
@@ -55,9 +53,10 @@ concommand.Add("addfunds",function(pl,_,_,argss)
 end)
 
 
-concommand.Add("igsreload", function(pl)
+concommand.Add("igsreload", function(pl, _, args)
 	if pl == NULL then -- console only
-		IGS.sh("igs/launcher.lua")
+		print(args[1]  and "Super Reload" or "Casual Reload")
+		IGS.sh(args[1] and "autorun/l_ingameshop.lua" or "igs/launcher.lua")
 	end
 end)
 
@@ -114,4 +113,36 @@ hook.Add("IGS.PaymentStatusUpdated","IGS.BroadcastCharge",function(pl,dat)
 		IGS.Notify(pl,"Похоже, у вас возникла ошибка в процессе пополнения счета")
 		IGS.Notify(pl,"Мы можем помочь. Просто напишите нам gm-donate.ru/support")
 	end
+end)
+
+
+
+--[[-------------------------------------------------------------------------
+	Поиск новых версий
+---------------------------------------------------------------------------]]
+local function announceNewVersion(new_version)
+	timer.Create("igs_new_version_announce", 10, 5, function()
+		local repo = IGS_REPO or "GM-DONATE/IGS"
+		local info_url = "https://github.com/" .. repo .. "/releases/tag/" .. math.floor(new_version)
+		print("IGS Доступна новая версия: " .. new_version .. ". Установлена: " .. IGS.Version .. "\nИнформация здесь: " .. info_url)
+	end)
+end
+
+timer.Simple(10, function() -- http.Fetch
+	local repo = IGS_REPO or "GM-DONATE/IGS"
+	http.Fetch("https://api.github.com/repos/" .. repo .. "/releases", function(json)
+		local releases = util.JSONToTable(json)
+		if not releases[1] then print("IGS No releases") return end -- fork
+
+		table.sort(releases, function(a, b)
+			return tonumber(a.tag_name) > tonumber(b.tag_name)
+		end)
+
+		local freshest_version = math.floor(releases[1].tag_name)
+		local current_version  = math.floor(IGS.Version)
+
+		if freshest_version > current_version then
+			announceNewVersion(freshest_version)
+		end
+	end)
 end)

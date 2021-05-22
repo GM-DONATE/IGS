@@ -1,7 +1,0 @@
-{
-	"title": "InGameShop Core",
-	"type": "tool",
-	"tags": [ "fun" ],
-	"description": "Make your own ingame shop",
-	"ignore": ["*.MD","*.txt"]
-}

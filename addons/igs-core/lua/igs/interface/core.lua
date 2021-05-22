@@ -52,6 +52,11 @@ function IGS.UI()
 		return
 	end
 
+	if not IGS.C then -- Проблема AddCSLua. В консоли клиента должны быть ошибки инклюда нескольких базовых файлов
+		LocalPlayer():ChatPrint("[IGS] Автодонат установлен неправильно. Сообщите администрации")
+		return
+	end
+
 	if IsValid(mf) then
 		if not mf:IsVisible() then
 			IGS.ShowUI()

@@ -6,7 +6,6 @@ IGS.ITEMS.ULX = IGS.ITEMS.ULX or {
 
 local STORE_ITEM = FindMetaTable("IGSItem")
 
--- #todo iGroupWeight удалить. Смотреть по индексу при добавлении
 function STORE_ITEM:SetULXGroup(sUserGroup, iGroupWeight)
 	self:SetCanActivate(function(pl) -- invDbID
 		if pl:IsUserGroup(sUserGroup) then
@@ -95,6 +94,7 @@ local function checkPermissions(pl)
 	end
 end
 
+timer.Simple(.1, function() -- чтобы этот хук обязательно был после RestorePex. История ВК 20 мая с Антон Панченко
 hook.Add("IGS.PlayerPurchasesLoaded", "ULXGroupsAndPEX", function(pl)
 	if next(IGS.ITEMS.ULX.GROUPS) then
 		checkGroups(pl)
@@ -103,4 +103,5 @@ hook.Add("IGS.PlayerPurchasesLoaded", "ULXGroupsAndPEX", function(pl)
 	if next(IGS.ITEMS.ULX.PEX) then
 		checkPermissions(pl)
 	end
+end, HOOK_HIGH)
 end)

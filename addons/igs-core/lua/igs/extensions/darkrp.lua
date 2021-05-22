@@ -76,3 +76,20 @@ hook.Add("playerCanChangeTeam", "IGS", function(pl, iTeam, bForce)
 		return allow or tobool(ITEM), message or "Это для донатеров (/donate)"
 	end
 end)
+
+
+-- Hunger
+function STORE_ITEM:DisablePlayerHunger()
+	return self:SetInstaller(function(pl)
+		pl.igs_disable_hunger = true
+	end):SetValidator(function(pl)
+		return false
+	end)
+end
+
+hook.Add("hungerUpdate", "IGS", function(pl)
+	if pl.igs_disable_hunger then
+		pl:setSelfDarkRPVar("Energy", 100)
+		return true
+	end
+end)
