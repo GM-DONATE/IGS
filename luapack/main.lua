@@ -1,3 +1,6 @@
+require("file")
+require("stringex")
+
 local source, save_to = arg[1], arg[2]
 source, save_to = source or "source/lua/igs", save_to or "superfile.json"
 
