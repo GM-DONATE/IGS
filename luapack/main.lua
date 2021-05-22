@@ -1,13 +1,16 @@
-require("pack")
-
 local source, save_to = arg[1], arg[2]
-source, save_to = source or "source/lua/igs", save_to or "superfile.txt"
+source, save_to = source or "source/lua/igs", save_to or "superfile.json"
 
 
-print("Files minification")
-local targ_dir = "minified"
-pack.minifyAndSaveFolder(source, targ_dir)
+local superfile = {}
 
-print("Creating " .. save_to)
-local content = pack.compileSuperfile(targ_dir)
-file.AdvWrite(save_to, content)
+local index = file.Index(source)
+for _,path in ipairs(index) do
+	local pref_pat  = string.PatternSafe(source)
+	local path_sub = path:match(pref_pat .. "/(.+)$")
+	superfile[path_sub] = file.Read(path)
+end
+
+local json = require("json")
+local superfile_json = json.stringify(superfile)
+file.AdvWrite(save_to, superfile_json)
