@@ -31,7 +31,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         body: ${{steps.changelog.outputs.changelog}}
-        draft: true
+        #draft: true
         prerelease: false
         files: |
           luapack/superfile.json
