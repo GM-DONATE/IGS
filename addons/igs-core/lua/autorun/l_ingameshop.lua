@@ -147,6 +147,10 @@ concommand.Add("igsflushversion", function(pl)
 	print("OK. После перезагрузки сервер скачает новую версию")
 end)
 
+-- загрузка с файлов, а не лоадером
+if GetConVarString("igs_version") == "" then
+	GetConVar("igs_version"):SetString("777")
+end
 
 IGS.sh("igs/launcher.lua")
 IGS.load_entities()

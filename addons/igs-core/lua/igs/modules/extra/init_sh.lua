@@ -38,4 +38,6 @@ local function runAfterhooks() -- #todo перенести эти выполне
 end
 
 -- IGS.Loaded выполняется при условии IGS.nw.InitPostEntity
-hook.Add("IGS.Initialized", "afterhooks", runAfterhooks)
+hook.Add("IGS.Initialized", "afterhooks", function()
+	timer.Simple(.1, runAfterhooks) -- энтити грузятся вроде шагом позже
+end)

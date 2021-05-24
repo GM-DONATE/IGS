@@ -1,12 +1,11 @@
-if file.Exists("igs/launcher.lua", "LUA") and not IGS_FORCE_WEB then return end
+file.CreateDir("igs")
+local igs_version = CreateConVar("igs_version", "", {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE})
 
 -- Вы можете сделать форк основного репозитория, сделать там изменения и указать его имя здесь
 -- Таким образом IGS будет грузиться у всех с вашего репозитория
--- IGS_REPO = "AMD-NICK/IGS-1"
+IGS_REPO = "AMD-NICK/IGS-1" -- "GM-DONATE/IGS"
+if not IGS_REPO then return end -- force lua
 
-
-file.CreateDir("igs")
-local igs_version = CreateConVar("igs_version", "", {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE})
 
 local function checkRunString()
 	RunString("IGS_Test_RS = true", "IGS_Test_RS")
@@ -28,10 +27,7 @@ local function wrapFetch(url, cb)
 end
 
 local function getSuperfileUrl(version)
-	local ver  = cookie.GetString("igsversion")
-	local repo = IGS_REPO or "GM-DONATE/IGS"
-	local url  = "https://github.com/" .. repo .. "/releases/" .. ver .. "/download/superfile.txt"
-	return url
+	return "https://github.com/" .. IGS_REPO .. "/releases/download/" .. version .. "/superfile.json"
 end
 
 local function downloadSuperfile(version, cb)
@@ -52,12 +48,12 @@ local function loadFromFile(superfile)
 
 	local path  = "autorun/l_ingameshop.lua"
 	IGS_MOUNT = util.JSONToTable(superfile)
+	assert(IGS_MOUNT and IGS_MOUNT[path], "Ошибка загрузки superfile. Удалите /data/superfile.txt и попробуйте снова")
 	RunString(IGS_MOUNT[path], path)
 end
 
 local function findFreshestVersion(cb)
-	local repo = IGS_REPO or "GM-DONATE/IGS"
-	wrapFetch("https://api.github.com/repos/" .. repo .. "/releases", function(json)
+	wrapFetch("https://api.github.com/repos/" .. IGS_REPO .. "/releases", function(json)
 		local releases = util.JSONToTable(json)
 		table.sort(releases, function(a, b) -- свежайшие версии сначала
 			return tonumber(a.tag_name) > tonumber(b.tag_name)
