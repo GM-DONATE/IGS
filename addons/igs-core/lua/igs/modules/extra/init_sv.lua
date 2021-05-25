@@ -120,15 +120,6 @@ end)
 --[[-------------------------------------------------------------------------
 	Поиск новых версий
 ---------------------------------------------------------------------------]]
-local function announceNewVersion(new_version, current)
-	timer.Create("igs_new_version_announce", 10, 5, function()
-		local info_url = "https://github.com/" .. IGS_REPO .. "/releases/tag/" .. math.floor(new_version)
-		print("IGS Доступна новая версия: " .. new_version .. ". Установлена: " .. current .. "\nИнформация здесь: " .. info_url)
-	end)
-end
-
-
-
 timer.Simple(1, function() -- http.Fetch
 	print("IGS Поиск обновлений")
 	if not IGS_REPO then return end
@@ -145,7 +136,8 @@ timer.Simple(1, function() -- http.Fetch
 		local current_version  = math.floor(current_tag)
 
 		if freshest_version > current_version then
-			announceNewVersion(freshest_version, current_version)
+			local info_url = "https://github.com/" .. IGS_REPO .. "/releases/tag/" .. math.floor(freshest_version)
+			print("IGS Доступна новая версия: " .. freshest_version .. ". Установлена: " .. current_version .. "\nИнформация здесь: " .. info_url)
 		else
 			print("IGS Major обновлений нет")
 		end
