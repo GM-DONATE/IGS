@@ -141,9 +141,9 @@ function IGS.load_entities()
 end
 
 
-concommand.Add("igsflushversion", function(pl)
+concommand.Add("igs_flushversion", function(pl)
 	if IsValid(pl) then print("console only") return end
-	cookie.Set("igsversion", nil)
+	cookie.Set("igs_version", nil)
 	print("OK. После перезагрузки сервер скачает новую версию")
 end)
 

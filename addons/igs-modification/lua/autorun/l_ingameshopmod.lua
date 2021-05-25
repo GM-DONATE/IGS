@@ -38,13 +38,13 @@ local function loadFromFile(superfile)
 	checkRunString()
 
 	if SERVER then
-		local version = cookie.GetString("igsversion")
+		local version = cookie.GetString("igs_version")
 		igs_version:SetString(version)
 	end
 
 	local path  = "autorun/l_ingameshop.lua"
 	IGS_MOUNT = util.JSONToTable(superfile)
-	assert(IGS_MOUNT and IGS_MOUNT[path], "Ошибка загрузки superfile. Удалите /data/superfile.txt и попробуйте снова")
+	assert(IGS_MOUNT and IGS_MOUNT[path], "Ошибка загрузки superfile. Удалите /data/superfile.txt и попробуйте снова или обратитесь в gm-donate.ru/support")
 	RunString(IGS_MOUNT[path], path)
 end
 
@@ -64,14 +64,14 @@ end
 
 if SERVER then
 	local superfile = file.Read("igs/superfile.txt")
-	local version   = cookie.GetString("igsversion")
+	local version   = cookie.GetString("igs_version")
 
 	if superfile and version then -- 2 может не быть, если сервер перенесли без sv.db
 		loadFromFile(superfile)
 
 	elseif not version then
 		findFreshestVersion(function(freshest_version)
-			cookie.Set("igsversion", freshest_version)
+			cookie.Set("igs_version", freshest_version)
 			downloadSuperfile(freshest_version, loadFromFile)
 		end)
 

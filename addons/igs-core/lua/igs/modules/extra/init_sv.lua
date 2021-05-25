@@ -157,7 +157,7 @@ timer.Simple(1, function() -- http.Fetch
 			http.Fetch(url, function(superfile)
 				print("IGS Обновление загружено. Перезагрузите сервер для применения")
 				file.Write("igs/superfile.txt", superfile)
-				cookie.Set("igsversion", freshest_suitable)
+				cookie.Set("igs_version", freshest_suitable)
 			end, error)
 		else
 			print("IGS  Soft обновлений нет")
