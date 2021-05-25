@@ -138,7 +138,7 @@ local function IGS_Activate(pl, invDbID, cb)
 
 	local INVITEM = IGS.Inventory(pl,"map")[invDbID]
 	if not INVITEM then -- если чел резко дважды кнопку нажал
-		cb(nil, "Предмет уже активирован")
+		cb(nil, "Предмет уже активирован. ID: " .. tostring(invDbID))
 		return
 	end
 
