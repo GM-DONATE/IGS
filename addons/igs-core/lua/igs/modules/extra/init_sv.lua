@@ -1,5 +1,3 @@
-CreateConVar("igs_version", IGS.Version, FCVAR_NOTIFY)
-
 --[[-------------------------------------------------------------------------
 	Чат команды
 ---------------------------------------------------------------------------]]
@@ -122,31 +120,47 @@ end)
 --[[-------------------------------------------------------------------------
 	Поиск новых версий
 ---------------------------------------------------------------------------]]
-local function announceNewVersion(new_version)
-	timer.Create("igs_new_version_announce", 10, 5, function()
-		local repo = IGS_REPO or "GM-DONATE/IGS"
-		local info_url = "https://github.com/" .. repo .. "/releases/tag/" .. math.floor(new_version)
-		print("IGS Доступна новая версия: " .. new_version .. ". Установлена: " .. IGS.Version .. "\nИнформация здесь: " .. info_url)
-	end)
-end
-
-hook.Add("IGS.Initialized", "check_updates", function()
-	local repo = IGS_REPO or "GM-DONATE/IGS"
-	http.Fetch("https://api.github.com/repos/" .. repo .. "/releases", function(json)
+timer.Simple(1, function() -- http.Fetch
+	print("IGS Поиск обновлений")
+	if not IGS_REPO then return end
+	http.Fetch("https://api.github.com/repos/" .. IGS_REPO .. "/releases", function(json)
 		local releases = util.JSONToTable(json)
-		if not releases[1] then print("IGS No releases") return end -- fork
+		assert(releases[1], "Релизов нет. Нужно запустить CI") -- форк
 
 		table.sort(releases, function(a, b)
 			return tonumber(a.tag_name) > tonumber(b.tag_name)
 		end)
 
+		local current_tag      = GetConVarString("igs_version")
 		local freshest_version = math.floor(releases[1].tag_name)
-		local current_version  = math.floor(IGS.Version)
+		local current_version  = math.floor(current_tag)
 
 		if freshest_version > current_version then
-			announceNewVersion(freshest_version)
+			local info_url = "https://github.com/" .. IGS_REPO .. "/releases/tag/" .. math.floor(freshest_version)
+			print("IGS Доступна новая версия: " .. freshest_version .. ". Установлена: " .. current_version .. "\nИнформация здесь: " .. info_url)
+		else
+			print("IGS Major обновлений нет")
 		end
-	end)
-end)
--- hook.GetTable()["IGS.Initialized"]["check_updates"]()
 
+		local freshest_suitable
+		for _,release in ipairs(releases) do -- от свежайших
+			if current_tag == release.tag_name then break end -- 123.1 current and 123.1 suitable
+			if math.floor(release.tag_name) == current_version then
+				freshest_suitable = release.tag_name
+				break
+			end
+		end
+
+		if freshest_suitable then
+			print("IGS Найдено новое soft обновление. Текущая версия, новая:", current_tag, freshest_suitable)
+			local url = "https://github.com/" .. IGS_REPO .. "/releases/download/" .. freshest_suitable .. "/superfile.json"
+			http.Fetch(url, function(superfile)
+				print("IGS Обновление загружено. Перезагрузите сервер для применения")
+				file.Write("igs/superfile.txt", superfile)
+				cookie.Set("igsversion", freshest_suitable)
+			end, error)
+		else
+			print("IGS  Soft обновлений нет")
+		end
+	end, error)
+end)

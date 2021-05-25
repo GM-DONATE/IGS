@@ -31,7 +31,7 @@ end
 local function onReady()
 	IGS.SERVERS.Broadcast()
 	hook.Run("IGS.ServersLoaded")
-	IGS.SetServerVersion(IGS.Version)
+	IGS.SetServerVersion(GetConVarString("igs_version"))
 end
 
 local function addServerLocally(id, serv_name, enabled)

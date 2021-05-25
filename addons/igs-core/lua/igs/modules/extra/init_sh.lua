@@ -22,7 +22,7 @@ scc.addClientside("IGSGroup",   function(_, arg) IGS.WIN.Group(arg)   end)
 IGS.PermaSaveFeature("npc_igs")
 
 local function runAfterhooks() -- #todo перенести эти выполнения в модули или вызывать локально if CODEMOUNT
-	if (not IGS.CODEMOUNT) or IGS.HOOKSFIRED then return end
+	if (not IGS_MOUNT) or IGS.HOOKSFIRED then return end
 
 	print("Выполнение 'опоздавших' хуков и spawnmenu_reload")
 	if CLIENT then -- костыль, но другого способа не вижу
@@ -38,4 +38,6 @@ local function runAfterhooks() -- #todo перенести эти выполне
 end
 
 -- IGS.Loaded выполняется при условии IGS.nw.InitPostEntity
-hook.Add("IGS.Initialized", "afterhooks", runAfterhooks)
+hook.Add("IGS.Initialized", "afterhooks", function()
+	timer.Simple(.1, runAfterhooks) -- энтити грузятся вроде шагом позже
+end)

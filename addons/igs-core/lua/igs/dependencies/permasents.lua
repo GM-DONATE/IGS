@@ -97,7 +97,7 @@ end
 
 if SERVER then
 	hook.Add("IGS.Loaded", "IGS.PermaSents", function()
-	timer.Simple(20, function()
+	timer.Simple(30, function()
 		for _, ent in ipairs(ents.GetAll()) do
 			if ent.permaSentUID then
 				ent:Remove()

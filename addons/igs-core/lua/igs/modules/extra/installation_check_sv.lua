@@ -7,7 +7,7 @@ local function isWorkshopped(path)
 end
 
 local function isDownloaded(path)
-	return IGS.CODEMOUNT and IGS.CODEMOUNT[path]
+	return IGS_MOUNT and IGS_MOUNT[path]
 end
 
 
