@@ -159,7 +159,7 @@ timer.Simple(1, function() -- http.Fetch
 		end
 
 		if freshest_suitable then
-			print("IGS Найдено новое soft обновление. Текущая версия, новая:", current_version, freshest_suitable)
+			print("IGS Найдено новое soft обновление. Текущая версия, новая:", current_tag, freshest_suitable)
 			local url = "https://github.com/" .. IGS_REPO .. "/releases/download/" .. freshest_suitable .. "/superfile.json"
 			http.Fetch(url, function(superfile)
 				print("IGS Обновление загружено. Перезагрузите сервер для применения")
