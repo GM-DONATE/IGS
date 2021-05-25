@@ -168,7 +168,7 @@ timer.Simple(1, function() -- http.Fetch
 				cookie.Set("igsversion", freshest_suitable)
 			end, error)
 		else
-			print("IGS Нет версий для фонового обновления")
+			print("IGS  Soft обновлений нет")
 		end
 	end, error)
 end)
