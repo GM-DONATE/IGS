@@ -140,8 +140,9 @@ timer.Simple(1, function() -- http.Fetch
 			return tonumber(a.tag_name) > tonumber(b.tag_name)
 		end)
 
+		local current_tag      = GetConVarString("igs_version")
 		local freshest_version = math.floor(releases[1].tag_name)
-		local current_version  = math.floor(GetConVarString("igs_version"))
+		local current_version  = math.floor(current_tag)
 
 		if freshest_version > current_version then
 			announceNewVersion(freshest_version, current_version)
@@ -151,7 +152,7 @@ timer.Simple(1, function() -- http.Fetch
 
 		local freshest_suitable
 		for _,release in ipairs(releases) do -- от свежайших
-			if math.floor(release.tag_name) == current_version then
+			if current_tag ~= release.tag_name and math.floor(release.tag_name) == current_version then
 				freshest_suitable = release.tag_name
 				break
 			end
@@ -170,7 +171,3 @@ timer.Simple(1, function() -- http.Fetch
 		end
 	end, error)
 end)
-
-
-
-

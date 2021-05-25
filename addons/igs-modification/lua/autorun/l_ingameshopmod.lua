@@ -13,7 +13,7 @@ local function checkRunString()
 	IGS_Test_RS = nil
 end
 
-checkRunString()
+checkRunString() -- сразу может быть, а потом пропасть
 
 
 
@@ -26,12 +26,8 @@ local function wrapFetch(url, cb)
 	end)
 end
 
-local function getSuperfileUrl(version)
-	return "https://github.com/" .. IGS_REPO .. "/releases/download/" .. version .. "/superfile.json"
-end
-
 local function downloadSuperfile(version, cb)
-	local url = getSuperfileUrl(version)
+	local url = "https://github.com/" .. IGS_REPO .. "/releases/download/" .. version .. "/superfile.json"
 	wrapFetch(url, function(superfile)
 		file.Write("igs/superfile.txt", superfile)
 		cb(superfile)
