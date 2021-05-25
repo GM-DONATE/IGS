@@ -18,11 +18,6 @@ function string.PatternSafe(str)
 	return (string.gsub(str, ".", pattern_escape_replacements))
 end
 
-function string.TrimRight(s, char)
-	if char then char = string.PatternSafe(char) else char = "%s" end
-	return string.match(s, "^(.-)" .. char .. "*$") or s
-end
-
 function string.Explode(separator, str, withpattern)
 	if separator == "" then return string.ToTable(str) end
 	if withpattern == nil then withpattern = false end
@@ -46,8 +41,3 @@ function string.Split(str, delimiter)
 	return string.Explode(delimiter, str)
 end
 
-function string.Replace(str, tofind, toreplace)
-	local tbl = string.Explode(tofind, str)
-	if tbl[1] then return table.concat(tbl, toreplace) end
-	return str
-end
