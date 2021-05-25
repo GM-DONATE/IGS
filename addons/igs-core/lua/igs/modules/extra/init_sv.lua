@@ -152,7 +152,8 @@ timer.Simple(1, function() -- http.Fetch
 
 		local freshest_suitable
 		for _,release in ipairs(releases) do -- от свежайших
-			if current_tag ~= release.tag_name and math.floor(release.tag_name) == current_version then
+			if current_tag == release.tag_name then break end -- 123.1 current and 123.1 suitable
+			if math.floor(release.tag_name) == current_version then
 				freshest_suitable = release.tag_name
 				break
 			end
