@@ -168,7 +168,7 @@ timer.Simple(1, function() -- http.Fetch
 				cookie.Set("igsversion", freshest_suitable)
 			end, error)
 		else
-			print("IGS Не может найти версию для фонового обновления. Обратитесь в gm-donate.ru/support")
+			print("IGS Нет версий для фонового обновления")
 		end
 	end, error)
 end)
