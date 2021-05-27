@@ -74,12 +74,13 @@ local function loadTab(activity,sidebar,dat)
 				act_btn:SetActive(true)
 				act_btn:SetText("Активировать")
 
-				-- if !IGS.C.Inv_AllowDrop then return end
-				IGS.AddButton(bg.side,"Бросить на пол",function()
-					IGS.DropItem(dbID,function()
-						removeFromCanvas(item)
+				if IGS.C.Inv_AllowDrop then
+					IGS.AddButton(bg.side,"Бросить на пол",function()
+						IGS.DropItem(dbID,function()
+							removeFromCanvas(item)
+						end)
 					end)
-				end)
+				end
 			end
 		end
 
