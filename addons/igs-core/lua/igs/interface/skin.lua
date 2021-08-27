@@ -31,6 +31,33 @@ IGS.S.COLORS = {
 	ICON                = Color(255,255,255), -- цвет иконок на плашечках
 }
 
+-- Вариант раскраски от Павел Тумачев (vk.com/id240371602)
+-- Демо: https://img.qweqwe.ovh/1626714494454.jpg
+-- IGS.S.COLORS = {
+-- 	FRAME_HEADER        = Color(0,0,0),
+-- 	ACTIVITY_BG         = Color(10,10,10,180),
+-- 	TAB_BAR             = Color(0,0,0),
+
+-- 	PASSIVE_SELECTIONS  = Color(0,0,0),
+-- 	INNER_SELECTIONS    = Color(0,0,0),
+
+-- 	SOFT_LINE           = Color(51,128,255),
+-- 	HARD_LINE           = Color(51,128,255),
+
+-- 	HIGHLIGHTING        = Color(51,128,255),
+-- 	HIGHLIGHT_INACTIVE  = Color(255,255,255),
+
+-- 	TEXT_HARD           = Color(255,255,255),
+-- 	TEXT_SOFT           = Color(255,255,255),
+-- 	TEXT_ON_HIGHLIGHT   = Color(255,255,255),
+
+-- 	LOG_SUCCESS         = Color(76,217,100),
+-- 	LOG_ERROR           = Color(255,45,85),
+-- 	LOG_NORMAL          = Color(255,255,255),
+
+-- 	ICON                = Color(255,255,255),
+-- }
+
 -- Попытки сделать темный скин интерфейса
 -- IGS.S.COLORS = {
 -- 	FRAME_HEADER        = Color(23,23,23),

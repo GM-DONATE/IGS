@@ -140,3 +140,24 @@ function STORE_ITEM:SetItems(tItems) -- IGS.C.Inv_Enabled
 end
 -- local ITEM = IGS("Тайный предмет", "secret", -10):SetStackable():SetHidden():SetOnActivate(fp{PRINT, "YEAH!!"})
 -- IGS("2 тайных предмета", "secret_2", 5):SetStackable():SetItems({ITEM, ITEM})
+
+
+
+
+--[[-------------------------------------------------------------------------
+	Секция с возможным перемещением в ядро
+	Переместить, если AddHook будет востребован для замены каких-то методов ядра
+---------------------------------------------------------------------------]]
+
+-- Должно использовать только те хуки,
+-- где первым аргументом в колбеке идет игрок
+-- ITEM:AddHook("PlayerLoadout", funciton(pl) pl:GiveAmmos() end)
+function STORE_ITEM:AddHook(sHook, fCallback)
+	local uid = self:UID()
+	hook.Add(sHook, "item." .. uid, function(pl, ...)
+		if pl:HasPurchase(uid) then
+			fCallback(pl, ...)
+		end
+	end)
+	return self
+end

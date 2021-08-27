@@ -147,9 +147,12 @@ concommand.Add("igs_flushversion", function(pl)
 	print("OK. После перезагрузки сервер скачает новую версию")
 end)
 
--- загрузка с файлов, а не лоадером
-if GetConVarString("igs_version") == "" then
-	GetConVar("igs_version"):SetString("777")
+-- мб ему место в launcher?
+local igs_version = CreateConVar("igs_version", "", {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE})
+
+if SERVER and igs_version:GetString() == "" then
+	local version = cookie.GetString("igs_version")
+	igs_version:SetString(version or "777") -- "or" for case when igsmod isn't ran (core hosted locally)
 end
 
 IGS.sh("igs/launcher.lua")

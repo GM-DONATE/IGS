@@ -22,7 +22,7 @@ scc.addClientside("IGSGroup",   function(_, arg) IGS.WIN.Group(arg)   end)
 IGS.PermaSaveFeature("npc_igs")
 
 local function runAfterhooks() -- #todo перенести эти выполнения в модули или вызывать локально if CODEMOUNT
-	if (not IGS_MOUNT) or IGS.HOOKSFIRED then return end
+	if (not IGS_MOUNT) then return end
 
 	print("Выполнение 'опоздавших' хуков и spawnmenu_reload")
 	if CLIENT then -- костыль, но другого способа не вижу
@@ -33,8 +33,6 @@ local function runAfterhooks() -- #todo перенести эти выполне
 		-- hook.GetTable()["InitPostEntity"]["IGS.PermaSents"]()
 		-- "InitPostEntity", "InitializePermaProps"
 	end
-
-	IGS.HOOKSFIRED = true
 end
 
 -- IGS.Loaded выполняется при условии IGS.nw.InitPostEntity
