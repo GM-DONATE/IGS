@@ -1,17 +1,20 @@
+IGS.BADMIN_GROUPS = IGS.BADMIN_GROUPS or {}
+
 local STORE_ITEM = FindMetaTable("IGSItem")
 
-function STORE_ITEM:SetBAdminGroup(usergroup, weight)
-	local rankId = ba.ranks.Get(usergroup):GetID()
+function STORE_ITEM:SetBAdminGroup(rank, rank_priority)
+	local rankId = ba.ranks.Get(rank):GetID()
+	IGS.BADMIN_GROUPS[rankId] = rank_priority or 0
+
 	self:SetInstaller(function(pl)
 		pl:SetNetVar("UserGroup", rankId)
-		pl.IGSBAdminWeight = weight
 	end)
 	self:SetValidator(function(pl)
-		if pl.IGSBAdminWeight then
-			return weight < pl.IGSBAdminWeight
-		else
-			return pl:GetNetVar("UserGroup") == rankId
-		end
+		local current_rank     = pl:GetNetVar("UserGroup")
+		local current_priority = IGS.BADMIN_GROUPS[current_rank]
+		if not current_priority then return end -- ранга игрока нет в продаже. Не сбрасываем
+
+		return current_priority >= rank_priority -- меняем, если вес текущей меньше, чем новой
 	end)
 	return self
 end
