@@ -1,10 +1,9 @@
 file.CreateDir("igs")
-local igs_version = CreateConVar("igs_version", "", {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE})
 
 -- Вы можете сделать форк основного репозитория, сделать там изменения и указать его имя здесь
 -- Таким образом IGS будет грузиться у всех с вашего репозитория
 IGS_REPO = "GM-DONATE/IGS" -- "AMD-NICK/IGS-1"
-if not IGS_REPO then return end -- force lua
+if not IGS_REPO or file.Exists("autorun/l_ingameshop.lua", "LUA") then return end -- force lua
 
 
 local function checkRunString()
@@ -21,7 +20,7 @@ local function wrapFetch(url, cb)
 	local patt = "IGS Не может выполнить HTTP запрос и загрузить скрипт\nURL: %s\nError: %s\n"
 	timer.Simple(0, function()
 		http.Fetch(url, cb, function(err)
-			for i = 1,10 do print(patt:format(url, err)) end
+			error(patt:format(url, err))
 		end)
 	end)
 end
@@ -37,14 +36,14 @@ end
 local function loadFromFile(superfile)
 	checkRunString()
 
-	if SERVER then
-		local version = cookie.GetString("igs_version")
-		igs_version:SetString(version)
-	end
+	local path = "autorun/l_ingameshop.lua"
+	IGS_MOUNT  = util.JSONToTable(superfile)
 
-	local path  = "autorun/l_ingameshop.lua"
-	IGS_MOUNT = util.JSONToTable(superfile)
-	assert(IGS_MOUNT and IGS_MOUNT[path], "Ошибка загрузки superfile. Удалите /data/superfile.txt и попробуйте снова или обратитесь в gm-donate.ru/support")
+	local err_msg = SERVER and
+			"Ошибка загрузки superfile. Удалите /data/superfile.txt и попробуйте снова или обратитесь в gm-donate.ru/support"
+		or 	"Ошибка загрузки superfile. Перезайдите на сервер " ..                    "или обратитесь в gm-donate.ru/support"
+
+	assert(IGS_MOUNT and IGS_MOUNT[path], err_msg)
 	RunString(IGS_MOUNT[path], path)
 end
 
@@ -80,6 +79,7 @@ if SERVER then
 	end
 
 elseif CLIENT then
-	local version = igs_version:GetString()
+	local version = GetConVar("igs_version"):GetString()
+	assert(tonumber(version), "cvar igs_version не передался клиенту. " .. tostring(version))
 	downloadSuperfile(version, loadFromFile)
 end
