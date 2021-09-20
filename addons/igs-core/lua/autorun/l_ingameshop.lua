@@ -6,12 +6,12 @@
 IGS = IGS or {}
 
 local function log(patt, ...)
-	if cookie.GetNumber("igsverbose", 0) == 1 then
+	if cookie.GetNumber("igs_verbose", 0) == 1 then
 		print(string.format("[IGS] " .. patt, ...))
 	end
 end
 
-concommand.Add("igsverbose", function(pl)
+concommand.Add("igs_verbose", function(pl)
 	if SERVER and IsValid(pl) then return end
 
 	local enable = cookie.GetNumber("igsverbose", 0) == 0
