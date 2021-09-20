@@ -28,7 +28,7 @@ jobs:
     - id: parse_version
       run: |
         VERSION="${{ github.event.head_commit.message }}"
-        echo ::set-output name=parsed_version::$($VERSION:8)
+        echo ::set-output name=parsed_version::${VERSION:8}
     - id: release
       uses: softprops/action-gh-release@v1
       with:
