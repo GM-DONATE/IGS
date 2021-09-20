@@ -1,5 +1,5 @@
 name: Release superfile
-#test
+
 on: push
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
         zip -x "*.DS_Store" -r igs-mod.zip igs-modification/
     - id: parse_version
       run: |
-        VERSION=${{ github.event.head_commit.message }}
+        VERSION="${{ github.event.head_commit.message }}"
         echo ::set-output name=parsed_version::$VERSION:8
     - id: release
       uses: softprops/action-gh-release@v1
