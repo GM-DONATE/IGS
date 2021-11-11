@@ -1,10 +1,10 @@
-list.Set("DesktopWindows", "IGS",{
+--[[list.Set("DesktopWindows", "IGS",{
 	title = "Автодонат",
 	icon  = "icon16/money_add.png",
 	init  = function()
 		IGS.UI()
 	end
-})
+})]] -- Отнюдь, это нам не нужно.
 
 
 
@@ -64,5 +64,3 @@ hook.Add("IGS.OnDepositWinOpen","CurrencyInfo",function()
 		end)
 	end
 end)
-
--- IGS.UI()
