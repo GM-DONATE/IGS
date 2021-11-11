@@ -4,20 +4,22 @@ local col_light = Color(228,228,228)
 local col_red   = Color(250,30,90)
 
 function IGS.NotifyAll(...)
-	chat.AddTextSV(
+	CityLiveRP.NotifyAll(1, ...)
+	--[[chat.AddTextSV(
 		col_lime, "[IGS]",
 		col_red,  " > ",
 		col_light,...
-	)
+	)]]
 end
 
 
 function IGS.Notify(pl, ...)
-	pl:ChatPrintColor(
+	pl:Notify(1, ...)
+	--[[pl:ChatPrintColor(
 		col_lime, "[IGS]",
 		col_red,  " > ",
 		col_light,...
-	)
+	)]]
 end
 
 -- IGS.MUTE_NOTIFY = IGS.MUTE_NOTIFY or {}
