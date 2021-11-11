@@ -1,10 +1,10 @@
 --[[-------------------------------------------------------------------------
 	Чат команды
 ---------------------------------------------------------------------------]]
-scc.add("igs", IGS.UI)
+--[[scc.add("igs", IGS.UI)
 for command in pairs(IGS.C.COMMANDS or {}) do
 	scc.add(command, IGS.UI)
-end
+end]] -- Отнюдь, это нам не нужно.
 
 
 
@@ -65,11 +65,11 @@ end)
 	Открытие интерфейса кнопкой на клаве
 ---------------------------------------------------------------------------]]
 -- http://wiki.garrysmod.com/page/Enums/KEY
-hook.Add("PlayerButtonDown","IGS.UI",function(pl, iButton)
+--[[hook.Add("PlayerButtonDown","IGS.UI",function(pl, iButton)
 	if iButton == IGS.C.MENUBUTTON then
 		scc.run(pl, "igs")
 	end
-end)
+end)]] -- Отнюдь, это нам не нужно.
 
 
 --[[-------------------------------------------------------------------------
