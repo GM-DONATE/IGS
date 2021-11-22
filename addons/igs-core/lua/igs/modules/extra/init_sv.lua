@@ -64,7 +64,7 @@ end)
 --[[-------------------------------------------------------------------------
 	Открытие интерфейса кнопкой на клаве
 ---------------------------------------------------------------------------]]
--- http://wiki.garrysmod.com/page/Enums/KEY
+-- https://wiki.facepunch.com/gmod/Enums/KEY
 hook.Add("PlayerButtonDown","IGS.UI",function(pl, iButton)
 	if iButton == IGS.C.MENUBUTTON then
 		scc.run(pl, "igs")

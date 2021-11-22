@@ -13,3 +13,4 @@
 ---
 
 Если возникли вопросы или проблемы с правильной установкой, то вы можете задать их [здесь](https://forum.gm-donate.ru/c/support/troubleshooting/15). Рекомендуем сразу приложить console.log и `garrysmod/data/igs_errors.txt`
+
