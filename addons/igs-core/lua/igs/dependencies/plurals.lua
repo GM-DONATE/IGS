@@ -1,4 +1,4 @@
-if TRIGON then return end
+if PL then return end
 
 local function plural_type(i)
 	return i % 10 == 1 and i % 100 ~= 11 and 1

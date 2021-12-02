@@ -1,4 +1,4 @@
-if TRIGON then return end
+if chat and chat.AddTextSV then return end
 
 
 if SERVER then
