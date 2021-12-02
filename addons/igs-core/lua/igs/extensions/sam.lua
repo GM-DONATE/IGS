@@ -3,7 +3,7 @@ local STORE_ITEM = FindMetaTable("IGSItem")
 function STORE_ITEM:SetSAMGroup(sUserGroup)
 	return self:SetInstaller(function(pl)
 		pl:sam_set_rank(sUserGroup)
-	end):AddHook("IGS.PlayerPurchasesLoaded", function(pl, purchases)
+	end):AddHook("IGS.PlayerPurchasesLoaded", function(pl, purchases) -- #TODO упростить хук. badmin использует тот же
 		if CLIENT or not purchases then return end
 
 		local priority_item = self
