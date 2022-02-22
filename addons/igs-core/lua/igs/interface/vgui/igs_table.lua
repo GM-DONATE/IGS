@@ -86,7 +86,7 @@ function PANEL:AddLine(...)
 						surface.DrawLine(w,0,w,h)
 
 						surface.SetFont("igs.18")
-						surface.SetTextColor(IGS.col.TEXT_HARD)
+						surface.SetTextColor(s.text_color or IGS.col.TEXT_HARD)
 						surface.SetTextPos((w - surface.GetTextSize(s:GetText())) / 2,0)
 						surface.DrawText(s:GetText())
 						return true -- override

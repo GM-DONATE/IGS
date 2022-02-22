@@ -66,7 +66,7 @@ net.Receive("IGS.NameRequest",function(_, pl)
 
 			if d_ then
 				net.WriteBool(true)
-				net.WriteString(d_.Name)
+				net.WriteString(Format("%d - %s", d_.Score, d_.Name))
 			else
 				net.WriteBool(false)
 			end
