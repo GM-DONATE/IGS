@@ -32,28 +32,24 @@ function IGS.LoadPlayerPurchases(pl,cb)
 		end
 
 		local purchases = {} -- uid = amount
-		local networked = {} -- iter = uid
+		local networked = {} -- uid = amount (было i>id до 16.02.2022, но веб загрузка потребовала перемен)
 
 		for i = 1,#dat do
-			local uid  = dat[i]["Item"]
-			local ITEM = IGS.GetItemByUID(uid) -- TO DO проверка на существование итема. Или не нужно? Время покажет
+			local uid = dat[i]["Item"]
+			purchases[uid] = (purchases[uid] or 0) + 1
 
-			purchases[uid] = purchases[uid] and (purchases[uid] + 1) or 1
-
-			if ITEM:IsNetworked() then
-				networked[#networked + 1] = ITEM:ID()
+			if IGS.GetItemByUID(uid).networked then
+				networked[uid] = (networked[uid] or 0) + 1
 			end
 		end
 
-		-- UID - Amount Of Purchases
+		-- UID = Amount Of Purchases
 		pl:SetVar("igs_purchases",purchases)
 
 		-- print("IGS.GetPlayerPurchases processed",pl)
 		IGS.nw.WaitForPlayer(pl, function()
 			-- print("IGS.nw.WaitForPlayer INSIDE",pl)
-			-- if (#networked > 0) then -- закомменчено, чтобы срабатывал клиентский хук в любом случае
-				pl:SetIGSVar("igs_purchases", networked) -- минус в том, что теперь для ВСЕХ игроков будет сетится
-			-- end -- а сделано это для тул хайдера
+			pl:SetIGSVar("igs_purchases", networked)
 		end)
 
 		hook.Run("IGS.PlayerPurchasesLoaded",pl,purchases)
@@ -70,9 +66,9 @@ function IGS.GivePurchase(pl, sItemUID)
 
 	pl:SetVar("igs_purchases",purchases)
 
-	if ITEM:IsNetworked() then
+	if ITEM.networked then
 		local tab = pl:GetIGSVar("igs_purchases") or {}
-		tab[#tab + 1] = ITEM:ID()
+		tab[sItemUID] = (tab[sItemUID] or 0) + 1
 		pl:SetIGSVar("igs_purchases", tab)
 	end
 
@@ -86,8 +82,8 @@ end
 function IGS.PlayerActivateItem(pl, sItemUID, fCallback)
 	local ITEM = IGS.GetItemByUID(sItemUID)
 
-	IGS.StoreLocalPurchase(pl:SteamID64(),ITEM:UID(),ITEM:Term(),function(iPurchID)
-		IGS.GivePurchase(pl,sItemUID)
+	IGS.StoreLocalPurchase(pl:SteamID64(), sItemUID, ITEM:Term(), function(iPurchID)
+		IGS.GivePurchase(pl, sItemUID)
 		hook.Run("IGS.PlayerActivatedItem", pl, ITEM, iPurchID)
 		if fCallback then fCallback(iPurchID) end
 	end)

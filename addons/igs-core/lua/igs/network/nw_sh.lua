@@ -17,21 +17,28 @@ IGS.nw.Register("igs_total_transactions")
 	:Read(net.ReadUInt,17)
 :SetLocalPlayer()
 
+-- До 16 фев 2022 передавались чисто ID предметов
+-- Но веб лоад приводит к тому, что еще до загрузки самого игрока на сервер ему могли
+-- передаваться ID предметов, которые на клиенте не успели создаться (например создавались в хуке IGS.Loaded)
+IGS.nw.Register("igs_purchases"):Write(function(networked_purchases)
+	local flatten = {}
+	for uid, am in pairs(networked_purchases) do
+		local s = #flatten
+		flatten[s + 1] = uid
+		flatten[s + 2] = am
+	end
 
-IGS.nw.Register("igs_purchases"):Write(function(v)
-	net.WriteUInt(#v, 9) -- 511
+	net.WriteUInt(#flatten / 2, 8) -- 255
 
-	for _,id in ipairs(v) do
-		net.WriteUInt(id,9)
+	for i = 1,#flatten,2 do
+		net.WriteString(flatten[i])
+		net.WriteUInt(flatten[i + 1], 9)
 	end
 end):Read(function()
-
 	local res = {}
-	for _ = 1,net.ReadUInt(9) do
-		local uid = IGS.GetItemByID( net.ReadUInt(9) ):UID()
-		res[uid] = res[uid] and (res[uid] + 1) or 1
+	for _ = 1,net.ReadUInt(8) do
+		res[net.ReadString()] = net.ReadUInt(9)
 	end
-
 	return res
 end):SetLocalPlayer():SetHook("IGS.PlayerPurchasesLoaded")
 
@@ -67,8 +74,8 @@ IGS.BIT_TX_ID = 32
 --[[--------------
 	.net Helpers
 ----------------]]
-function net.WriteIGSItem(ITEM) net.WriteUInt(ITEM:ID(),9) end
-function net.ReadIGSItem() return IGS.GetItemByID(net.ReadUInt(9)) end
+function net.WriteIGSItem(ITEM) net.WriteString(ITEM:UID()) end
+function net.ReadIGSItem() return IGS.GetItemByUID(net.ReadString()) end
 -- function net.WriteIGSGroup(GROUP) net.WriteString(GROUP:Name()) end
 -- function net.ReadIGSGroup() return IGS.GetGroup(net.ReadString()) end
 
