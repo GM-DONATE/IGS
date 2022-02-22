@@ -2,7 +2,9 @@ local STORE_ITEM = FindMetaTable("IGSItem")
 
 function STORE_ITEM:SetBAdminGroup(rank)
 	return self:SetInstaller(function(pl)
-		pl:SetNetVar("UserGroup", ba.ranks.Get(rank):GetID())
+		assert(rank, "IGS Rank expected, got " .. type(rank))
+		local RANK = assert(ba.ranks.Get(rank), "IGS Rank " .. rank .. " invalid")
+		pl:SetNetVar("UserGroup", RANK:GetID())
 	end):AddHook("IGS.PlayerPurchasesLoaded", function(pl, purchases) -- #TODO упростить хук. sam использует тот же
 		if CLIENT or not purchases then return end
 
