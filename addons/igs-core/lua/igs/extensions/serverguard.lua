@@ -1,50 +1,40 @@
-IGS.ITEMS.SG = IGS.ITEMS.SG or {
-	GROUPS = {}
-}
-
 local STORE_ITEM = FindMetaTable("IGSItem")
 
-function STORE_ITEM:SetSGGroup(sUserGroup, iGroupWeight)
-	self:SetCanActivate(function(pl)
-		if pl:IsUserGroup(sUserGroup) then
-			return "У вас уже действует эта услуга"
-		end
-	end)
-	self:SetInstaller(function(pl)
+local is_on_sale_ranks = {}
+
+function STORE_ITEM:SetSGGroup(sUserGroup)
+	is_on_sale_ranks[sUserGroup] = true
+
+	return self:SetInstaller(function(pl)
 		local rankData = serverguard.ranks:GetRank(sUserGroup)
-		if rankData then
-			serverguard.player:SetRank(pl, sUserGroup, 0)
-			serverguard.player:SetImmunity(pl, rankData.immunity)
-			serverguard.player:SetTargetableRank(pl, rankData.targetable)
-			serverguard.player:SetBanLimit(pl, rankData.banlimit)
-			pl.IGSSGWeight = iGroupWeight
-		end
-	end)
-	self:SetValidator(function(pl)
-		if pl.IGSSGWeight then
-			return iGroupWeight < pl.IGSSGWeight
-		else
-			return serverguard.player:GetRank(pl) == sUserGroup
-		end
-	end)
-
-	self.sg_group = self:Insert(IGS.ITEMS.SG.GROUPS, sUserGroup)
-	return self
+		assert(rankData, "IGS: В SetSGGroup указана несуществующая группа")
+		serverguard.player:SetRank(pl, sUserGroup, 0)
+		serverguard.player:SetImmunity(pl, rankData.immunity)
+		serverguard.player:SetTargetableRank(pl, rankData.targetable)
+		serverguard.player:SetBanLimit(pl, rankData.banlimit)
+	end):SetMeta("sggroup", sUserGroup)
 end
-if CLIENT then return end
-local function checkGroups(pl)
-	local hasAccess = IGS.PlayerHasOneOf(pl, IGS.ITEMS.SG.GROUPS[ serverguard.player:GetRank(pl) ])
-	if hasAccess == nil then return end  -- не отслеживается
 
-	if hasAccess then
-		return -- если имеется хоть одна покупка, то не снимаем права
+if CLIENT then return end
+
+-- addhook не подойдет (не будет автоснятия. Можно и отдельно, конечно)
+hook.Add("IGS.PlayerPurchasesLoaded", "sggroup", function(pl, purchases)
+	if not serverguard then hook.Remove("IGS.PlayerPurchasesLoaded", "sggroup") return end
+	local prior
+
+	for uid in pairs(purchases or {}) do
+		local ITEM = IGS.GetItemByUID(uid)
+		if ITEM:GetMeta("sggroup") and (not prior or ITEM.id >= prior.id) then
+			prior = ITEM
+		end
 	end
 
-	serverguard.player:SetRank(pl, "user", 0);
-end
-
-hook.Add("IGS.PlayerPurchasesLoaded", "SGGroups", function(pl)
-	if next(IGS.ITEMS.SG.GROUPS) then -- группы продаются
-		checkGroups(pl)
+	if prior then
+		prior:Setup(pl)
+	else -- ни один не куплен (срок истек?)
+		local player_rank = serverguard.player:GetRank(pl) -- default: user
+		if is_on_sale_ranks[player_rank] then -- но ранг, который у игрока продается
+			serverguard.player:SetRank(pl, "user", 0) -- снимаем
+		end
 	end
 end)
