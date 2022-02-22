@@ -84,36 +84,36 @@ end)
 
 
 --[[-------------------------------------------------------------------------
-	Глобальное оповещение о пополнении счета
+	Оповещение о пополнении счета
 	https://trello.com/c/6rMMH3cn/483-сообщение-о-пополнении-счета
 ---------------------------------------------------------------------------]]
-local explanations = {
-	["qiwi_gmd"] = "Qiwi",
-	["ibox"]     = "Терминалы IBOX (Украина)",
-	["mc"]       = "MasterCard",
-	["mir"]      = "Карты МИР",
-	["wm"]       = "WebMoney",
-	["pm"]       = "PerfectMoney",
-	["term_ru"]  = "Терминалы России",
-}
 
-hook.Add("IGS.PaymentStatusUpdated","IGS.BroadcastCharge",function(pl,dat)
-	if dat.method == "pay" and IGS.C.BroadcastCharge ~= false then -- #todo сделать модулем
-		local method = dat.paymentType
-		if method == "panel" then return end
+hook.Add("IGS.PlayerDonate", "ThanksForDonate", function(pl, sum_igs)
+	local score = pl.igs_score -- #todo make netvar
 
-		local method_beauty = explanations[method] or method
+	IGS.Notify(pl, Format("Спасибо вам за пополнение счета. " ..
+		"Ваш новый Score на всех проектах - %d. " ..
+		"Что такое Score: vk.cc/caHTZi", score))
 
-		local igs = dat.orderSum
-		local rub = IGS.RealPrice(igs)
+	local rub = IGS.RealPrice(sum_igs)
 
-		IGS.NotifyAll(pl:Nick() .. " пополнил счет через " .. method_beauty .. " на " .. PL_MONEY(rub))
+	local rub_str = PL_MONEY(rub)
+	local full_str = Format("%s пополнил счет на %s. Его новый Score: %s", pl:Nick(), rub_str, score)
 
-	elseif dat.method == "error" then
-		IGS.Notify(pl,"Похоже, у вас возникла ошибка в процессе пополнения счета")
-		IGS.Notify(pl,"Мы можем помочь. Просто напишите нам gm-donate.ru/support")
+	IGS.NotifyAll(full_str)
+end)
+
+hook.Add("IGS.PlayerPurchasesLoaded", "BalanceRemember", function(pl)
+	local balance = pl:IGSFunds()
+	if balance >= 10 then
+		timer.Simple(10, function()
+			if not IsValid(pl) then return end
+			IGS.Notify(pl, "Вы можете потратить " .. IGS.SignPrice(balance) .. " через /donate")
+			IGS.Notify(pl, "Ваш Score " .. (pl.igs_score or 0) .. ". Подробнее: vk.cc/caHTZi") -- or 0 на всякий случай
+		end)
 	end
 end)
+
 
 
 
