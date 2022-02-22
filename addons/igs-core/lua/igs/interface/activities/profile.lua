@@ -127,9 +127,14 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 			for i,v in ipairs(dat) do
 				v.note = v.note or "-"
 
+				local function name_or_uid(sUid)
+					local ITEM = IGS.GetItemByUID(sUid)
+					return ITEM.isnull and sUid or ITEM:Name()
+				end
+
 				-- Если покупка, то пишем ее название или пишем с чем связана транзакция
 				local note =
-					v.note:StartWith("P: ") and IGS.GetItemByUID(v.note:sub(4)):Name() or
+					v.note:StartWith("P: ") and name_or_uid(v.note:sub(4)) or
 					v.note:StartWith("A: ") and ("Пополнение счета (" .. v.note:sub(4) .. ")") or
 					v.note:StartWith("C: ") and ("Купон " .. v.note:sub(4,13) .. "...") or
 					v.note
