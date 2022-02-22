@@ -1,4 +1,3 @@
-
 hook.Add("IGS.CatchActivities","purchases",function(activity,sidebar)
 	local bg = sidebar:AddPage("Активные покупки")
 
@@ -25,7 +24,7 @@ hook.Add("IGS.CatchActivities","purchases",function(activity,sidebar)
 
 
 		IGS.GetMyPurchases(function(d)
-			if !IsValid(pnl) then return end -- Долго данные получались, фрейм успели закрыть
+			if not IsValid(pnl) then return end -- Долго данные получались, фрейм успели закрыть
 
 			IGS.AddTextBlock(bg.side,"Что тут?",
 				#d == 0 and
@@ -38,14 +37,14 @@ hook.Add("IGS.CatchActivities","purchases",function(activity,sidebar)
 			)
 
 			IGS.AddButton(bg.side,"Купить плюшку",function()
-				if #IGS.GetItems() <= 1 then -- если NULL уберу
+				if #IGS.GetItems() == 0 then -- если NULL уберу
 					LocalPlayer():ChatPrint("Настройте предметы автодоната в sh_additems.lua")
 					return
 				end
 
 				while true do
 					local random_ITEM = table.Random(IGS.GetItems())
-					if !(random_ITEM.isnull or random_ITEM:IsHidden()) then
+					if not random_ITEM:IsHidden() then
 						IGS.WIN.Item(random_ITEM:UID())
 						break
 					end

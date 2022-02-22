@@ -46,7 +46,7 @@ hook.Add("IGS.OnItemInfoOpen","CheckGiveWeaponOnSpawn",function(ITEM, fr)
 		self:DockMargin(0,5,0,0)
 		self:SetTall(20)
 
-		local should_give = LocalPlayer():GetNWBool("igs.gos." .. ITEM:ID())
+		local should_give = LocalPlayer():GetNWBool("igs.gos." .. ITEM:ID()) -- #todo UID и избавиться от :ID()
 		self:SetValue(should_give)
 
 		self:SetText("Выдавать при спавне")
