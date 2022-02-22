@@ -100,7 +100,7 @@ function IGS.UpdatePlayerName(s64, sName, fCallback)
 end
 -- IGS.UpdatePlayerName(sid,"TEST !@#$%^&*()'",PRINT)
 
--- nil or {`Name`,`Balance`}
+-- nil or {`Name`,`Balance`, `Score`}
 function IGS.GetPlayer(s64, fCallback)
 	IGS.Query("/donators/get",{
 		sid = s64,

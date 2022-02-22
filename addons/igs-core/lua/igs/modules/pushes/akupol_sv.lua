@@ -18,8 +18,9 @@ log.setCvar("kupol_logging_level")
 
 local function get_updates(base_url, uid, sleep, ts, fOnResponse)
 	local url = base_url .. uid .. "/getUpdates?sleep=" .. (sleep or "") .. "&ts=" .. (ts or "")
-	log.debug("http.Fetch({})", url)
+	log.info("http.Fetch({})", url)
 	http.Fetch(url, function(json)
+		log.debug("Body: {}", json)
 		local t = util.JSONToTable(json)
 		if t and t.ok then
 			fOnResponse(t)
