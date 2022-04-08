@@ -13,6 +13,8 @@ function PANEL:Init()
 
 	self.scroll = uigs.Create("igs_scroll", self)
 	self.scroll:Dock(FILL)
+
+	hook.Run("IGS.ItemInfoPanelCreated", self)
 end
 
 function PANEL:SetName(sName)
@@ -219,6 +221,8 @@ function PANEL:SetInfo(tInf)
 
 	pnl:SetTall(y)
 	self:AddPanel("Информация",pnl)
+	
+	hook.Run("IGS.ItemInfoPanelInfoChanged", self)
 end
 
 -- Добавляет панель с указанным изображением
