@@ -38,6 +38,8 @@ function PANEL:Init()
 			size     = 20,
 		})
 	end
+
+	hook.Run("IGS.ItemPanelCreated", self)
 end
 
 function PANEL:SetItem(STORE_ITEM)
@@ -52,6 +54,8 @@ function PANEL:SetItem(STORE_ITEM)
 	self:SetSign( "Действ. " .. IGS.TermToStr(STORE_ITEM:Term()) )
 
 	self:SetBottomText( getBottomText(STORE_ITEM, true) )
+
+	hook.Run("IGS.ItemPanelChanged", self)
 
 	return self
 end
