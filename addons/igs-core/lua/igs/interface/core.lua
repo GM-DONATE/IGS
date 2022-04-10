@@ -60,6 +60,7 @@ function IGS.UI()
 	if IsValid(mf) then
 		if not mf:IsVisible() then
 			IGS.ShowUI()
+			hook.Run("IGS.ShowUI", mf)
 		end
 		return
 	end
@@ -166,6 +167,7 @@ function IGS.UI()
 
 	-- Собираем кнопочки в футере
 	hook.Run("IGS.CatchActivities",mf.activity,mf.sidebar)
+	hook.Run("IGS.ShowUI", mf)
 
 	return mf
 end
