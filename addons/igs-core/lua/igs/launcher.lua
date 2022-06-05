@@ -90,7 +90,6 @@ sv("processor_sv.lua") -- начинаем обработку всего сер�
 	Уродский кусок пост хуков
 --------------------------------]]
 if SERVER then
-	resource.AddWorkshop("2769795273")
 	hook.Add("IGS.ServersLoaded", "Loaded", function()
 		IGS.GetSettings(function(t)
 			IGS.UpdateMoneySettings(t["MinCharge"],t["CurrencyPrice"])
