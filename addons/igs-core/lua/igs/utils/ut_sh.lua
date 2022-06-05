@@ -171,9 +171,9 @@ function IGS.SignPrice(iPrice) -- 10 Alc
 end
 
 local rubs = {"рубль", "рубля", "рублей"}
-PL_MONEY = PL.Add("realmoney",rubs)
-PL_IGS   = PL.Add("igs_currency",IGS.C.CurrencyPlurals or rubs)
-PL_DAYS  = PL.Add("days",{"день", "дня", "дней"})
+PL_MONEY = PLUR(rubs)
+PL_IGS   = PLUR(IGS.C.CurrencyPlurals or rubs)
+PL_DAYS  = PLUR({"день", "дня", "дней"})
 
 
 local PL_IGS_ORIGINAL

@@ -1,6 +1,6 @@
 local PANEL = {}
 
-local PL_VARIANTS = PL.Add("variants",{"вариант", "варианта", "вариантов"})
+local PL_VARIANTS = PLUR({"вариант", "варианта", "вариантов"})
 function PANEL:SetGroup(ITEM_GROUP)
 	self.group = ITEM_GROUP
 
