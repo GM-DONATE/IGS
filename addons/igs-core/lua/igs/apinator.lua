@@ -9,7 +9,7 @@ end
 
 local error_no_igsmod =
 	"ABTogoHaT He HacTpoeH: Hy}{Ho ycTaHoBuTb igsmodificator. " ..
-	"(CKa4auTe ero c cauTa gm-donate.ru/panel)"
+	"(CKa4auTe ero c cauTa gm-donate.net/panel)"
 
 local error_invalid_credentials =
 	"Не указаны или неверно указаны данные проекта в файле config_sv.lua"
@@ -28,7 +28,7 @@ function IGS.DoRequest(project_id, secret, sMethod, tParams, fSucc, fErr)
 	tParams = map(tParams, tostring)
 
 	-- prt({"Sign: %s" .. IGS.GetSign(tParams), tParams})
-	local api_url = IGS_API_ENDPOINT or "https://gm-donate.ru/api"
+	local api_url = IGS_API_ENDPOINT or "https://gm-donate.net/api"
 	http.Post(api_url .. sMethod, tParams, fSucc, fErr, {
 		sign    = IGS.GetSign(tParams, secret),
 		project = tostring(project_id)
@@ -54,6 +54,7 @@ local function wrapResponse(sMethod, tParams, fOnSuccess, fOnError)
 		local d = util.JSONToTable(sBody)
 
 		if (not d) then
+			IGS.print(Color(255,0,0), sBody)
 			fOnError("invalid_response_format")
 		elseif (not d.ok) then
 			fOnError(d.error)

@@ -1,7 +1,7 @@
 ENT.Type      = "anim"
 ENT.Base      = "base_anim"
 ENT.PrintName = "Донат итем"
-ENT.Author    = "gm-donate.ru"
+ENT.Author    = "GMDonate"
 ENT.Category  = "IGS"
 
 ENT.RenderGroup = RENDERGROUP_TRANSLUCENT

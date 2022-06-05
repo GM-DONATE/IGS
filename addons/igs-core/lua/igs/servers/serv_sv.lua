@@ -55,7 +55,7 @@ local function registerCurrentServer(local_ip,port, fOnSuccess)
 	IGS.AddServer(local_ip, port, function(id)
 		IGS.print(
 			"CEPBEP 3APEruCTPuPOBAH nOg ig: " .. id .. "\n" ..
-			"HACTPOuKu B gm-donate.ru/panel/projects/" .. IGS.C.ProjectID
+			"HACTPOuKu B gm-donate.net/panel/projects/" .. IGS.C.ProjectID
 		)
 
 		local sock_port = port + 10

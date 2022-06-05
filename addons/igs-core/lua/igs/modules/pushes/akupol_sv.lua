@@ -1,5 +1,6 @@
 -- 2021.01.18 4:16
--- Polling client for gm-donate.ru's polling server
+-- Polling client for poll.gmod.app
+-- Docs: https://blog.amd-nick.me/poll-gmod-app-docs
 -- Author: amd-nick.me/about
 
 -- 2 copy of this file in some cases in different places with different include methods

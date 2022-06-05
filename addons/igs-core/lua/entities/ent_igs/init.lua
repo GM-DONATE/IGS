@@ -71,7 +71,7 @@ function IGS.SpawnGift(sUid, vPos)
 end
 
 -- Обратная совместимость
--- https://forum.gm-donate.ru/t/spavn-donata-cherez-konsol/438/4?u=gmd
+-- https://forum.gm-donate.net/t/spavn-donata-cherez-konsol/438/4?u=gmd
 function IGS.CreateGift(sUid, plOwner, vPos)
 	local ent = IGS.SpawnGift(sUid, vPos)
 	if ent.Setowning_ent then
