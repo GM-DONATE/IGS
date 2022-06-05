@@ -1,5 +1,8 @@
 IGS.sh("shared.lua")
 
+-- https://forum.gm-donate.net/t/kak-izmenit-imya-donat-nps/1086
+ENT.TextAboveNPC = "Донат услуги"
+
 -- #todo сделать такое же для подарка?
 
 local COL_TEXT = Color(255,255,255)
@@ -50,5 +53,5 @@ function ENT:Draw()
 	if IGS_NPC_HIDE_ON_DISTANCE and dist > IGS_NPC_HIDE_ON_DISTANCE then return end -- не отрисовывать
 
 	self:DrawModel()
-	drawInfo(self, "Донат услуги", dist)
+	drawInfo(self, self.TextAboveNPC, dist)
 end
