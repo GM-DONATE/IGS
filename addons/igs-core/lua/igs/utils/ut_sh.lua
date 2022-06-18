@@ -17,9 +17,11 @@ function PLAYER:HasPurchase(sUID)
 	return IGS.PlayerPurchases(self)[sUID]
 end
 
--- true, если человек имеет хоть один итем из списка, nil, если итем не отслеживается, false, если нет права. Начало юзаться для упрощения кода модулей
-function IGS.PlayerHasOneOf(pl,tItems)
-	if !tItems then return end
+-- ITEM, если человек имеет хоть один итем из списка
+-- nil, если итем не отслеживается
+-- false, если нет права
+function IGS.PlayerHasOneOf(pl, tItems)
+	if not tItems then return end
 
 	for _,ITEM in ipairs(tItems) do
 		if pl:HasPurchase( ITEM:UID() ) then
@@ -41,7 +43,7 @@ function IGS.CanAfford(pl,sum,assert)
 		return true
 	end
 
-	if !assert then
+	if not assert then
 		return false
 	end
 
@@ -107,7 +109,7 @@ end
 
 -- Не смог загрузиться или выключен в панели, меню открывать нельзя
 function IGS.IsLoaded()
-	return getSettings() and IGS.SERVERS:ID() and !GetGlobalBool("IGS_DISABLED")
+	return getSettings() and IGS.SERVERS:ID() and not GetGlobalBool("IGS_DISABLED")
 end
 
 
@@ -121,7 +123,7 @@ local terms = {
 
 function IGS.TermType(term)
 	return
-		!term     and 1 or -- бесконечно
+		not term  and 1 or -- бесконечно
 		term == 0 and 2 or -- мгновенно
 		term      and 3    -- кол-во дней
 end
@@ -131,7 +133,7 @@ function IGS.TermToStr(term)
 end
 
 function IGS.TimestampToDate(ts,bShowFull) -- в "купил до"
-	if !ts then return end
+	if not ts then return end
 	return os.date(bShowFull and IGS.C.DATE_FORMAT or IGS.C.DATE_FORMAT_SHORT,ts)
 end
 
@@ -149,7 +151,7 @@ end
 
 function IGS.print(...)
 	local args = {...}
-	if !IsColor(args[1]) then
+	if not IsColor(args[1]) then
 		table.insert(args,1,color_white)
 	end
 
@@ -178,7 +180,7 @@ PL_DAYS  = PLUR({"день", "дня", "дней"})
 
 local PL_IGS_ORIGINAL
 hook.Add("IGS.OnSettingsUpdated","PL_IGS = PL_MONEY",function()
-	if !IGS.IsCurrencyEnabled() then -- Если донат валюта отключена
+	if not IGS.IsCurrencyEnabled() then -- Если донат валюта отключена
 		PL_IGS_ORIGINAL = PL_IGS -- а это не таблица случайно? Мб table.copy?
 		PL_IGS = PL_MONEY
 

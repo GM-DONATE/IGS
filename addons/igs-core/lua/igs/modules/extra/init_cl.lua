@@ -34,7 +34,7 @@ function IGS.WIN.AboutCurrency(bHideClose)
 
 	local modal = IGS.ShowNotify(t,"Лучше прочтите")
 
-	if !bHideClose then return end
+	if not bHideClose then return end
 	modal.btnOK:SetVisible(false)
 	timer.Simple(7,function()
 		if IsValid(modal) then
@@ -54,10 +54,10 @@ end
 
 
 hook.Add("IGS.OnDepositWinOpen","CurrencyInfo",function()
-	if !IGS.IsCurrencyEnabled() then return end -- донат валюта отключена
+	if not IGS.IsCurrencyEnabled() then return end -- донат валюта отключена
 
 	-- Ни разу не пополнял и не видел подсказки
-	if !IGS.isUser(LocalPlayer()) and !getReadCurrencyInfoStatus() then
+	if not IGS.isUser(LocalPlayer()) and not getReadCurrencyInfoStatus() then
 		timer.Simple(0,function() -- чтобы не оказаться позади igs_frame
 			IGS.WIN.AboutCurrency(true)
 			setReadCurrencyInfoStatus(true)

@@ -20,7 +20,7 @@ function IGS.WIN.Group(sGroupUID)
 			local it = uigs.Create("igs_item"):SetItem(ITEM)
 			it:SetName(nameInGroup or ITEM:Name())
 
-			if !cellW then
+			if not cellW then
 				cellW,cellH = it:GetSize()
 			end
 
@@ -41,7 +41,7 @@ function IGS.WIN.Group(sGroupUID)
 		bg.scroll:AddItem( getSpacePanel() ) -- из-за паддинга #1
 		for _,v in pairs(GROUP:Items()) do
 			local ITEM = v.item
-			if !v.item:IsHidden() then -- еще в main_cl
+			if not v.item:IsHidden() then -- еще в main_cl
 				bg:AddIGSItem(ITEM, v.name)
 			end
 		end

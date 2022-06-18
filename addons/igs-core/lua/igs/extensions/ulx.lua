@@ -24,7 +24,7 @@ function STORE_ITEM:SetULXGroup(sUserGroup, iGroupWeight)
 			valid = pl:IsUserGroup(sUserGroup)
 		end
 
-		if !valid then
+		if not valid then
 			IGS.NotifyAll("Автовосстановление " .. self:Name() .. " для " .. pl:Name())
 			return false
 		end
@@ -39,7 +39,7 @@ end
 -- Есть много ньюансов. Коммит 1 октября 2019
 function STORE_ITEM:SetULXCommandAccess(cmd,tag) -- "ulx model","^", например
 	self:SetInstaller(function(pl)
-		if !tag then
+		if not tag then
 			table.insert(ULib.ucl.authed[ pl:UniqueID() ].allow, cmd)
 		else
 			ULib.ucl.authed[ pl:UniqueID() ].allow[cmd] = tag
@@ -76,14 +76,14 @@ end
 
 local function checkPermissions(pl)
 	local user = ULib.ucl.authed[ pl:UniqueID() ]
-	if !user then return end
+	if not user then return end
 
 	local changed
 	-- Вид ucl таблицы https://img.qweqwe.ovh/1523035793058.png
 	for k,v in pairs(user.allow or {}) do -- не уверен, что allow обязательно есть
 		local cmd = isnumber(k) and v or k
 
-		if !hasPexAccess(pl, cmd) then
+		if not hasPexAccess(pl, cmd) then
 			user.allow[k] = nil
 			changed = true
 		end

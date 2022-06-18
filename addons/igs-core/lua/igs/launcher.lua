@@ -26,7 +26,7 @@ sh("dependencies/lolib.lua") -- должна быть перед kupol
 -- Антиконфликт с https://trello.com/c/3ti6xIjW/
 sh("dependencies/dash/nw.lua")
 
--- if !dash then
+-- if not dash then
 sh("dependencies/dash/hash.lua")
 sh("dependencies/dash/misc.lua")
 cl("dependencies/dash/wmat.lua")

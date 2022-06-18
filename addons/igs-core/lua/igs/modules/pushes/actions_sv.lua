@@ -10,7 +10,7 @@ hook.Add("IGS.IncomingMessage","PaymentStatus",function(d, method)
 	if method ~= "payment.UpdateStatus" then return end
 
 	local pl = getPlayer(d)
-	if !pl then return end
+	if not pl then return end
 
 	-- https://img.qweqwe.ovh/1537567538620.png
 	-- https://img.qweqwe.ovh/1537568769298.png
@@ -29,7 +29,7 @@ hook.Add("IGS.IncomingMessage","GivePurchase",function(d, method)
 	if method ~= "purchase.store" then return end
 
 	local pl = getPlayer(d)
-	if !pl then return end
+	if not pl then return end
 
 	local ITEM = IGS.GivePurchase(pl,d.Item) -- выдает покупку без сохранения в БД
 	IGS.Notify(pl,"Вам выдана новая услуга: " .. ITEM:Name())
@@ -37,10 +37,10 @@ end)
 
 -- Перенос услуги (в т.ч. отключение)
 hook.Add("IGS.IncomingMessage","MovePurchase",function(d, method)
-	if !(method == "purchase.move" and IGS.SERVERS:ID() == d.ServFrom) then return end
+	if not (method == "purchase.move" and IGS.SERVERS:ID() == d.ServFrom) then return end
 
 	local pl = getPlayer(d)
-	if !pl then return end
+	if not pl then return end
 
 	-- Просто перезагружаем данные
 	-- Если перенос был на этот сервер, то услуга будет выдана (или забрана. С :HasPurchase)
@@ -59,10 +59,10 @@ local INV_ACTIONS = {
 -- Забираем вещь с инвентаря
 -- Добавление итема в инвентарь
 hook.Add("IGS.IncomingMessage","InventoryActions",function(d, method)
-	if !INV_ACTIONS[method] then return end
+	if not INV_ACTIONS[method] then return end
 
 	local pl = getPlayer(d)
-	if !pl then return end
+	if not pl then return end
 
 	IGS.Notify(pl, "Перезагрузка инвентаря")
 	IGS.LoadInventory(pl,function()
@@ -92,7 +92,7 @@ hook.Add("IGS.IncomingMessage", "nomr", function(d, method)
 	if method ~= "transactions.create" then return end
 
 	local pl = getPlayer(d)
-	if !pl then return end
+	if not pl then return end
 
 	if IGS.C.DisableAntiMultirun then return end
 

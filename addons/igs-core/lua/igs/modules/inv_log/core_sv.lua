@@ -57,7 +57,7 @@ net.Receive("IGS.InvLog",function(_, pl)
 end)
 
 net.Receive("IGS.NameRequest",function(_, pl)
-	if !pl:IsSuperAdmin() then return end
+	if not pl:IsSuperAdmin() then return end
 
 	local s64 = net.ReadString()
 	IGS.GetPlayer(s64, function(d_)
@@ -76,7 +76,7 @@ end)
 
 net.Receive("IGS.DeactivateItem", function(_, pl)
 	local iPurchID = net.ReadUInt(IGS.BIT_PURCH_ID)
-	if !(iPurchID and pl:IsSuperAdmin()) then return end
+	if not (iPurchID and pl:IsSuperAdmin()) then return end
 
 	IGS.DisablePurchase(iPurchID, function(bUpdated)
 		IGS.Notify(pl, bUpdated and "Покупка отключена" or "Услуга уже отключена")

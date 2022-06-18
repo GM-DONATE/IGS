@@ -61,7 +61,7 @@ function IGS.WIN.InvLog()
 				if player.GetBySteamID64(s64) then continue end -- игрок в сети, ник получен
 
 				getNameBySid(function(name_)
-					if !name_ then return end
+					if not name_ then return end
 
 					local btn_owner = line.columns[i] -- 1, 2 колонка
 					btn_owner:SetText(name_)
@@ -90,7 +90,7 @@ function IGS.WIN.InvLog()
 			self.prev_uid  = uid_
 
 			IGS.IL.GetLog(function(tLog)
-				if !IsValid(bg) then return end -- Долго данные получались
+				if not IsValid(bg) then return end -- Долго данные получались
 
 				for _,r in ipairs(tLog) do
 					local ITEM = IGS.GetItemByUID(r.gift_uid)

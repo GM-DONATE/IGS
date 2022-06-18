@@ -40,8 +40,8 @@ local function loadFromFile(superfile)
 	IGS_MOUNT  = util.JSONToTable(superfile)
 
 	local err_msg = SERVER and
-			"Ошибка загрузки superfile. Удалите /data/superfile.txt и попробуйте снова или обратитесь в gm-donate.ru/support"
-		or 	"Ошибка загрузки superfile. Перезайдите на сервер " ..                    "или обратитесь в gm-donate.ru/support"
+			"Ошибка загрузки superfile. Удалите /data/superfile.txt и попробуйте снова или обратитесь в gm-donate.net/support"
+		or 	"Ошибка загрузки superfile. Перезайдите на сервер " ..                    "или обратитесь в gm-donate.net/support"
 
 	assert(IGS_MOUNT and IGS_MOUNT[path], err_msg)
 	RunString(IGS_MOUNT[path], path)

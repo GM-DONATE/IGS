@@ -2,7 +2,7 @@ local m
 
 local function purchase(ITEM, buy_button)
 	IGS.Purchase(ITEM:UID(), function(errMsg,dbID)
-		if !IsValid(buy_button) then return end
+		if not IsValid(buy_button) then return end
 
 		if errMsg then
 			IGS.ShowNotify(errMsg, "Ошибка покупки")
@@ -21,7 +21,7 @@ local function purchase(ITEM, buy_button)
 				m:Close()
 			end
 
-			if !IGS.C.Inv_Enabled then
+			if not IGS.C.Inv_Enabled then
 				IGS.ShowNotify("Спасибо за покупку. Это было просто, правда? :)", "Успешная покупка")
 				return
 			end
@@ -29,7 +29,7 @@ local function purchase(ITEM, buy_button)
 			IGS.BoolRequest("Успешная покупка",
 				"Спасибо за покупку. Она находится в вашем /donate инвентаре.\n\nАктивировать ее сейчас?",
 			function(yes)
-				if !yes then return end
+				if not yes then return end
 
 				IGS.ProcessActivate(dbID)
 			end)
@@ -50,7 +50,7 @@ local function move(f, x, sp, cb)
 end
 
 local function shakeFrame(f, amplitude, speed, cb)
-	if !IsValid(f) then return end
+	if not IsValid(f) then return end
 
 	local x = f:GetPos()
 	move(f, x + amplitude, speed, function()
@@ -101,7 +101,7 @@ function IGS.WIN.Item(uid)
 		if viewed < 3 then
 			local oldThink = p.scroll.scrollBar.Think
 			timer.Simple(.5,function() -- 0.5 = время, которое скролл будет мигать
-				if !IsValid(p) then return end
+				if not IsValid(p) then return end
 
 				p.scroll.scrollBar.Think = oldThink
 			end)
@@ -134,7 +134,7 @@ function IGS.WIN.Item(uid)
 			buy:SetText( "Купить за " .. PL_IGS(cur_price) )
 			buy:SetActive( IGS.CanAfford(LocalPlayer(), cur_price) )
 			buy.DoClick = function(s)
-				if !s:IsActive() then
+				if not s:IsActive() then
 					local need = cur_price - LocalPlayer():IGSFunds()
 
 					surface.PlaySound("ambient/voices/citizen_beaten1.wav") -- еще есть

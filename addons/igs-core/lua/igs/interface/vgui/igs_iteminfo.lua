@@ -45,8 +45,8 @@ function PANEL:SetIcon(sIco, bIsModel) -- url, Material or Model path
 	end, self.head)
 
 	if IsValid(self.icon) and
-		((self.model and !bIsModel) or   -- Если раньше была установлена моделька, а сейчас надо поставить иконку
-		(!self.model and bIsModel)) then -- Наоборот. Нужно поставить модельку, но стаяла картинка
+		((self.model and not bIsModel) or   -- Если раньше была установлена моделька, а сейчас надо поставить иконку
+		(not self.model and bIsModel)) then -- Наоборот. Нужно поставить модельку, но стаяла картинка
 
 		self.icon:Remove()
 		self.icon = nil
@@ -83,7 +83,7 @@ end
 
 -- Кнопка под названием инфо панели
 function PANEL:SetSubNameButton(sName,func)
-	if !sName then return end
+	if not sName then return end
 
 	self.sub = self.sub or uigs.Create("DButton", function(btn)
 		btn:Dock(TOP)
@@ -223,7 +223,7 @@ end
 
 -- Добавляет панель с указанным изображением
 function PANEL:SetImage(sUrl)
-	if !sUrl then return end
+	if not sUrl then return end
 
 	self:InvalidateParent(true) -- self:GetWide()
 

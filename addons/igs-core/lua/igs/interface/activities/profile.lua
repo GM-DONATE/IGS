@@ -82,7 +82,7 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 
 	local lvl = IGS.PlayerLVL(LP)
 	local mybal  = LP:IGSFunds()
-	local next_lvl = !lvl and IGS.LVL.MAP[1] or lvl:GetNext()
+	local next_lvl = not lvl and IGS.LVL.MAP[1] or lvl:GetNext()
 
 	ava_bg:AddRow("Статус",lvl and lvl:Name() or "Никто :(")
 	if next_lvl then
@@ -117,7 +117,7 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 
 		-- Обновление списка транзакций и информации в сайдбаре
 		IGS.GetMyTransactions(function(dat)
-			if !IsValid(pnl) then return end -- Долго данные получались
+			if not IsValid(pnl) then return end -- Долго данные получались
 
 			local bit_num_limit = 2 ^ IGS.BIT_TX - 1
 			if #dat == bit_num_limit then

@@ -104,9 +104,9 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 
 			-- #todo переписать это говнище
 			addItems(function(ITEM)
-				return self.categ == "Разное" and !ITEM:Category() or (ITEM:Category() == self.categ)
+				return self.categ == "Разное" and not ITEM:Category() or (ITEM:Category() == self.categ)
 			end,function(GROUP)
-				return self.categ == "Разное" and !GROUP:Items()[1].item:Category() or (GROUP:Items()[1].item:Category() == self.categ)
+				return self.categ == "Разное" and not GROUP:Items()[1].item:Category() or (GROUP:Items()[1].item:Category() == self.categ)
 			end)
 		end).categ = categ
 	end
@@ -117,7 +117,7 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 		Список последних покупок в сайдбаре
 	---------------------------------------------------------------------------]]
 	IGS.GetLatestPurchases(function(latest_purchases)
-		if !IsValid(activity) then return end
+		if not IsValid(activity) then return end
 
 		local function addPurchasePanel(v)
 			local b = uigs.Create("Panel")

@@ -26,7 +26,7 @@ function IGS.Activate(iInvID, callback)
 		net.WriteBool(callback)
 	net.SendToServer()
 
-	if !callback then return end
+	if not callback then return end
 	net.Receive("IGS.Activate", function()
 		local ok = net.ReadBool()
 		local iPurchID = ok and net.ReadUInt(IGS.BIT_PURCH_ID)
@@ -129,7 +129,7 @@ function IGS.GetInventory(fCallback)
 end
 
 function IGS.DropItem(iID,fCallback) -- энтити в каллбэке
-	if !IGS.C.Inv_AllowDrop then
+	if not IGS.C.Inv_AllowDrop then
 		IGS.ShowNotify("Дроп предметов отключен администратором", "Ошибка")
 		return
 	end

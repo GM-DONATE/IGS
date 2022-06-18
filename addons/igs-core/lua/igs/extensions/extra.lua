@@ -91,9 +91,11 @@ end
 hook.Add("IGS.PlayerActivatedItem", "IGS.GlobalPurchase", function(pl, ITEM)
 	if SERVER and ITEM:GetMeta("global") then
 		for sv_id in pairs(IGS.SERVERS.MAP) do
-			if sv_id == IGS.SERVERS.CURRENT then continue end -- уже выдано
-			IGS.StorePurchase(pl:SteamID64(), ITEM:UID(), ITEM:Term(), sv_id)
+			if sv_id ~= IGS.SERVERS.CURRENT then -- еще не выдано
+				IGS.StorePurchase(pl:SteamID64(), ITEM:UID(), ITEM:Term(), sv_id)
+			end
 		end
+
 		IGS.Notify(pl, "Предмет выдан на " .. IGS.SERVERS.TOTAL .. " серверах")
 	end
 end)
@@ -156,7 +158,7 @@ function STORE_ITEM:AddHook(sHook, fCallback)
 	local uid = self:UID()
 	hook.Add(sHook, "item." .. uid, function(pl, ...)
 		if pl:HasPurchase(uid) then
-			fCallback(pl, ...)
+			return fCallback(pl, ...)
 		end
 	end)
 	return self

@@ -41,7 +41,7 @@ local function updateBalance(pl, fOnFinish, bGiveBonuses)
 		local was_igs = pl:IGSFunds()
 		local diff = (now_igs_ or 0) - was_igs
 
-		if diff ~= 0 then -- баланс != nil и не 0 (? https://t.me/c/1353676159/45001)
+		if diff ~= 0 then -- баланс ~= nil и не 0 (? https://t.me/c/1353676159/45001)
 			pl:SetIGSVar("igs_balance", now_igs_) -- НЕ ДОЛЖНО ВЫПОЛНЯТЬСЯ НА НЕ_КЛИЕНТОВ
 			pl.igs_score = now_score_ -- #todo make netvar
 		end

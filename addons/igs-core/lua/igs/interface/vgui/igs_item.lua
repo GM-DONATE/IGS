@@ -25,7 +25,7 @@ local font_exists
 function PANEL:Init()
 	self:SetSize(180,70)
 
-	if !font_exists then
+	if not font_exists then
 		surface.CreateFont("roboto_15",{
 			font     = "roboto",
 			extended = true,
@@ -104,13 +104,13 @@ end
 -- end
 
 function PANEL:SetIcon(sIco,bIsModel) -- :SetIcon() для сброса
-	if !sIco then return self end
+	if not sIco then return self end
 
-	if bIsModel and !file.Exists(sIco, "GAME") then
+	if bIsModel and not file.Exists(sIco, "GAME") then
 		sIco = "models/props_lab/huladoll.mdl"
 	end
 
-	if !self.icon then
+	if not self.icon then
 		local icobg = uigs.Create("Panel", self)
 		icobg:SetSize(40,40)
 		icobg:SetPos(2,2)

@@ -51,7 +51,7 @@ end
 
 -- function scc.addWithCooldown(cooldown, command, callback)
 -- 	local runIfNotCooldown = function(pl, ...)
--- 		if !pl.sccLastRun then pl.sccLastRun = {} end
+-- 		if not pl.sccLastRun then pl.sccLastRun = {} end
 -- 		if CurTime() - (pl.sccLastRun[command] or 0) >= cooldown then
 -- 			pl.sccLastRun[command] = CurTime()
 -- 			callback(pl, ...)

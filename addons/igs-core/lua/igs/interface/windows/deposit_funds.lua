@@ -10,7 +10,7 @@ function IGS.WIN.Deposit(iRealSum)
 	surface.PlaySound("ambient/weather/rain_drip1.wav")
 	hook.Run("IGS.OnDepositWinOpen",iRealSum)
 
-	local cd = !IGS.IsCurrencyEnabled() -- cd = currency disabled. Bool
+	local cd = not IGS.IsCurrencyEnabled() -- cd = currency disabled. Bool
 	local realSum = math.max(IGS.GetMinCharge(), niceSum(iRealSum, 0))
 
 	m = uigs.Create("igs_frame", function(self)
@@ -66,7 +66,7 @@ function IGS.WIN.Deposit(iRealSum)
 		--[[-------------------------------------
 			Середина. Знак равности и кнопка покупки
 		---------------------------------------]]
-		if !cd then
+		if not cd then
 			uigs.Create("DLabel", function(eq)
 				eq:SetSize(50,30)
 				eq:SetPos(200,50)
@@ -86,7 +86,7 @@ function IGS.WIN.Deposit(iRealSum)
 
 			p.DoClick = function()
 				local want_money = niceSum(self.real_m:GetValue())
-				if !want_money then
+				if not want_money then
 					self.log:AddRecord("Указана некорректная сумма пополнения", false)
 					return
 
@@ -99,7 +99,7 @@ function IGS.WIN.Deposit(iRealSum)
 
 				IGS.GetPaymentURL(want_money,function(url)
 					IGS.OpenURL(url,"Процедура пополнения счета")
-					if !IsValid(self) then return end
+					if not IsValid(self) then return end
 					self.log:AddRecord("Подпись получена. начинаем процесс оплаты")
 
 					timer.Simple(.7,function()
@@ -112,7 +112,7 @@ function IGS.WIN.Deposit(iRealSum)
 		--[[-------------------------------------
 			Правая колонка. Донат валюта
 		---------------------------------------]]
-		if !cd then
+		if not cd then
 			uigs.Create("DLabel", function(curr)
 				curr:SetSize(180,25)
 				curr:SetPos(self:GetWide() - 10 - curr:GetWide(),self:GetTitleHeight())
@@ -226,7 +226,7 @@ function IGS.WIN.Deposit(iRealSum)
 
 		local function log(delay,text,status)
 			timer.Simple(delay,function()
-				if !IsValid(self.log) then return end
+				if not IsValid(self.log) then return end
 				self.log:AddRecord(text, status)
 			end)
 		end
@@ -249,7 +249,7 @@ hook.Add("IGS.PaymentStatusUpdated","UpdatePaymentStatus",function(dat)
 		dat.method == "error" and ("Ошибка пополнения счета: " .. dat.errorMessage) or
 		"С сервера пришел неизвестный метод " .. tostring(dat.method) .. " и возникла ошибка"
 
-	if !IsValid(m) then
+	if not IsValid(m) then
 		IGS.ShowNotify(text,"Обновление статуса платежа")
 		return
 	end

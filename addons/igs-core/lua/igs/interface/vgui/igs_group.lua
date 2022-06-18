@@ -14,7 +14,7 @@ function PANEL:SetGroup(ITEM_GROUP)
 
 	local visible_items = {}
 	for _,GROUP_ITEM in ipairs(ITEM_GROUP:Items()) do
-		if !GROUP_ITEM.item:IsHidden() then
+		if not GROUP_ITEM.item:IsHidden() then
 			table.insert(visible_items, GROUP_ITEM)
 		end
 	end
@@ -45,7 +45,7 @@ function PANEL:SetGroup(ITEM_GROUP)
 end
 
 function PANEL:DoClick()
-	if !IsValid(self.list_bg) then
+	if not IsValid(self.list_bg) then
 		self.list_bg = IGS.WIN.Group(self.group:UID())
 	end
 end

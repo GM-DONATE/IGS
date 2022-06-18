@@ -73,7 +73,7 @@ end
 -- Дает объект лвл, соответствующий указанной сумме
 function IGS.LVL.GetByCost(iRealCost)
 	for lvl = 1,#IGS.LVL.MAP do
-		if !IGS.LVL.MAP[lvl + 1] or IGS.LVL.MAP[lvl + 1].cost > iRealCost then
+		if not IGS.LVL.MAP[lvl + 1] or IGS.LVL.MAP[lvl + 1].cost > iRealCost then
 			return IGS.LVL.MAP[lvl]
 		end
 	end

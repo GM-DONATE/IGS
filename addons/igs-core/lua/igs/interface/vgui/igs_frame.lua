@@ -95,7 +95,7 @@ function PANEL:PerformLayout()
 	self.lblTitle:SizeToContents()
 	self.btnClose:SetPos(self:GetWide() - 30, 0)
 
-	if self.remember_uid and !self.restored then
+	if self.remember_uid and not self.restored then
 		self.restored = true
 		self:RestoreLocation(self.remember_uid)
 	end
