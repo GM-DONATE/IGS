@@ -48,13 +48,13 @@ end
 --[[-------------------------------------------------------------------------
 	Ссылки
 ---------------------------------------------------------------------------]]
-function IGS.GetPaymentURL(iSum,fCallback)
+function IGS.GetPaymentURL(iSum,fCallback) -- url in callback
 	net.Start("IGS.GetPaymentURL")
 		net.WriteDouble(iSum)
 	net.SendToServer()
 
 	net.Receive("IGS.GetPaymentURL",function()
-		fCallback(net.ReadString())
+		fCallback(net.ReadString()) -- url
 	end)
 end
 

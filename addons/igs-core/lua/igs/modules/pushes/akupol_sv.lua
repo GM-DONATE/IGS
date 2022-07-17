@@ -67,7 +67,7 @@ function kupol.new(sUrl, uid, iTimeout)
 			local i = bib.getNum("lp:ts:" .. o.uid, 0) + 1
 			bib.setNum("lp:ts:" .. o.uid, i) -- increment
 
-			local ok, err = pcall(o.handler, upd)
+			local _, err = pcall(o.handler, upd)
 			if err then
 				log.error("Внутри хендлера произошла ошибка и работа чуть не прекратилась: {}", err)
 			end
