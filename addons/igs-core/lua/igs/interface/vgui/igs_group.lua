@@ -1,6 +1,6 @@
 local PANEL = {}
 
-local PL_VARIANTS = PL.Add("variants",{"вариант", "варианта", "вариантов"})
+local PL_VARIANTS = PLUR({"вариант", "варианта", "вариантов"})
 function PANEL:SetGroup(ITEM_GROUP)
 	self.group = ITEM_GROUP
 
@@ -14,7 +14,7 @@ function PANEL:SetGroup(ITEM_GROUP)
 
 	local visible_items = {}
 	for _,GROUP_ITEM in ipairs(ITEM_GROUP:Items()) do
-		if !GROUP_ITEM.item:IsHidden() then
+		if not GROUP_ITEM.item:IsHidden() then
 			table.insert(visible_items, GROUP_ITEM)
 		end
 	end
@@ -24,7 +24,7 @@ function PANEL:SetGroup(ITEM_GROUP)
 
 	local min,max = math.huge,0 -- минимальная и максимальная цены итемов
 	for _,v in ipairs(visible_items) do
-		local price = v.item:PriceInCurrency()
+		local price = v.item:GetPrice( LocalPlayer() )
 
 		if price < min then
 			min = price
@@ -45,7 +45,7 @@ function PANEL:SetGroup(ITEM_GROUP)
 end
 
 function PANEL:DoClick()
-	if !IsValid(self.list_bg) then
+	if not IsValid(self.list_bg) then
 		self.list_bg = IGS.WIN.Group(self.group:UID())
 	end
 end

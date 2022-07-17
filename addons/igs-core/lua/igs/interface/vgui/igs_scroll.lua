@@ -4,7 +4,7 @@ function SCROLLBAR:Init()
 
 	self.scrollButton = vgui.Create("Panel", self)
 	self.scrollButton.OnMousePressed = function(s, mb)
-		if (mb == MOUSE_LEFT and !self:GetParent().ShouldHideScrollbar) then
+		if (mb == MOUSE_LEFT and not self:GetParent().ShouldHideScrollbar) then
 			local _, my = s:CursorPos()
 
 			s.scrolling = true
@@ -24,7 +24,7 @@ end
 
 function SCROLLBAR:Think()
 	if (self.scrollButton.scrolling) then
-		if (!input.IsMouseDown(MOUSE_LEFT)) then
+		if (not input.IsMouseDown(MOUSE_LEFT)) then
 			self.scrollButton:OnMouseReleased(MOUSE_LEFT)
 			return
 		end
@@ -50,7 +50,7 @@ function SCROLLBAR:Think()
 		self.addWidth = math.Clamp(self.addWidth - (FrameTime() * 96), 0, 8)
 	end
 
-	if (preSize != self.addWidth) then
+	if (preSize ~= self.addWidth) then
 		self:InvalidateLayout()
 	end
 end
@@ -160,7 +160,7 @@ function SCROLLABLE:SetOffset(offSet)
 end
 
 function SCROLLABLE:Think()
-	if (self.ySpeed != 0) then
+	if (self.ySpeed ~= 0) then
 		if (self:SetOffset(self.yOffset - self.ySpeed)) then
 			self.ySpeed = 0
 		else
@@ -176,7 +176,7 @@ end
 function SCROLLABLE:PerformLayout()
 	local canvas = self:GetCanvas()
 
-	if (canvas:GetWide() != self:GetWide()) then
+	if (canvas:GetWide() ~= self:GetWide()) then
 		canvas:SetWide(self:GetWide())
 	end
 
@@ -184,10 +184,10 @@ function SCROLLABLE:PerformLayout()
 	local lastChild
 	for k, v in ipairs(canvas:GetChildren()) do
 		local childY = y + self.SpaceTop
-		if (v.x != self.Padding or v.y != childY) then
+		if (v.x ~= self.Padding or v.y ~= childY) then
 			v:SetPos(math.max(0, self.Padding), y + self.SpaceTop)
 		end
-		if (v:GetWide() != self:GetWide() - self.Padding * 2) then
+		if (v:GetWide() ~= self:GetWide() - self.Padding * 2) then
 			v:SetWide(math.min(self:GetWide(), self:GetWide() - self.Padding * 2))
 		end
 
@@ -195,7 +195,7 @@ function SCROLLABLE:PerformLayout()
 		lastChild = v
 	end
 	y = lastChild and lastChild.y + lastChild:GetTall() or y
-	if (canvas:GetTall() != y) then
+	if (canvas:GetTall() ~= y) then
 		canvas:SetTall(y)
 	end
 
@@ -203,7 +203,7 @@ function SCROLLABLE:PerformLayout()
 		canvas:SetTall(self:GetTall())
 
 		self.scrollBar:SetVisible(false)
-	elseif (canvas:GetTall() > self:GetTall() and !self.scrollBar:IsVisible()) then
+	elseif (canvas:GetTall() > self:GetTall() and not self.scrollBar:IsVisible()) then
 		self.scrollBar:SetVisible(true)
 	end
 
@@ -217,7 +217,7 @@ function SCROLLABLE:PerformLayout()
 		self.yOffset = 0
 	end
 
-	if (canvas.x != 0 or canvas.y != -self.yOffset) then
+	if (canvas.x ~= 0 or canvas.y ~= -self.yOffset) then
 		canvas:SetPos(0, -self.yOffset)
 		self.scrollBar:InvalidateLayout()
 	end

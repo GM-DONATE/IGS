@@ -27,14 +27,16 @@ end
 -- uigs.Create("name", func, parent)
 -- uigs.Create("name", func)
 
+local function f1()
+	local GM = GM or GAMEMODE
+	if GM and IGS.C.MENUBUTTON == KEY_F1 then
+		function GM:ShowHelp() end
+	end
+end
 
 -- Чтобы не открывало F1 менюшку даркрпшевскую ебучую
-hook.Add("DarkRPFinishedLoading","SupressDarkRPF1",function()
-	if IGS.C.MENUBUTTON ~= KEY_F1 then return end
-
-	local GM = GM or GAMEMODE
-	function GM:ShowHelp() end
-end)
+hook.Add("DarkRPFinishedLoading","SupressDarkRPF1",f1) -- с addons
+hook.Add("IGS.Initialized","SupressDarkRPF1",f1) -- git загрузка
 
 
 

@@ -26,7 +26,7 @@ function IGS.Activate(iInvID, callback)
 		net.WriteBool(callback)
 	net.SendToServer()
 
-	if !callback then return end
+	if not callback then return end
 	net.Receive("IGS.Activate", function()
 		local ok = net.ReadBool()
 		local iPurchID = ok and net.ReadUInt(IGS.BIT_PURCH_ID)
@@ -48,13 +48,13 @@ end
 --[[-------------------------------------------------------------------------
 	Ссылки
 ---------------------------------------------------------------------------]]
-function IGS.GetPaymentURL(iSum,fCallback)
+function IGS.GetPaymentURL(iSum,fCallback) -- url in callback
 	net.Start("IGS.GetPaymentURL")
 		net.WriteDouble(iSum)
 	net.SendToServer()
 
 	net.Receive("IGS.GetPaymentURL",function()
-		fCallback(net.ReadString())
+		fCallback(net.ReadString()) -- url
 	end)
 end
 
@@ -129,7 +129,7 @@ function IGS.GetInventory(fCallback)
 end
 
 function IGS.DropItem(iID,fCallback) -- энтити в каллбэке
-	if !IGS.C.Inv_AllowDrop then
+	if not IGS.C.Inv_AllowDrop then
 		IGS.ShowNotify("Дроп предметов отключен администратором", "Ошибка")
 		return
 	end

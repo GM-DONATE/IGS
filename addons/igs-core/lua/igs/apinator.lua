@@ -9,7 +9,7 @@ end
 
 local error_no_igsmod =
 	"ABTogoHaT He HacTpoeH: Hy}{Ho ycTaHoBuTb igsmodificator. " ..
-	"(CKa4auTe ero c cauTa gm-donate.ru/panel)"
+	"(CKa4auTe ero c cauTa gm-donate.net/panel)"
 
 local error_invalid_credentials =
 	"Не указаны или неверно указаны данные проекта в файле config_sv.lua"
@@ -28,7 +28,7 @@ function IGS.DoRequest(project_id, secret, sMethod, tParams, fSucc, fErr)
 	tParams = map(tParams, tostring)
 
 	-- prt({"Sign: %s" .. IGS.GetSign(tParams), tParams})
-	local api_url = IGS_API_ENDPOINT or "https://gm-donate.ru/api"
+	local api_url = IGS_API_ENDPOINT or "https://gm-donate.net/api"
 	http.Post(api_url .. sMethod, tParams, fSucc, fErr, {
 		sign    = IGS.GetSign(tParams, secret),
 		project = tostring(project_id)
@@ -54,6 +54,7 @@ local function wrapResponse(sMethod, tParams, fOnSuccess, fOnError)
 		local d = util.JSONToTable(sBody)
 
 		if (not d) then
+			IGS.print(Color(255,0,0), sBody)
 			fOnError("invalid_response_format")
 		elseif (not d.ok) then
 			fOnError(d.error)
@@ -81,7 +82,7 @@ end
 
 
 -- Дебаг
-local sid = "76561198071463189"
+-- local sid = "76561198071463189"
 
 
 
@@ -100,7 +101,7 @@ function IGS.UpdatePlayerName(s64, sName, fCallback)
 end
 -- IGS.UpdatePlayerName(sid,"TEST !@#$%^&*()'",PRINT)
 
--- nil or {`Name`,`Balance`}
+-- nil or {`Name`,`Balance`, `Score`}
 function IGS.GetPlayer(s64, fCallback)
 	IGS.Query("/donators/get",{
 		sid = s64,
@@ -253,14 +254,13 @@ end
 	ССЫЛКИ
 >----------------------------<
 ]]
-function IGS.GetPaymentURL(fCallback, s64, iSum, sDescription_)
+function IGS.GetPaymentURL(fCallback, s64, iSum)
 	IGS.Query("/url/getPayment",{
 		sid   = s64,
-		sum   = iSum,
-		descr = sDescription_ or nil, -- если не указать, то будет "Пополнение счета на sum руб"
+		sum   = iSum
 	},fCallback) -- ссылка
 end
--- IGS.GetPaymentURL(PRINT,sid,10,"Примечание, которое можно не указывать")
+-- IGS.GetPaymentURL(PRINT,sid,10)
 
 
 --[[
@@ -313,7 +313,7 @@ end
 -- IGS.AddServer("255.255.255.255", 65535, PRINT)
 
 -- Получает список серверов проекта
--- `ID`,`Name`,`IP`,`Port`,`SocketPort`,`Disabled`
+-- `ID`,`Name`,`IP`,`Port`,`Disabled`
 -- Если указать bIncludeDisabled, то получит и отключенные
 function IGS.GetServers(fCallback, bIncludeDisabled_, iID_)
 	IGS.Query("/servers/get",{
@@ -329,7 +329,7 @@ function IGS.GetExternalIP(fCallback)
 end
 -- IGS.GetExternalIP(PRINT)
 
--- Нужно указать минимум один параметр (name, port, version, state, ip, hostport)
+-- Нужно указать минимум один параметр (name, version, state, ip, hostport)
 function IGS.UpdateServer(iServerID, tParams, fCallback)
 	tParams.s = iServerID
 	IGS.Query("/servers/update", tParams, fCallback)
@@ -344,12 +344,6 @@ function IGS.SetServerName(sName, fCallback)
 	IGS.UpdateCurrentServer({name = sName}, fCallback) -- до 32 символов
 end
 -- IGS.SetServerName("12345678901234567890123456789012", PRINT)
-
--- Изменяет порт сокета для указанного сервера
-function IGS.SetServerSocketPort(iPort, fCallback)
-	IGS.UpdateCurrentServer({port = iPort}, fCallback) -- 1-65535
-end
--- IGS.SetServerSocketPort(29004, PRINT)
 
 -- Чисто техническая инфа для упрощения поддержки
 function IGS.SetServerVersion(iVersion, fCallback)

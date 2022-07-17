@@ -60,27 +60,31 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 		local rows = {}
 
 		for _,GROUP in pairs( IGS.GetGroups() ) do -- name
-			if fGroupFilter and fGroupFilter(GROUP) == false then continue end
+			if not fGroupFilter or fGroupFilter(GROUP) ~= false then
+				local pnl = uigs.Create("igs_group"):SetGroup(GROUP)
+				pnl.category = GROUP:Items()[1].item:Category() -- предполагаем, что в одной группе будут итемы одной категории
 
-			local pnl = uigs.Create("igs_group"):SetGroup(GROUP)
-			pnl.category = GROUP:Items()[1].item:Category() -- предполагаем, что в одной группе будут итемы одной категории
+				table.insert(rows,pnl)
+			end
+		end
 
-			table.insert(rows,pnl)
+		local check_skip = function(ITEM)
+			return ITEM.isnull  -- пустышка
+				or ITEM.hidden  -- еще в IGS.WIN.Group
+				or ITEM:Group() -- группированные итемы засунуты в группу выше
+				or (fItemsFilter and fItemsFilter(ITEM) == false)
 		end
 
 		-- не (i)pairs, потому что какой-то ID в каком-то очень редком случае может отсутствовать
 		-- если его кто-то принудительно занилит, чтобы убрать итем например.
 		-- Хотя маловероятно, но все же
 		for _,ITEM in pairs(IGS.GetItems()) do
-			if fItemsFilter and fItemsFilter(ITEM) == false then continue end
-			if ITEM:IsHidden() then continue end -- еще в IGS.WIN.Group
-			if ITEM:Group()    then continue end -- группированные итемы засунуты в группу выше
-			if ITEM.isnull     then continue end -- пустышка
+			if not check_skip(ITEM) then
+				local pnl = uigs.Create("igs_item"):SetItem(ITEM)
+				pnl.category = ITEM:Category()
 
-			local pnl = uigs.Create("igs_item"):SetItem(ITEM)
-			pnl.category = ITEM:Category()
-
-			table.insert(rows,pnl)
+				table.insert(rows,pnl)
+			end
 		end
 
 		for _,pnl in ipairs(rows) do
@@ -104,9 +108,9 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 
 			-- #todo переписать это говнище
 			addItems(function(ITEM)
-				return self.categ == "Разное" and !ITEM:Category() or (ITEM:Category() == self.categ)
+				return self.categ == "Разное" and not ITEM:Category() or (ITEM:Category() == self.categ)
 			end,function(GROUP)
-				return self.categ == "Разное" and !GROUP:Items()[1].item:Category() or (GROUP:Items()[1].item:Category() == self.categ)
+				return self.categ == "Разное" and not GROUP:Items()[1].item:Category() or (GROUP:Items()[1].item:Category() == self.categ)
 			end)
 		end).categ = categ
 	end
@@ -117,7 +121,7 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 		Список последних покупок в сайдбаре
 	---------------------------------------------------------------------------]]
 	IGS.GetLatestPurchases(function(latest_purchases)
-		if !IsValid(activity) then return end
+		if not IsValid(activity) then return end
 
 		local function addPurchasePanel(v)
 			local b = uigs.Create("Panel")
@@ -181,9 +185,9 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 
 		for _,purchase in ipairs(latest_purchases) do
 			local ITEM = IGS.GetItemByUID(purchase.item)
-			if ITEM.isnull then continue end
-
-			addPurchasePanel(purchase)
+			if not ITEM.isnull then
+				addPurchasePanel(purchase)
+			end
 		end
 	end)
 

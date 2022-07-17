@@ -1,3 +1,5 @@
+-- Плашечка предмета с иконкой, ценой
+
 --[[-------------------------------------------------------------------------
 	:SetIcon ДОЛЖЕН вызываться ДО :SetName
 	а :SetName ДОЛЖЕН вызываться ДО :SetSign
@@ -7,17 +9,9 @@ local PANEL = {}
 local function getBottomText(ITEM, bShowDiscounted)
 	local iDiscFrom = bShowDiscounted and ITEM.discounted_from
 
-	local iReal = iDiscFrom or ITEM:Price()
-	local iCurr = IGS.PriceInCurrency(iReal)
-
+	local iReal = iDiscFrom or ITEM:GetPrice( LocalPlayer() )
 	local real = PL_MONEY(iReal)
-	local curr = IGS.SignPrice(iCurr)
-
-	if IGS.IsCurrencyEnabled() then
-		return real .. " (" .. curr .. ")"
-	else
-		return real
-	end
+	return real
 end
 
 
@@ -25,7 +19,7 @@ local font_exists
 function PANEL:Init()
 	self:SetSize(180,70)
 
-	if !font_exists then
+	if not font_exists then
 		surface.CreateFont("roboto_15",{
 			font     = "roboto",
 			extended = true,
@@ -45,7 +39,7 @@ function PANEL:SetItem(STORE_ITEM)
 
 	self:SetIcon(STORE_ITEM:ICON())
 	self:SetName(STORE_ITEM:Name())
-	-- self:SetPrice(STORE_ITEM:Price())
+	-- self:SetPrice(STORE_ITEM:GetPrice( LocalPlayer() ))
 
 	self:SetTitleColor(STORE_ITEM:GetHighlightColor()) -- nil
 
@@ -104,13 +98,13 @@ end
 -- end
 
 function PANEL:SetIcon(sIco,bIsModel) -- :SetIcon() для сброса
-	if !sIco then return self end
+	if not sIco then return self end
 
-	if bIsModel and !file.Exists(sIco, "GAME") then
+	if bIsModel and not file.Exists(sIco, "GAME") then
 		sIco = "models/props_lab/huladoll.mdl"
 	end
 
-	if !self.icon then
+	if not self.icon then
 		local icobg = uigs.Create("Panel", self)
 		icobg:SetSize(40,40)
 		icobg:SetPos(2,2)
@@ -238,7 +232,7 @@ end
 function PANEL:PaintOver(w,h)
 	if self.item and self.item.discounted_from then
 		-- local disc_price = self.item.discounted_from
-		-- local disc = diffNumsPercent(disc_price, self.item:Price())
+		-- local disc = diffNumsPercent(disc_price, self.item:GetPrice( LocalPlayer() ))
 
 		surface.SetDrawColor(IGS.col.TEXT_SOFT)
 

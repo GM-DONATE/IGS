@@ -10,26 +10,18 @@ local STORE_ITEM = FindMetaTable("IGSItem")
 
 -- Тулы
 function STORE_ITEM:SetTool(sToolName)
-	self:SetCategory("Инструменты")
-	self:SetDescription("Разрешает использовать инструмент " .. sToolName)
-
 	self.tool = self:Insert(IGS.ITEMS.SB.TOOLS, sToolName)
 	return self
 end
 
 -- Энтити
 function STORE_ITEM:SetEntity(sEntClass)
-	self:SetCategory("Энтити (Предметы)")
-
 	self.entity = self:Insert(IGS.ITEMS.SB.SENTS, sEntClass)
 	return self
 end
 
 -- Пушки
 function STORE_ITEM:SetWeapon(sWepClass,tAmmo)
-	self:SetCategory("Оружие")
-	self:SetDescription("Разрешает спавнить " .. sWepClass .. " через спавн меню в любое время")
-
 	self:SetNetworked() -- для HasPurchase и отображения галочки
 
 	self.ammo = tAmmo
@@ -39,14 +31,14 @@ end
 
 if CLIENT then -- :SetWeapon only
 hook.Add("IGS.OnItemInfoOpen","CheckGiveWeaponOnSpawn",function(ITEM, fr)
-	if !(ITEM.swep and LocalPlayer():HasPurchase(ITEM:UID())) then return end
+	if not (ITEM.swep and LocalPlayer():HasPurchase(ITEM:UID())) then return end
 
 	uigs.Create("DCheckBoxLabel", function(self)
 		self:Dock(TOP)
 		self:DockMargin(0,5,0,0)
 		self:SetTall(20)
 
-		local should_give = LocalPlayer():GetNWBool("igs.gos." .. ITEM:ID())
+		local should_give = LocalPlayer():GetNWBool("igs.gos." .. ITEM:ID()) -- #todo UID и избавиться от :ID()
 		self:SetValue(should_give)
 
 		self:SetText("Выдавать при спавне")
@@ -102,10 +94,7 @@ else -- SV
 	function IGS:IGS_PlayerLoadout(pl)
 		for uid in pairs(IGS.PlayerPurchases(pl) or {}) do
 			local ITEM = IGS.GetItemByUID(uid)
-			if !ITEM.swep then continue end
-
-			local give = GetShouldPlayerReceiveWep(pl, ITEM)
-			if give then
+			if ITEM.swep and GetShouldPlayerReceiveWep(pl, ITEM) then
 				pl:Give(ITEM.swep)
 				giveItemAmmo(pl, ITEM)
 			end
@@ -114,7 +103,7 @@ else -- SV
 
 	net.Receive("IGS.GiveOnSpawnWep",function(_, pl)
 		local ITEM,bWant = net.ReadIGSItem(),net.ReadBool()
-		if !pl:HasPurchase(ITEM:UID()) or !ITEM.swep then return end -- байпас
+		if not pl:HasPurchase(ITEM:UID()) or not ITEM.swep then return end -- байпас
 
 		PlayerSetWantReceiveOnSpawn(pl, ITEM, bWant)
 	end)
@@ -149,8 +138,6 @@ end
 
 -- Машины
 function STORE_ITEM:SetVehicle(sVehClass)
-	self:SetCategory("Транспорт")
-
 	self.vehicle = self:Insert(IGS.ITEMS.SB.VEHS, sVehClass)
 	return self
 end
@@ -227,7 +214,7 @@ hook.Add("PlayerSpawnedVehicle","IGS",function(pl,veh)
 		counter(pl, getVehClass(veh), 1)
 
 		veh:CallOnRemove("ChangeCounter",function(ent)
-			if !IsValid(pl) then return end
+			if not IsValid(pl) then return end
 			counter(pl, getVehClass(ent), -1)
 		end)
 	end
@@ -236,7 +223,7 @@ end)
 hook.Add("PlayerSpawnVehicle","IGS",function(pl, _, class) -- model, class, table
 	if IGS.PlayerHasOneOf(pl,IGS.ITEMS.SB.VEHS[class]) then -- покупал машину
 		local can = canSpawn(pl,class)
-		if !can then
+		if not can then
 			IGS.Notify(pl,"У вас есть заспавнена эта машина")
 		end
 
@@ -292,7 +279,7 @@ end)
 -- DARKRP ONLY
 hook.Add("canDropWeapon","IGS",function(pl,wep)
 	-- Пушка не продается
-	if !IsValid(wep) or !IGS.ITEMS.SB.SWEPS[wep:GetClass()] then return end
+	if not IsValid(wep) or not IGS.ITEMS.SB.SWEPS[wep:GetClass()] then return end
 
 	-- Пушка продается и чел купил ее
 	local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.SB.SWEPS[wep:GetClass()])
@@ -304,3 +291,31 @@ hook.Add("canDropWeapon","IGS",function(pl,wep)
 	-- Т.е. по сути возможность дропа контроллируется другими хуками
 end, HOOK_HIGH)
 end)
+
+
+function STORE_ITEM:SetPlayerModel(mdl)
+	return self:SetMeta("player_model", mdl):AddHook("PlayerSetModel", function(pl)
+		local override = hook.Run("IGS.PlayerSetModel", pl, self)
+		if override ~= false then
+			pl:SetModel(mdl)
+			pl:SetupHands()
+			return true
+		end
+	end)
+end
+
+--[[
+IGS("Alyx", "custom_model", 300)
+	:SetDescription("Вы будете спавниться всегда с моделькой Аликс")
+	:SetTerm(30) -- 30 дней
+	:SetPlayerModel("models/player/alyx.mdl")
+
+
+-- Если у игрока куплена моделька alyx.mdl, то выдавать ее только за профессию бомжа
+hook.Add("IGS.PlayerSetModel", "SetPlayerModel_filter", function(pl, ITEM)
+	local mdl = ITEM:GetMeta("player_model")
+	if mdl == "models/player/alyx.mdl" and pl:Team() ~= TEAM_HOBO then
+		return false
+	end
+end)
+--]]

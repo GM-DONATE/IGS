@@ -113,7 +113,7 @@ function lolib.new()
 	return logger
 end
 
-/*
+--[[
 local log = lolib.new()
 log.setLevel(lolib.LEVELS.INFO)
 log.setFormat("{time} name {message}")
@@ -122,6 +122,6 @@ log.debug("debug value: {}", 123)
 log.info("info value: {}", 123)
 log.warning("warning value: {}", 123)
 log.error("error value: {}", 123)
-*/
+]]
 
 -- return lolib

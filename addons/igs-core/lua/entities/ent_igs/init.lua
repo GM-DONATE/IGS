@@ -5,7 +5,7 @@ function ENT:Initialize()
 	-- self:SetModel("models/props_junk/Shoe001a.mdl") -- ботинок
 	-- self:SetModel("models/christmas_gift2/christmas_gift2.mdl") -- подарок
 
-	self:SetModel("models/dav0r/hoverball.mdl")
+	self:SetModel(IGS_GIFT_MODEL or "models/dav0r/hoverball.mdl")
 	self:SetModelScale(1.5)
 	self:SetAngles(Angle(90, 0, 0))
 
@@ -52,25 +52,30 @@ function ENT:PlayerUse(pl)
 
 		-- вставлять новый ID не совсем корректно
 		-- Думаю, надо кешировать тот ИД, что был при покупке
-		hook.Run("IGS.PlayerPickedGift", self:Getowning_ent(), UID, invDbID, pl)
+		hook.Run("IGS.PlayerPickedGift", self.Getowning_ent and self:Getowning_ent(), UID, invDbID, pl)
 	end)
 end
 
-function IGS.CreateGift(sUid, plOwner, vPos)
+function IGS.SpawnGift(sUid, vPos)
 	assert(sUid, "Item UID expected")
 
 	local ent = ents.Create("ent_igs")
+	ent:SetUID(sUid)
 
 	if vPos then
 		ent:SetPos(vPos)
-	end
-
-	ent:SetUID(sUid)
-	ent:Setowning_ent(plOwner)
-
-	if vPos then
 		ent:Spawn()
 	end
 
+	return ent
+end
+
+-- Обратная совместимость
+-- https://forum.gm-donate.net/t/spavn-donata-cherez-konsol/438/4?u=gmd
+function IGS.CreateGift(sUid, plOwner, vPos)
+	local ent = IGS.SpawnGift(sUid, vPos)
+	if ent.Setowning_ent then
+		ent:Setowning_ent(plOwner)
+	end
 	return ent
 end

@@ -9,7 +9,7 @@ end
 function PANEL:Add(panel,sCategory)
 	local cat = sCategory or "Разное"
 
-	if !self.list[cat] then
+	if not self.list[cat] then
 		self.list[cat] = uigs.Create("igs_panels_layout", self)
 		self.list[cat]:SetWide(650)
 		self.list[cat]:SetName(sCategory)

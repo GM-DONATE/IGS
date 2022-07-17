@@ -1,48 +1,51 @@
-IGS.ITEMS.SAM = IGS.ITEMS.SAM or {
-	GROUPS = {}
-}
-
 local STORE_ITEM = FindMetaTable("IGSItem")
 
-function STORE_ITEM:SetSAMGroup(sUserGroup, iGroupWeight)
-	self:SetCategory("SAM (Админка)")
+function STORE_ITEM:SetSAMGroup(sUserGroup)
+	IGS.SAM_GROUPS = IGS.SAM_GROUPS or {}
 
-	self:SetCanActivate(function(pl) -- global, invDbID
-		if pl:IsUserGroup(sUserGroup) then
-			return "У вас уже действует эта услуга"
-		end
-	end)
 	self:SetInstaller(function(pl)
 		pl:sam_set_rank(sUserGroup)
-	end)
-	self:SetValidator(function(pl)
-		if pl.IGSSAMWeight then
-			return iGroupWeight < pl.IGSSAMWeight
-		else
-			return  pl:GetUserGroup() == sUserGroup
-		end
-	end)
+	end):SetMeta("samgroup", sUserGroup)
 
-
-	self.sg_group = self:Insert(IGS.ITEMS.SAM.GROUPS, sUserGroup)
+	self:Insert(IGS.SAM_GROUPS, sUserGroup) -- #todo insert возвращает значение..
 	return self
 end
 
-if CLIENT then return end
-
-local function checkGroups(pl)
-	local hasAccess = IGS.PlayerHasOneOf(pl, IGS.ITEMS.SAM.GROUPS[ pl:GetUserGroup() ])
-	if hasAccess == nil then return end  -- не отслеживается
-
-	if hasAccess then
-		return -- если имеется хоть одна покупка, то не снимаем права
+-- #todo IGS.Filter ?
+local function fl_filter(t, func)
+	local res = {}
+	for i,v in ipairs(t) do
+		if func(v) then
+			res[#res + 1] = v
+		end
 	end
-
-	pl:sam_set_rank("user")
+	return res
 end
 
-hook.Add("IGS.PlayerPurchasesLoaded", "SAMGroups", function(pl)
-	if next(IGS.ITEMS.SAM.GROUPS) then -- группы продаются
-		checkGroups(pl)
+hook.Add("IGS.PlayerPurchasesLoaded", "IGS_SAM", function(pl, purchases_)
+	if CLIENT or not purchases_ or not IGS.SAM_GROUPS then return end
+
+	local purchases_list = table.GetKeys(purchases_)
+	local purchased_groups = fl_filter(purchases_list, function(uid)
+		return IGS.GetItemByUID(uid):GetMeta("samgroup")
+	end)
+
+	if not purchased_groups[1] then
+		local rank = pl:sam_getrank()
+		if rank ~= "user" and IGS.SAM_GROUPS[rank] then
+			pl:sam_set_rank("user")
+		end
+
+		return
 	end
+
+	local priority_item = IGS.GetItemByUID( purchased_groups[1] )
+	for _,uid in ipairs(purchased_groups) do
+		local ITEM = IGS.GetItemByUID(uid)
+		if ITEM.id > priority_item.id then
+			priority_item = ITEM
+		end
+	end
+
+	priority_item:Setup(pl)
 end)

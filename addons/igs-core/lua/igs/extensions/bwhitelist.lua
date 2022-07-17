@@ -6,8 +6,7 @@ local function team_id(team_cmd)
 	return DarkRP.getJobByCommand(team_cmd).team
 end
 
-function STORE_ITEM:SetWhitelist(team_cmd)
-	self:SetCategory("Вайтлисты")
+function STORE_ITEM:SetBWhitelist(team_cmd)
 	self:SetCanActivate(function(pl)
 		if GAS.JobWhitelist:IsWhitelisted(pl, team_id(team_cmd)) then
 			return "Вы в вайтлисте"

@@ -21,7 +21,7 @@ local function recalcTransactionsAndBonuses(pl, bGiveBonuses)
 		end
 
 		local prev_lvl = IGS.PlayerLVL(pl) or 0 -- не двигать под igs_lvl!
-		pl:SetIGSVar("igs_lvl",IGS.LVL.GetByCost( IGS.RealPrice(tt) ):LVL())
+		pl:SetIGSVar("igs_lvl",IGS.LVL.GetByCost( tt ):LVL())
 		pl:SetIGSVar("igs_total_transactions",tt)
 
 		if bGiveBonuses and IGS.PlayerLVL(pl) > prev_lvl then
@@ -33,14 +33,17 @@ end
 
 -- Указать bGiveBonuses, если нужно пересчитать бонусы
 local function updateBalance(pl, fOnFinish, bGiveBonuses)
-	IGS.GetBalance(pl:SteamID64(),function(now_igs_)
+	IGS.GetPlayer(pl:SteamID64(),function(pld_)
 		if not IsValid(pl) then return end
+		local now_igs_ = pld_ and pld_.Balance
+		local now_score_ = pld_ and pld_.Score
 
 		local was_igs = pl:IGSFunds()
 		local diff = (now_igs_ or 0) - was_igs
 
-		if diff ~= 0 then -- баланс != nil и не 0 (? https://t.me/c/1353676159/45001)
+		if diff ~= 0 then -- баланс ~= nil и не 0 (? https://t.me/c/1353676159/45001)
 			pl:SetIGSVar("igs_balance", now_igs_) -- НЕ ДОЛЖНО ВЫПОЛНЯТЬСЯ НА НЕ_КЛИЕНТОВ
+			pl.igs_score = now_score_ -- #todo make netvar
 		end
 
 		if now_igs_ then -- значит есть транзакции
@@ -53,25 +56,19 @@ local function updateBalance(pl, fOnFinish, bGiveBonuses)
 	end)
 end
 
-local function suggestSpent(pl,bal)
-	IGS.Notify(pl, "Вы можете потратить " .. IGS.SignPrice(bal) .. " через /donate")
-end
 
 hook.Add("PlayerInitialSpawn", "IGS.LoadPlayer", function(pl)
 	if pl:IsBot() then return end
 
 	-- Устанавливаем баланс донат счета и донат уровень игрока
-	updateBalance(pl, function(bal_)
+	updateBalance(pl, function(now_igs_)
 		if (not IsValid(pl)) then return end
 
 		IGS.LoadPlayerPurchases(pl)
 		IGS.LoadInventory(pl)
 
-		if bal_ and bal_ > 0 then
+		if now_igs_ and now_igs_ > 0 then
 			IGS.UpdatePlayerName(pl:SteamID64(), pl:Name())
-
-			-- подталкиваем тратить деньги
-			if bal_ > 10 then timer.Simple(10,function() suggestSpent(pl,bal_) end) end
 		end
 	end)
 end)
@@ -87,7 +84,7 @@ local function repairBrokenPurchases(pl,purchases)
 end
 
 -- Восстановление слетевших прав
-hook.Add("IGS.PlayerPurchasesLoaded","RestorePex",function(pl,purchases)
+hook.Add("IGS.PlayerPurchasesLoaded", "RestorePex", function(pl,purchases)
 	if purchases then
 		repairBrokenPurchases(pl, purchases)
 	end
@@ -99,13 +96,11 @@ end)
 hook.Add("IGS.PaymentStatusUpdated","NoRejoiningCharge",function(pl,dat)
 	if dat.method ~= "pay" then return end
 
-	timer.Simple(1,function() -- даем успеть в БД обновить данные
+	--timer.Simple(1,function() -- даем успеть в БД обновить данные
 
-		updateBalance(pl,function(new_bal_, diff)
-			IGS.Notify(pl, "Спасибо вам за пополнение счета. Вы прелесть :3")
-			hook.Run("IGS.PlayerDonate", pl, diff, new_bal_)
-			suggestSpent(pl, new_bal_)
+		updateBalance(pl,function(new_bal, diff)
+			hook.Run("IGS.PlayerDonate", pl, diff, new_bal)
 		end, true) -- updateBalance with bGiveBonuses
 
-	end) -- timer 1
+	--end) -- timer 1
 end)

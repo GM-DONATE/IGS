@@ -26,19 +26,19 @@ function PANEL:RenderTexture()
 		:SetSize(self:GetSize())
 		:SetFormat(self:GetURL():sub(-3) == "jpg" and "jpg" or "png")
 		:Download(self:GetURL(), function()
-			if !IsValid(self) then return end
+			if not IsValid(self) then return end
 
 			self.Rendering 	= false
 			self.LastURL 	= self:GetURL()
 		end, function()
-			if !IsValid(self) then return end
+			if not IsValid(self) then return end
 
 			self.Rendering = false
 		end)
 end
 
 function PANEL:Paint(w,h)
-	if (!self:GetTexture() and !self.Rendering) or (self:GetURL() ~= self.LastURL and !self.Rendering) then
+	if (not self:GetTexture() and not self.Rendering) or (self:GetURL() ~= self.LastURL and not self.Rendering) then
 		self:RenderTexture()
 
 	elseif self:GetTexture() then

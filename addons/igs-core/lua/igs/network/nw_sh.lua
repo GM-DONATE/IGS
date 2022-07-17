@@ -17,39 +17,30 @@ IGS.nw.Register("igs_total_transactions")
 	:Read(net.ReadUInt,17)
 :SetLocalPlayer()
 
+-- До 16 фев 2022 передавались чисто ID предметов
+-- Но веб лоад приводит к тому, что еще до загрузки самого игрока на сервер ему могли
+-- передаваться ID предметов, которые на клиенте не успели создаться (например создавались в хуке IGS.Loaded)
+IGS.nw.Register("igs_purchases"):Write(function(networked_purchases)
+	local flatten = {}
+	for uid, am in pairs(networked_purchases) do
+		local s = #flatten
+		flatten[s + 1] = uid
+		flatten[s + 2] = am
+	end
 
-IGS.nw.Register("igs_purchases"):Write(function(v)
-	net.WriteUInt(#v, 9) -- 511
+	net.WriteUInt(#flatten / 2, 8) -- 255
 
-	for _,id in ipairs(v) do
-		net.WriteUInt(id,9)
+	for i = 1,#flatten,2 do
+		net.WriteString(flatten[i])
+		net.WriteUInt(flatten[i + 1], 9)
 	end
 end):Read(function()
-
 	local res = {}
-	for _ = 1,net.ReadUInt(9) do
-		local uid = IGS.GetItemByID( net.ReadUInt(9) ):UID()
-		res[uid] = res[uid] and (res[uid] + 1) or 1
+	for _ = 1,net.ReadUInt(8) do
+		res[net.ReadString()] = net.ReadUInt(9)
 	end
-
 	return res
 end):SetLocalPlayer():SetHook("IGS.PlayerPurchasesLoaded")
-
-
--- https://img.qweqwe.ovh/1492003125937.png
-IGS.nw.Register("igs_settings")
-	:Write(function(t)
-		net.WriteUInt(t[1],10) -- minimal charge (max 1023)
-		net.WriteDouble(t[2])  -- currecy price
-	end)
-	:Read(function()
-		return {
-			net.ReadUInt(10), -- charge
-			net.ReadDouble(), -- price
-		}
-	end)
-:SetGlobal():SetHook("IGS.OnSettingsUpdated")
-
 
 
 --[[--------------
@@ -67,8 +58,8 @@ IGS.BIT_TX_ID = 32
 --[[--------------
 	.net Helpers
 ----------------]]
-function net.WriteIGSItem(ITEM) net.WriteUInt(ITEM:ID(),9) end
-function net.ReadIGSItem() return IGS.GetItemByID(net.ReadUInt(9)) end
+function net.WriteIGSItem(ITEM) net.WriteString(ITEM:UID()) end
+function net.ReadIGSItem() return IGS.GetItemByUID(net.ReadString()) end
 -- function net.WriteIGSGroup(GROUP) net.WriteString(GROUP:Name()) end
 -- function net.ReadIGSGroup() return IGS.GetGroup(net.ReadString()) end
 
@@ -148,39 +139,3 @@ end
 
 net.WriteIGSError = net.WriteIGSMessage
 net.ReadIGSError  = net.ReadIGSMessage
-
-
-
-if SERVER then
-	local first_time_trigger = true -- не позволяет выполниться IGS.GetMinCharge() и IGS.GetCurrencyPrice(), поскольку будет ошибка из-за nil внутри net вара
-	function IGS.UpdateMoneySettings(iMinCharge,iCurrencyPrice)
-		iMinCharge     = tonumber(iMinCharge)
-		iCurrencyPrice = tonumber(iCurrencyPrice)
-
-		-- Кеш старых данных
-		local min_charge = first_time_trigger and 0 or IGS.GetMinCharge()
-		local cur_price  = first_time_trigger and 0 or IGS.GetCurrencyPrice()
-		first_time_trigger = nil
-
-		local min_charge_changed = min_charge ~= iMinCharge
-		local cur_price_changed  = cur_price  ~= iCurrencyPrice
-
-		if min_charge_changed or cur_price_changed then
-			IGS.nw.SetGlobal("igs_settings",{
-				iMinCharge,
-				iCurrencyPrice
-			})
-
-			hook.Run("IGS.OnSettingsUpdated")
-
-			-- Может измениться сразу две вещи
-			if min_charge_changed then
-				IGS.NotifyAll("Изменена минимальная сумма пополнения: " .. ("(%s > %s руб)"):format(min_charge,iMinCharge))
-			end
-
-			if cur_price_changed then
-				IGS.NotifyAll("Стоимость донат валюты изменена с " .. cur_price .. " до " .. iCurrencyPrice .. " руб за единицу")
-			end
-		end
-	end
-end

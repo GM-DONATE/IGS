@@ -17,9 +17,11 @@ function PLAYER:HasPurchase(sUID)
 	return IGS.PlayerPurchases(self)[sUID]
 end
 
--- true, если человек имеет хоть один итем из списка, nil, если итем не отслеживается, false, если нет права. Начало юзаться для упрощения кода модулей
-function IGS.PlayerHasOneOf(pl,tItems)
-	if !tItems then return end
+-- ITEM, если человек имеет хоть один итем из списка
+-- nil, если итем не отслеживается
+-- false, если нет права
+function IGS.PlayerHasOneOf(pl, tItems)
+	if not tItems then return end
 
 	for _,ITEM in ipairs(tItems) do
 		if pl:HasPurchase( ITEM:UID() ) then
@@ -41,18 +43,17 @@ function IGS.CanAfford(pl,sum,assert)
 		return true
 	end
 
-	if !assert then
+	if not assert then
 		return false
 	end
 
 	if isfunction(assert) then
 		assert()
 	else
-		local rub = IGS.RealPrice(sum)
 		if SERVER then
-			IGS.WIN.Deposit(pl,rub)
+			IGS.WIN.Deposit(pl, sum)
 		else
-			IGS.WIN.Deposit(rub)
+			IGS.WIN.Deposit(sum)
 		end
 	end
 
@@ -76,38 +77,14 @@ function IGS.PlayerLVL(pl)
 end
 
 
--- Конвертирует IGS в реальную валюту
-function IGS.RealPrice(iCurrencyAmount)
-	return iCurrencyAmount * IGS.GetCurrencyPrice()
-end
-
--- Реальная валюта в IGS по текущему курсу
-function IGS.PriceInCurrency(iRealPrice)
-	return iRealPrice / IGS.GetCurrencyPrice()
-end
-
-
-function IGS.IsCurrencyEnabled()
-	return IGS.GetCurrencyPrice() ~= 1
-end
-
-local function getSettings()
-	return IGS.nw.GetGlobal("igs_settings")
-end
-
 -- Минимальная сумма пополнения в рублях
 function IGS.GetMinCharge()
-	return getSettings()[1]
-end
-
--- Стоимость 1 донат валюты в рублях
-function IGS.GetCurrencyPrice()
-	return getSettings()[2]
+	return 10 -- TODO global var?
 end
 
 -- Не смог загрузиться или выключен в панели, меню открывать нельзя
 function IGS.IsLoaded()
-	return getSettings() and IGS.SERVERS:ID() and !GetGlobalBool("IGS_DISABLED")
+	return IGS.SERVERS:ID() and not GetGlobalBool("IGS_DISABLED")
 end
 
 
@@ -121,7 +98,7 @@ local terms = {
 
 function IGS.TermType(term)
 	return
-		!term     and 1 or -- бесконечно
+		not term  and 1 or -- бесконечно
 		term == 0 and 2 or -- мгновенно
 		term      and 3    -- кол-во дней
 end
@@ -131,25 +108,25 @@ function IGS.TermToStr(term)
 end
 
 function IGS.TimestampToDate(ts,bShowFull) -- в "купил до"
-	if !ts then return end
+	if not ts then return end
 	return os.date(bShowFull and IGS.C.DATE_FORMAT or IGS.C.DATE_FORMAT_SHORT,ts)
 end
 
-
-function IGS.FormItemInfo(ITEM)
+-- TODO: может удалить с sh (используется только на клиенте)
+function IGS.FormItemInfo(ITEM, pl)
 	return {
-		["Категория"] = ITEM:Category(),
-		["Действует"] = IGS.TermToStr(ITEM:Term()),
-		["Цена"]       = PL_MONEY(ITEM:Price()),
+		["Категория"]  = ITEM:Category(),
+		["Действует"]  = IGS.TermToStr(ITEM:Term()),
+		["Цена"]       = PL_MONEY(ITEM:GetPrice(pl)),
 		["Без скидки"] = ITEM.discounted_from and PL_MONEY(ITEM.discounted_from) or nil,
-		["Покупки суммируются"]  = ITEM:IsStackable() and "да" or "нет",
+		["Покупки стакаются"]  = ITEM:IsStackable() and "да" or "нет",
 	}
 end
 
 
 function IGS.print(...)
 	local args = {...}
-	if !IsColor(args[1]) then
+	if not IsColor(args[1]) then
 		table.insert(args,1,color_white)
 	end
 
@@ -164,26 +141,13 @@ function IGS.dprint(...)
 end
 
 
-
-
 function IGS.SignPrice(iPrice) -- 10 Alc
 	return math.Truncate(tonumber(iPrice),2) .. " " .. IGS.C.CURRENCY_SIGN
 end
 
-local rubs = {"рубль", "рубля", "рублей"}
-PL_MONEY = PL.Add("realmoney",rubs)
-PL_IGS   = PL.Add("igs_currency",IGS.C.CurrencyPlurals or rubs)
-PL_DAYS  = PL.Add("days",{"день", "дня", "дней"})
+PL_MONEY = PLUR(IGS.C.CurrencyPlurals)
+PL_DAYS  = PLUR({"день", "дня", "дней"})
 
-
-local PL_IGS_ORIGINAL
-hook.Add("IGS.OnSettingsUpdated","PL_IGS = PL_MONEY",function()
-	if !IGS.IsCurrencyEnabled() then -- Если донат валюта отключена
-		PL_IGS_ORIGINAL = PL_IGS -- а это не таблица случайно? Мб table.copy?
-		PL_IGS = PL_MONEY
-
-	-- Валюта уже отключалась. Сейчас включилась
-	elseif PL_IGS_ORIGINAL then
-		PL_IGS = PL_IGS_ORIGINAL
-	end
-end)
+-- #TODO: ОБРАТНАЯ СОВМЕСТИМОСТЬ. НЕ применяется в core.
+-- https://forum.gm-donate.net/t/cryptos-igs/1461/6
+PL_IGS = PL_MONEY

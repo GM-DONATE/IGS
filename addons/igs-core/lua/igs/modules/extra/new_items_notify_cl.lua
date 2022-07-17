@@ -1,9 +1,9 @@
 -- bib.setNum("igs:lasttimeitems", 85)
 
 -- 18, 23, 245
-local PL_POYAVILSA = PL.Add("appear", {"появился","появилось","появилось"})
-local PL_NEW       = PL.Add("new",    {"новый", "новых", "новых"})
-local PL_ITEMS     = PL.Add("item",   {"предмет", "предмета", "предметов"})
+local PL_POYAVILSA = PLUR({"появился","появилось","появилось"})
+local PL_NEW       = PLUR({"новый", "новых", "новых"})
+local PL_ITEMS     = PLUR({"предмет", "предмета", "предметов"})
 
 hook.Add("IGS.Loaded", "NewItemsNotify", function()
 	-- local ip,port = game.GetIPAddress():match("(.+):(.+)")

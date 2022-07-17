@@ -59,14 +59,14 @@ local function loadTab(activity,sidebar,dat)
 					IGS.WIN.Group(ITEM:Group():UID())
 				end)
 				infpan:SetDescription(ITEM:Description())
-				infpan:SetInfo(IGS.FormItemInfo(ITEM))
+				infpan:SetInfo(IGS.FormItemInfo(ITEM, LocalPlayer())) -- lp для GetPrice
 
 
 				bg.side:Reset()
 
 				local act_btn = IGS.AddButton(bg.side, "",function()
 					IGS.ProcessActivate(dbID, function(ok) -- iPurchID, sMsg_
-						if !ok then return end
+						if not ok then return end
 
 						removeFromCanvas(item)
 					end)
@@ -103,10 +103,10 @@ local function loadTab(activity,sidebar,dat)
 end
 
 hook.Add("IGS.CatchActivities","inventory",function(activity,sidebar)
-	if !IGS.C.Inv_Enabled then return end
+	if not IGS.C.Inv_Enabled then return end
 
 	IGS.GetInventory(function(items)
-		if !IsValid(sidebar) then return end
+		if not IsValid(sidebar) then return end
 		loadTab(activity,sidebar,items)
 	end)
 end)

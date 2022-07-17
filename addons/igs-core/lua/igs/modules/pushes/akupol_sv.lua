@@ -1,5 +1,6 @@
 -- 2021.01.18 4:16
--- Polling client for gm-donate.ru's polling server
+-- Polling client for poll.gmod.app
+-- Docs: https://blog.amd-nick.me/poll-gmod-app-docs
 -- Author: amd-nick.me/about
 
 -- 2 copy of this file in some cases in different places with different include methods
@@ -18,8 +19,9 @@ log.setCvar("kupol_logging_level")
 
 local function get_updates(base_url, uid, sleep, ts, fOnResponse)
 	local url = base_url .. uid .. "/getUpdates?sleep=" .. (sleep or "") .. "&ts=" .. (ts or "")
-	log.debug("http.Fetch({})", url)
+	log.info("http.Fetch({})", url)
 	http.Fetch(url, function(json)
+		log.debug("Body: {}", json)
 		local t = util.JSONToTable(json)
 		if t and t.ok then
 			fOnResponse(t)
@@ -65,7 +67,7 @@ function kupol.new(sUrl, uid, iTimeout)
 			local i = bib.getNum("lp:ts:" .. o.uid, 0) + 1
 			bib.setNum("lp:ts:" .. o.uid, i) -- increment
 
-			local ok, err = pcall(o.handler, upd)
+			local _, err = pcall(o.handler, upd)
 			if err then
 				log.error("Внутри хендлера произошла ошибка и работа чуть не прекратилась: {}", err)
 			end

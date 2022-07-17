@@ -48,20 +48,24 @@ function IGS.WIN.InvLog()
 
 		function bg:AddLine(sOwner, sInfli, sItem, sAction, sDate, r)
 			local line = bg.table:AddLine(sOwner, sInfli, sItem, r.gift_id, sAction, sDate)
-			line:SetTooltip("ID операции: " .. r.action_id)
+			line:SetTooltip("ID операции: " .. r.action_id .. ". Перед ником глобальный Score игрока")
+
+			local btn_giftid = line.columns[4]
+			btn_giftid.text_color = IGS_IL_ROW_SOLID_COLOR or HSVToColor(((r.gift_id * 10) * 5) % 360, 1, 1)
+
 			for _,v in ipairs(line.columns) do
 				v:SetCursor("hand")
 			end
 
 			for i,s64 in ipairs({r.owner, r.inflictor}) do
-				if player.GetBySteamID64(s64) then continue end -- игрок в сети, ник получен
+				if not player.GetBySteamID64(s64) then -- игрок не в сети, ник не получен
+					getNameBySid(function(name_)
+						if not name_ then return end
 
-				getNameBySid(function(name_)
-					if !name_ then return end
-
-					local btn_owner = line.columns[i] -- 1, 2 колонка
-					btn_owner:SetText(name_)
-				end, s64)
+						local btn_owner = line.columns[i] -- 1, 2 колонка
+						btn_owner:SetText(name_)
+					end, s64)
+				end
 			end
 
 			line.DoClick = function()
@@ -86,7 +90,7 @@ function IGS.WIN.InvLog()
 			self.prev_uid  = uid_
 
 			IGS.IL.GetLog(function(tLog)
-				if !IsValid(bg) then return end -- Долго данные получались
+				if not IsValid(bg) then return end -- Долго данные получались
 
 				for _,r in ipairs(tLog) do
 					local ITEM = IGS.GetItemByUID(r.gift_uid)
@@ -113,10 +117,10 @@ function IGS.WIN.InvLog()
 
 			pnl:SetTitle("Действия")
 
-			pnl:AddColumn("Владелец",100)
-			pnl:AddColumn("Исполнитель",100)
+			pnl:AddColumn("Владелец",120)
+			pnl:AddColumn("Исполнитель",120)
 			pnl:AddColumn("Предмет")
-			pnl:AddColumn("ID гифта", 60)
+			pnl:AddColumn("ID гифта", 65)
 			pnl:AddColumn("Действие",110)
 			pnl:AddColumn("Дата",130)
 		end, bg)
@@ -179,10 +183,10 @@ end
 concommand.Add("igs_invlog",IGS.WIN.InvLog)
 
 -- for i = 1,1 do
-	-- local fr = IGS.WIN.InvLog()
--- 	-- timer.Simple(10,function()
--- 	-- 	if IsValid(fr) then
--- 	-- 		fr:Remove()
--- 	-- 	end
--- 	-- end)
+-- 	local fr = IGS.WIN.InvLog()
+-- 	timer.Simple(10,function()
+-- 		if IsValid(fr) then
+-- 			fr:Remove()
+-- 		end
+-- 	end)
 -- end

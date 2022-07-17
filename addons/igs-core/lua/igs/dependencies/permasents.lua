@@ -106,16 +106,15 @@ if SERVER then
 
 		local map = getIndex()
 		for uid,class in pairs(map) do
-			if not scripted_ents.GetStored(class) then
+			if scripted_ents.GetStored(class) then
+				local dat = util.JSONToTable(cookie.GetString("perma_" .. class .. "_" .. uid))
+				local ent = SpawnSent(class, util.StringToType(dat[1], "Vector"), util.StringToType(dat[2], "Angle"))
+				ent.permaSentUID = uid
+
+				print("IGS.PermaSents: Заспавнили " .. class)
+			else
 				print("IGS.PermaSents: " .. class .. " не существует на сервере")
-				continue
 			end
-
-			local dat = util.JSONToTable(cookie.GetString("perma_" .. class .. "_" .. uid))
-			local ent = SpawnSent(class, util.StringToType(dat[1], "Vector"), util.StringToType(dat[2], "Angle"))
-			ent.permaSentUID = uid
-
-			print("IGS.PermaSents: Заспавнили " .. class)
 		end
 	end)
 	end)

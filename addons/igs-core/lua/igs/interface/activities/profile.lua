@@ -82,14 +82,14 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 
 	local lvl = IGS.PlayerLVL(LP)
 	local mybal  = LP:IGSFunds()
-	local next_lvl = !lvl and IGS.LVL.MAP[1] or lvl:GetNext()
+	local next_lvl = not lvl and IGS.LVL.MAP[1] or lvl:GetNext()
 
 	ava_bg:AddRow("Статус",lvl and lvl:Name() or "Никто :(")
 	if next_lvl then
 		local next_desc = next_lvl:Description()
 
 		ava_bg:AddRow("След. статус", next_lvl:Name() .. (next_desc and ("\n\n%s"):format(next_desc) or ""))
-		ava_bg:AddRow("Нужно", next_lvl:Cost() - IGS.RealPrice( IGS.TotalTransaction(LP) ) .. " руб")
+		ava_bg:AddRow("Нужно", IGS.SignPrice(next_lvl:Cost() - IGS.TotalTransaction(LP)) )
 	end
 
 	bg.side:AddItem(ava_bg)
@@ -117,7 +117,7 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 
 		-- Обновление списка транзакций и информации в сайдбаре
 		IGS.GetMyTransactions(function(dat)
-			if !IsValid(pnl) then return end -- Долго данные получались
+			if not IsValid(pnl) then return end -- Долго данные получались
 
 			local bit_num_limit = 2 ^ IGS.BIT_TX - 1
 			if #dat == bit_num_limit then
@@ -127,9 +127,14 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 			for i,v in ipairs(dat) do
 				v.note = v.note or "-"
 
+				local function name_or_uid(sUid)
+					local ITEM = IGS.GetItemByUID(sUid)
+					return ITEM.isnull and sUid or ITEM:Name()
+				end
+
 				-- Если покупка, то пишем ее название или пишем с чем связана транзакция
 				local note =
-					v.note:StartWith("P: ") and IGS.GetItemByUID(v.note:sub(4)):Name() or
+					v.note:StartWith("P: ") and name_or_uid(v.note:sub(4)) or
 					v.note:StartWith("A: ") and ("Пополнение счета (" .. v.note:sub(4) .. ")") or
 					v.note:StartWith("C: ") and ("Купон " .. v.note:sub(4,13) .. "...") or
 					v.note

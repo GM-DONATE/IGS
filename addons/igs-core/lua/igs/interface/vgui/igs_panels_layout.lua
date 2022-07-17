@@ -13,7 +13,7 @@ function PANEL:Init()
 end
 
 function PANEL:SetName(sName)
-	if !sName then return end
+	if not sName then return end
 
 	self.name = sName
 
@@ -68,7 +68,7 @@ function PANEL:Add(panel)
 
 	local line_wide = self:GetLineWide(self.current_line)
 
-	local borders = !self.disabled_align and (self:GetWide() - line_wide) / 2 -- отступы по сторонам
+	local borders = not self.disabled_align and (self:GetWide() - line_wide) / 2 -- отступы по сторонам
 	local line_panels = self:GetCurrentLine()
 
 	for i,pan in ipairs(line_panels) do

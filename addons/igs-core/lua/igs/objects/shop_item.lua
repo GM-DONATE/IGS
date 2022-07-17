@@ -47,8 +47,22 @@ function STORE_ITEM:SetPrice(iPrice)
 	return set(self,"price",iPrice)
 end
 
+-- TODO УСТАРЕЛО. БУДЕТ УДАЛЕНО В БЛИЖАЙШИХ ВЕРСИЯХ
+-- Подробнее: https://forum.gm-donate.net/t/kak-sdelat-skidku-na-moder-esli-u-igroka-vip/1441/18?u=gmd
 function STORE_ITEM:Price()
 	return self.price
+end
+
+
+-- function(pl, self) return pl:IsUserGroup("vip") and 50 end
+-- если return ничего не вернул, то будет стандартная цена
+function STORE_ITEM:SetGetPrice(fGetPrice)
+	return set(self,"getprice",fGetPrice)
+end
+
+function STORE_ITEM:GetPrice(pl)
+	local getprice = self.getprice and self.getprice(pl)
+	return getprice or self.price
 end
 
 -- Сбрасывает текущее описание и устанавливает указанное, если не указать bAppand
@@ -118,10 +132,6 @@ end
 -- Нужна ли информация о покупке на клиентсайде? (Будет в IGS.PlayerPurchases(ply))
 function STORE_ITEM:SetNetworked(b)
 	return set(self,"networked",b ~= false)
-end
-
-function STORE_ITEM:IsNetworked()
-	return self.networked
 end
 
 -- Баннер товара. Будет отображен под информацией о товаре. Рекомендуемый размер 1000х400
@@ -284,22 +294,28 @@ function STORE_ITEM:Insert(to, key)
 	return key
 end
 
-function STORE_ITEM:PriceInCurrency()
-	return IGS.PriceInCurrency(self.price)
-end
-
 
 --[[-------------------------------------------------------------------------
 	CORE
 ---------------------------------------------------------------------------]]
+function IGS.Item(sName, sUID)
+	return setmetatable({
+		name = sName,
+		uid  = sUID,
+		-- id   = ,
+		description = "",
+		termin = 0 -- если не изменить, то услуга не добавится в покупки. Только в транзакции
+	}, STORE_ITEM)
+end
+
+
+
 IGS.ITEMS = IGS.ITEMS or {
 	STORED = {},
 	MAP    = {},
 }
 
-
-IGS.ITEMS.count = IGS.ITEMS.count or 0 -- нулевым будет null итем
-function IGS.AddItem(sName,sUID,iPrice)
+function IGS.AddItem(sName, sUID, iPrice)
 	sUID = sUID:lower()
 
 	-- Поле БД 32. Но с "P: " UID надо сокращать
@@ -321,41 +337,40 @@ function IGS.AddItem(sName,sUID,iPrice)
 	-- Чтобы счетчик не набивался
 	local ITEM = IGS.ITEMS.MAP[sUID]
 	if ITEM then
-		ITEM:SetPrice(iPrice or ITEM:Price()) -- обновляем цену, вдруг изменилась
+		ITEM:SetPrice(iPrice or ITEM.price) -- обновляем цену, вдруг изменилась
 		ITEM.name = sName -- и имя
 
 		return ITEM
 	end
 
-	local t = setmetatable({
-		name = sName,
-		uid  = sUID:lower(),
-		id   = IGS.ITEMS.count,
-		description = "",
-		termin = 0 -- если не изменить, то услуга не добавится в покупки. Только в транзакции
-	}, STORE_ITEM)
+	local t = IGS.Item(sName, sUID)
+	t.id = #IGS.ITEMS.STORED + 1
 
 	if iPrice then
 		t:SetPrice(iPrice)
 	end
 
 	IGS.ITEMS.MAP[t.uid]   = t
-	IGS.ITEMS.STORED[t.id] = t
+	IGS.ITEMS.STORED[t.id] = t -- just insert
 
-	IGS.ITEMS.count = IGS.ITEMS.count + 1
 	return t
 end
 
 
--- ой, как не правильно..
-local null
+local null = IGS.Item("null", "null"):SetPrice(0)
+	:SetDescription("Этот предмет, скорее всего, когда-то существовал или существует на другом сервере, но не здесь")
+	:SetIcon("http://i.imgur.com/NfpcFdy.png")
+	:SetImage("http://i.imgur.com/32iTOFi.jpg")
+	:SetCanBuy(function() return "Этого предмета на сервере нет. Как вы нашли его?" end)
+	:SetCanActivate(function() return "Этого предмета на сервере нет. Можете уничтожить его" end) -- например купил в инвентарь, а потом uid сменился
+
+null.isnull = true -- для проверки во время активации
+null.id = 0 -- на всякий
+
+-- IGS.NULL = null -- альтернативный способ сравнения
 
 function IGS.GetItem(id_or_uid) -- AKA ItemExists
 	return IGS.ITEMS.STORED[id_or_uid] or IGS.ITEMS.MAP[id_or_uid]
-end
-
-function IGS.GetItemByID(iID)
-	return IGS.ITEMS.STORED[iID] or null
 end
 
 function IGS.GetItemByUID(sUID)
@@ -365,13 +380,3 @@ end
 function IGS.GetItems()
 	return IGS.ITEMS.STORED
 end
-
-
-null = IGS.AddItem("null","null",0)
-	:SetDescription("Этот предмет, скорее всего, когда-то существовал или существует на другом сервере, но не здесь")
-	:SetIcon("http://i.imgur.com/NfpcFdy.png")
-	:SetImage("http://i.imgur.com/32iTOFi.jpg")
-	:SetCanBuy(function() return "Этого предмета на сервере нет. Как вы нашли его?" end)
-	:SetCanActivate(function() return "Этого предмета на сервере нет. Можете уничтожить его" end) -- например купил в инвентарь, а потом uid сменился
-
-null.isnull = true -- для проверки во время активации
