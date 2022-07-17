@@ -63,7 +63,6 @@ local function findFreshestVersion(cb)
 	end)
 end
 
-
 if SERVER then
 	local superfile = file.Read("igs/superfile.txt")
 	local version   = cookie.GetString("igs_version")
