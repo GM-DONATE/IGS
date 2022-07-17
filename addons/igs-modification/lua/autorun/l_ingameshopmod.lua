@@ -8,7 +8,7 @@ if not IGS_REPO or file.Exists("autorun/l_ingameshop.lua", "LUA") then return en
 
 local function checkRunString()
 	RunString("IGS_Test_RS = true", "IGS_Test_RS")
-	assert(IGS_Test_RS, "[IGSmod] RunString doesn't work")
+	assert(IGS_Test_RS, "RunString не работает: https://forum.gm-donate.net/t/1663")
 	IGS_Test_RS = nil
 end
 
@@ -28,6 +28,13 @@ end
 local function downloadSuperfile(version, cb)
 	local url = "https://github.com/" .. IGS_REPO .. "/releases/download/" .. version .. "/superfile.json"
 	wrapFetch(url, function(superfile)
+		local dat = util.JSONToTable(superfile)
+		local err =
+			not dat and "superfile.json получен не в правильном формате"
+			or dat.error and ("Ошибка от GitHub: " .. dat.error)
+
+		assert(not err, (err or "") .. "\n" .. url .. "\nПопробуйте снова или почитайте тут https://forum.gm-donate.net/t/1663")
+
 		file.Write("igs/superfile.txt", superfile)
 		cb(superfile)
 	end)
@@ -37,13 +44,8 @@ local function loadFromFile(superfile)
 	checkRunString()
 
 	local path = "autorun/l_ingameshop.lua"
-	IGS_MOUNT  = util.JSONToTable(superfile)
+	IGS_MOUNT = util.JSONToTable(superfile)
 
-	local err_msg = SERVER and
-			"Ошибка загрузки superfile. Удалите /data/superfile.txt и попробуйте снова или обратитесь в gm-donate.net/support"
-		or 	"Ошибка загрузки superfile. Перезайдите на сервер " ..                    "или обратитесь в gm-donate.net/support"
-
-	assert(IGS_MOUNT and IGS_MOUNT[path], err_msg)
 	RunString(IGS_MOUNT[path], path)
 end
 
@@ -55,11 +57,12 @@ local function findFreshestVersion(cb)
 		end)
 
 		local freshest_version = releases[1]
-		assert(freshest_version, "Релизов нет. Нужно запустить CI")
+		assert(freshest_version, "Релизов нет. Нужно запустить CI: https://forum.gm-donate.net/t/1663")
 
 		cb(freshest_version.tag_name)
 	end)
 end
+
 
 if SERVER then
 	local superfile = file.Read("igs/superfile.txt")
@@ -81,6 +84,6 @@ if SERVER then
 elseif CLIENT then
 	CreateConVar("igs_version", "", {FCVAR_REPLICATED})
 	local version = GetConVarString("igs_version")
-	assert(tonumber(version), "cvar igs_version не передался клиенту. " .. tostring(version))
+	assert(tonumber(version), "cvar igs_version не передался клиенту. " .. tostring(version) .. ": https://forum.gm-donate.net/t/1663")
 	downloadSuperfile(version, loadFromFile)
 end

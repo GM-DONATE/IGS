@@ -127,7 +127,7 @@ timer.Simple(1, function() -- http.Fetch
 			return tonumber(a.tag_name) > tonumber(b.tag_name)
 		end)
 
-		local current_tag      = GetConVarString("igs_version")
+		local current_tag      = cookie.GetNumber("igs_version") or 0 -- or 0 для постоянных напоминаний про обнову, если локальная установка
 		local freshest_version = math.floor(releases[1].tag_name)
 		local current_version  = math.floor(current_tag)
 
