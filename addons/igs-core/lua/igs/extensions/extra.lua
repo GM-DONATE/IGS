@@ -60,24 +60,27 @@ end)
 -- Возволяет настроить максимальное количество ПОКУПОК одного предмета
 -- Полезно для тестовых випок за рубль и тд
 function STORE_ITEM:SetMaxPlayerPurchases(iLimit)
-	local function bibKey(pid, iid) return string.format("igs:purchases:%s:%s", pid, iid) end
-
-	return self:SetCanBuy(function(pl)
-		local limit = self:GetMeta("purchasesLimit")
-		local key = bibKey(pl:UniqueID(), self:UID())
-		if bib.getNum(key, 0) >= limit then
-			return "Этот предмет можно купить только " .. limit .. " раз(а)"
-		end
-	end):SetOnBuy(function(pl)
+	return self:SetOnBuy(function(pl)
 		local limit = self:GetMeta("purchasesLimit")
 		if limit then
-			local key = bibKey(pl:UniqueID(), self:UID())
+			local key = string.format("igs:purchases:%s:%s", pl:UniqueID(), self:UID())
 			local now_purchased = bib.getNum(key, 0) + 1
 			bib.setNum(key, now_purchased)
 			IGS.Notify(pl, "Вы купили " .. self:Name() .. " " .. now_purchased .. " раз из " .. limit)
 		end
 	end):SetMeta("purchasesLimit", iLimit)
 end
+
+-- Причина почему в хуке, а не методе: https://vk.com/gim143836547?sel=273715457&msgid=211938
+hook.Add("IGS.CanPlayerBuyItem", "PlayerLimit", function(pl, ITEM)
+	if SERVER and ITEM:GetMeta("purchasesLimit") then
+		local limit = ITEM:GetMeta("purchasesLimit")
+		local key   = string.format("igs:purchases:%s:%s", pl:UniqueID(), ITEM:UID())
+		if bib.getNum(key, 0) >= limit then
+			return false, "Этот предмет можно купить только " .. limit .. " раз(а)"
+		end
+	end
+end)
 
 
 
