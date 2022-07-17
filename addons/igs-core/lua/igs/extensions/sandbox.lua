@@ -10,26 +10,18 @@ local STORE_ITEM = FindMetaTable("IGSItem")
 
 -- Тулы
 function STORE_ITEM:SetTool(sToolName)
-	self:SetCategory("Инструменты")
-	self:SetDescription("Разрешает использовать инструмент " .. sToolName)
-
 	self.tool = self:Insert(IGS.ITEMS.SB.TOOLS, sToolName)
 	return self
 end
 
 -- Энтити
 function STORE_ITEM:SetEntity(sEntClass)
-	self:SetCategory("Энтити (Предметы)")
-
 	self.entity = self:Insert(IGS.ITEMS.SB.SENTS, sEntClass)
 	return self
 end
 
 -- Пушки
 function STORE_ITEM:SetWeapon(sWepClass,tAmmo)
-	self:SetCategory("Оружие")
-	self:SetDescription("Разрешает спавнить " .. sWepClass .. " через спавн меню в любое время")
-
 	self:SetNetworked() -- для HasPurchase и отображения галочки
 
 	self.ammo = tAmmo
@@ -146,8 +138,6 @@ end
 
 -- Машины
 function STORE_ITEM:SetVehicle(sVehClass)
-	self:SetCategory("Транспорт")
-
 	self.vehicle = self:Insert(IGS.ITEMS.SB.VEHS, sVehClass)
 	return self
 end
