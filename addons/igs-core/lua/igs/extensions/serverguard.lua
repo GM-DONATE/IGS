@@ -20,6 +20,8 @@ if CLIENT then return end
 -- addhook не подойдет (не будет автоснятия. Можно и отдельно, конечно)
 hook.Add("IGS.PlayerPurchasesLoaded", "sggroup", function(pl, purchases)
 	if not serverguard then hook.Remove("IGS.PlayerPurchasesLoaded", "sggroup") return end
+	if hook.Run("IGS.SkipSGRestore", pl) then return end
+
 	local prior
 
 	for uid in pairs(purchases or {}) do
