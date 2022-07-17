@@ -1,3 +1,6 @@
+-- источник и альтернативные решения:
+-- https://forum.gm-donate.net/t/usluga-beskonechnye-patrony/633/10?u=gmd
+
 -- IGS("Бесконечные патроны", "infammo", 100)
 -- 	:SetInfAmmo()
 -- 	:SetTerm(10)
@@ -44,9 +47,9 @@ local function setInfAmmo(pl)
 end
 
 
-infammo_players = {}
+local infammo_players = {}
 
-timer.Create("igs_infammo", 1, 0, function()
+timer.Create("igs_infammo", 3.3, 0, function()
 	if not infammo_players[1] then return end
 
 	for i = #infammo_players, 0, -1 do -- reversed ipairs
@@ -62,7 +65,7 @@ end)
 function ITEM:SetInfAmmo()
 	return self:SetInstaller(function(pl)
 		if not table.HasValue(infammo_players, pl) then
-			table.insert(infammo_players, pl) 
+			table.insert(infammo_players, pl)
 		end
 	end):SetValidator(function(pl)
 		return false
