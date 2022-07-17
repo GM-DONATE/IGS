@@ -59,7 +59,7 @@ local function loadTab(activity,sidebar,dat)
 					IGS.WIN.Group(ITEM:Group():UID())
 				end)
 				infpan:SetDescription(ITEM:Description())
-				infpan:SetInfo(IGS.FormItemInfo(ITEM))
+				infpan:SetInfo(IGS.FormItemInfo(ITEM, LocalPlayer())) -- lp для GetPrice
 
 
 				bg.side:Reset()

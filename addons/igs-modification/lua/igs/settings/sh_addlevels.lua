@@ -8,7 +8,7 @@ IGS.LVL.Add(1, "Новичок")
 	:SetBonus(function(pl)
 		local bonus = pl:IGSFunds() * .1
 		pl:AddIGSFunds(bonus,"Бонус за первое пополнение")
-		IGS.Notify(pl,"Вы получили " .. PL_IGS(bonus) .. "\nв качестве бонуса за первое пополнение счета")
+		IGS.Notify(pl,"Вы получили " .. PL_MONEY(bonus) .. "\nв качестве бонуса за первое пополнение счета")
 	end)
 	:SetDescription("При первом пополнении счета получите 10% в подарок автоматически и бесплатно") -- выше в catchDSHints еще
 
@@ -32,7 +32,7 @@ IGS.LVL.Add(2500, "При деньгах")
 	:SetBonus(function(pl)
 		local bonus = pl:IGSFunds() * .2 -- на самом деле бонус начислит на всю имеющуюся сумму, а не сумму пополнения. Так что ахтунг
 		pl:AddIGSFunds(bonus,"Бонус за 2500 руб транзакций")
-		IGS.Notify(pl,"Вы получили " .. PL_IGS(bonus) .. "\nв качестве бонуса за новый бизнес ЛВЛ")
+		IGS.Notify(pl,"Вы получили " .. PL_MONEY(bonus) .. "\nв качестве бонуса за новый бизнес ЛВЛ")
 	end)
 
 

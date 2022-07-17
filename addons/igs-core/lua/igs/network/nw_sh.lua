@@ -43,22 +43,6 @@ end):Read(function()
 end):SetLocalPlayer():SetHook("IGS.PlayerPurchasesLoaded")
 
 
--- https://img.qweqwe.ovh/1492003125937.png
-IGS.nw.Register("igs_settings")
-	:Write(function(t)
-		net.WriteUInt(t[1],10) -- minimal charge (max 1023)
-		net.WriteDouble(t[2])  -- currecy price
-	end)
-	:Read(function()
-		return {
-			net.ReadUInt(10), -- charge
-			net.ReadDouble(), -- price
-		}
-	end)
-:SetGlobal():SetHook("IGS.OnSettingsUpdated")
-
-
-
 --[[--------------
 	CONSTANTS
 ----------------]]
@@ -155,39 +139,3 @@ end
 
 net.WriteIGSError = net.WriteIGSMessage
 net.ReadIGSError  = net.ReadIGSMessage
-
-
-
-if SERVER then
-	local first_time_trigger = true -- не позволяет выполниться IGS.GetMinCharge() и IGS.GetCurrencyPrice(), поскольку будет ошибка из-за nil внутри net вара
-	function IGS.UpdateMoneySettings(iMinCharge,iCurrencyPrice)
-		iMinCharge     = tonumber(iMinCharge)
-		iCurrencyPrice = tonumber(iCurrencyPrice)
-
-		-- Кеш старых данных
-		local min_charge = first_time_trigger and 0 or IGS.GetMinCharge()
-		local cur_price  = first_time_trigger and 0 or IGS.GetCurrencyPrice()
-		first_time_trigger = nil
-
-		local min_charge_changed = min_charge ~= iMinCharge
-		local cur_price_changed  = cur_price  ~= iCurrencyPrice
-
-		if min_charge_changed or cur_price_changed then
-			IGS.nw.SetGlobal("igs_settings",{
-				iMinCharge,
-				iCurrencyPrice
-			})
-
-			hook.Run("IGS.OnSettingsUpdated")
-
-			-- Может измениться сразу две вещи
-			if min_charge_changed then
-				IGS.NotifyAll("Изменена минимальная сумма пополнения: " .. ("(%s > %s руб)"):format(min_charge,iMinCharge))
-			end
-
-			if cur_price_changed then
-				IGS.NotifyAll("Стоимость донат валюты изменена с " .. cur_price .. " до " .. iCurrencyPrice .. " руб за единицу")
-			end
-		end
-	end
-end

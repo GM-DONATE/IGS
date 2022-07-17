@@ -26,18 +26,18 @@ end
 
 -- Дроп или активация гифта
 for _,d in ipairs(datagen) do
-	if DICE(5) then continue end -- в 1 из 5 случаев игрок купил итем и ничего не делает (холдит)
-
-	local action = DICE(5) and IGS.IL.DROP or IGS.IL.ACT -- 1 дроп на 5 активаций
-	d.second_action = action
+	if not DICE(5) then -- в 1 из 5 случаев игрок купил итем и ничего не делает (холдит)
+		local action = DICE(5) and IGS.IL.DROP or IGS.IL.ACT -- 1 дроп на 5 активаций
+		d.second_action = action
+	end
 end
 
 -- Пик гифта другим человеком
 for _,d in ipairs(datagen) do
-	if DICE(10) then continue end -- в 1 из 10 случаев гифт не поднимаем
-
-	local s64_inflictor = table.Random(datagen).s64
-	d.pick_by = s64_inflictor
+	if DICE(10) then -- в 1 из 10 случаев гифт не поднимаем
+		local s64_inflictor = table.Random(datagen).s64
+		d.pick_by = s64_inflictor
+	end
 end
 
 for _,d in ipairs(datagen) do

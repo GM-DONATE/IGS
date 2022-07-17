@@ -33,14 +33,12 @@ concommand.Add("addfunds",function(pl,_,_,argss)
 		return n(pl,"Формат команды нарушен\nПример: addfunds STEAM_0:1:2345678 10 А вот это отметка транзакции")
 	end
 
-	-- Мы ведь в валюте счет должны пополнить, а не рублях
-	amount = IGS.PriceInCurrency(amount)
 	local note = argss:sub(endpos + 2)
 
 	local targ = player.GetBySteamID(sid)
 	if targ then
 		targ:AddIGSFunds(amount,note,function()
-			n(pl,"Транзакция успешно проведена. Баланс игрока: " .. PL_IGS(targ:IGSFunds()))
+			n(pl,"Транзакция успешно проведена. Баланс игрока: " .. PL_MONEY(targ:IGSFunds()))
 		end)
 
 	-- Игрок оффлайн
@@ -77,9 +75,9 @@ end)
 	https://trello.com/c/SvZ8UE0F/472-сообщение-о-покупке
 ---------------------------------------------------------------------------]]
 hook.Add("IGS.PlayerPurchasedItem","IGS.BroadcastPurchase",function(pl, ITEM)
-	if IGS.C.BroadcastPurchase == false then return end -- #todo сделать модулем
+	if IGS.C.BroadcastPurchase == false then return end -- TODO сделать модулем
 
-	IGS.NotifyAll(pl:Nick() .. " купил " .. ITEM:Name())  --  .. " за " .. PL_MONEY(ITEM:Price())
+	IGS.NotifyAll(pl:Nick() .. " купил " .. ITEM:Name())
 end)
 
 
@@ -88,16 +86,14 @@ end)
 	https://trello.com/c/6rMMH3cn/483-сообщение-о-пополнении-счета
 ---------------------------------------------------------------------------]]
 
-hook.Add("IGS.PlayerDonate", "ThanksForDonate", function(pl, sum_igs)
-	local score = pl.igs_score -- #todo make netvar
+hook.Add("IGS.PlayerDonate", "ThanksForDonate", function(pl, rub)
+	local score = pl.igs_score -- TODO: make netvar
 
 	IGS.Notify(pl, Format("Спасибо вам за пополнение счета. " ..
 		"Ваш новый Score на всех проектах - %d. " ..
 		"Что такое Score: vk.cc/caHTZi", score))
 
-	local rub = IGS.RealPrice(sum_igs)
-
-	local rub_str = PL_MONEY(rub)
+	local rub_str  = PL_MONEY(rub)
 	local full_str = Format("%s пополнил счет на %s. Его новый Score: %s", pl:Nick(), rub_str, score)
 
 	IGS.NotifyAll(full_str)
@@ -131,7 +127,7 @@ timer.Simple(1, function() -- http.Fetch
 			return tonumber(a.tag_name) > tonumber(b.tag_name)
 		end)
 
-		local current_tag      = GetConVarString("igs_version")
+		local current_tag      = cookie.GetNumber("igs_version") or 0 -- or 0 для постоянных напоминаний про обнову, если локальная установка
 		local freshest_version = math.floor(releases[1].tag_name)
 		local current_version  = math.floor(current_tag)
 

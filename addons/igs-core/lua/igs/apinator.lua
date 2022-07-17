@@ -82,7 +82,7 @@ end
 
 
 -- Дебаг
-local sid = "76561198071463189"
+-- local sid = "76561198071463189"
 
 
 
@@ -254,14 +254,13 @@ end
 	ССЫЛКИ
 >----------------------------<
 ]]
-function IGS.GetPaymentURL(fCallback, s64, iSum, sDescription_)
+function IGS.GetPaymentURL(fCallback, s64, iSum)
 	IGS.Query("/url/getPayment",{
 		sid   = s64,
-		sum   = iSum,
-		descr = sDescription_ or nil, -- если не указать, то будет "Пополнение счета на sum руб"
+		sum   = iSum
 	},fCallback) -- ссылка
 end
--- IGS.GetPaymentURL(PRINT,sid,10,"Примечание, которое можно не указывать")
+-- IGS.GetPaymentURL(PRINT,sid,10)
 
 
 --[[
@@ -314,7 +313,7 @@ end
 -- IGS.AddServer("255.255.255.255", 65535, PRINT)
 
 -- Получает список серверов проекта
--- `ID`,`Name`,`IP`,`Port`,`SocketPort`,`Disabled`
+-- `ID`,`Name`,`IP`,`Port`,`Disabled`
 -- Если указать bIncludeDisabled, то получит и отключенные
 function IGS.GetServers(fCallback, bIncludeDisabled_, iID_)
 	IGS.Query("/servers/get",{
@@ -330,7 +329,7 @@ function IGS.GetExternalIP(fCallback)
 end
 -- IGS.GetExternalIP(PRINT)
 
--- Нужно указать минимум один параметр (name, port, version, state, ip, hostport)
+-- Нужно указать минимум один параметр (name, version, state, ip, hostport)
 function IGS.UpdateServer(iServerID, tParams, fCallback)
 	tParams.s = iServerID
 	IGS.Query("/servers/update", tParams, fCallback)
@@ -345,12 +344,6 @@ function IGS.SetServerName(sName, fCallback)
 	IGS.UpdateCurrentServer({name = sName}, fCallback) -- до 32 символов
 end
 -- IGS.SetServerName("12345678901234567890123456789012", PRINT)
-
--- Изменяет порт сокета для указанного сервера
-function IGS.SetServerSocketPort(iPort, fCallback)
-	IGS.UpdateCurrentServer({port = iPort}, fCallback) -- 1-65535
-end
--- IGS.SetServerSocketPort(29004, PRINT)
 
 -- Чисто техническая инфа для упрощения поддержки
 function IGS.SetServerVersion(iVersion, fCallback)

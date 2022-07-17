@@ -43,4 +43,4 @@ IGS.nw.Register("igs_servers")
 
 		return IGS.SERVERS
 	end)
-:SetGlobal()
+:SetGlobal():SetHook("IGS.ServersLoaded")

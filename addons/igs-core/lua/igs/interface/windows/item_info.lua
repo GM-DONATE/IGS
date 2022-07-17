@@ -123,27 +123,27 @@ function IGS.WIN.Item(uid)
 			IGS.WIN.Group(ITEM:Group():UID())
 		end)
 		p:SetDescription( ITEM:Description() )
-		p:SetInfo(IGS.FormItemInfo(ITEM))
+		p:SetInfo(IGS.FormItemInfo(ITEM, LocalPlayer())) -- lp для GetPrice
 
 		m.act = p:CreateActivity() -- панелька для кастом эллементов
 		m.buy = uigs.Create("igs_button", function(buy)
-			local cur_price = ITEM:PriceInCurrency()
+			local price = ITEM:GetPrice( LocalPlayer() )
 
 			buy:Dock(TOP)
 			buy:SetTall(20)
-			buy:SetText( "Купить за " .. PL_IGS(cur_price) )
-			buy:SetActive( IGS.CanAfford(LocalPlayer(), cur_price) )
+			buy:SetText( "Купить за " .. PL_MONEY(price) )
+			buy:SetActive( IGS.CanAfford(LocalPlayer(), price) )
 			buy.DoClick = function(s)
 				if not s:IsActive() then
-					local need = cur_price - LocalPlayer():IGSFunds()
+					local need = price - LocalPlayer():IGSFunds()
 
 					surface.PlaySound("ambient/voices/citizen_beaten1.wav") -- еще есть
 					IGS.BoolRequest(
 						"Недостаточно денег",
-						("Вам не хватает %s для покупки %s.\nЖелаете мгновенно пополнить счет?"):format( PL_IGS(need), ITEM:Name()),
+						("Вам не хватает %s для покупки %s.\nЖелаете мгновенно пополнить счет?"):format( PL_MONEY(need), ITEM:Name()),
 						function(yes)
 							if yes then
-								IGS.WIN.Deposit(IGS.RealPrice(need), true)
+								IGS.WIN.Deposit(price, true)
 								surface.PlaySound("vo/npc/male01/yeah02.wav")
 							end
 						end

@@ -9,7 +9,7 @@ function PLAYER:AddIGSFunds(amount, note, callback)
 			local tt = IGS.TotalTransaction(self) + amount
 			self:SetIGSVar("igs_total_transactions", tt)
 
-			self:SetIGSVar("igs_lvl", IGS.LVL.GetByCost( IGS.RealPrice(tt) ):LVL())
+			self:SetIGSVar("igs_lvl", IGS.LVL.GetByCost( tt ):LVL())
 		end
 
 		if callback then

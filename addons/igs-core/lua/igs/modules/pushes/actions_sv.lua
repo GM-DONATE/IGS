@@ -17,13 +17,6 @@ hook.Add("IGS.IncomingMessage","PaymentStatus",function(d, method)
 	hook.Run("IGS.PaymentStatusUpdated",pl,d)
 end)
 
--- Цена валюты и минимальное пополнение
-hook.Add("IGS.IncomingMessage","ProjectSettings",function(d, method)
-	if method ~= "project.updateMoneySettings" then return end
-
-	IGS.UpdateMoneySettings(d.minCharge,d.currencyPrice)
-end)
-
 -- Моментальная выдача услуги
 hook.Add("IGS.IncomingMessage","GivePurchase",function(d, method)
 	if method ~= "purchase.store" then return end

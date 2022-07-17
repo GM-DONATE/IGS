@@ -50,11 +50,10 @@ function IGS.CanAfford(pl,sum,assert)
 	if isfunction(assert) then
 		assert()
 	else
-		local rub = IGS.RealPrice(sum)
 		if SERVER then
-			IGS.WIN.Deposit(pl,rub)
+			IGS.WIN.Deposit(pl, sum)
 		else
-			IGS.WIN.Deposit(rub)
+			IGS.WIN.Deposit(sum)
 		end
 	end
 
@@ -78,38 +77,14 @@ function IGS.PlayerLVL(pl)
 end
 
 
--- Конвертирует IGS в реальную валюту
-function IGS.RealPrice(iCurrencyAmount)
-	return iCurrencyAmount * IGS.GetCurrencyPrice()
-end
-
--- Реальная валюта в IGS по текущему курсу
-function IGS.PriceInCurrency(iRealPrice)
-	return iRealPrice / IGS.GetCurrencyPrice()
-end
-
-
-function IGS.IsCurrencyEnabled()
-	return IGS.GetCurrencyPrice() ~= 1
-end
-
-local function getSettings()
-	return IGS.nw.GetGlobal("igs_settings")
-end
-
 -- Минимальная сумма пополнения в рублях
 function IGS.GetMinCharge()
-	return getSettings()[1]
-end
-
--- Стоимость 1 донат валюты в рублях
-function IGS.GetCurrencyPrice()
-	return getSettings()[2]
+	return 10 -- TODO global var?
 end
 
 -- Не смог загрузиться или выключен в панели, меню открывать нельзя
 function IGS.IsLoaded()
-	return getSettings() and IGS.SERVERS:ID() and not GetGlobalBool("IGS_DISABLED")
+	return IGS.SERVERS:ID() and not GetGlobalBool("IGS_DISABLED")
 end
 
 
@@ -137,14 +112,14 @@ function IGS.TimestampToDate(ts,bShowFull) -- в "купил до"
 	return os.date(bShowFull and IGS.C.DATE_FORMAT or IGS.C.DATE_FORMAT_SHORT,ts)
 end
 
-
-function IGS.FormItemInfo(ITEM)
+-- TODO: может удалить с sh (используется только на клиенте)
+function IGS.FormItemInfo(ITEM, pl)
 	return {
-		["Категория"] = ITEM:Category(),
-		["Действует"] = IGS.TermToStr(ITEM:Term()),
-		["Цена"]       = PL_MONEY(ITEM:Price()),
+		["Категория"]  = ITEM:Category(),
+		["Действует"]  = IGS.TermToStr(ITEM:Term()),
+		["Цена"]       = PL_MONEY(ITEM:GetPrice(pl)),
 		["Без скидки"] = ITEM.discounted_from and PL_MONEY(ITEM.discounted_from) or nil,
-		["Покупки суммируются"]  = ITEM:IsStackable() and "да" or "нет",
+		["Покупки стакаются"]  = ITEM:IsStackable() and "да" or "нет",
 	}
 end
 
@@ -166,26 +141,13 @@ function IGS.dprint(...)
 end
 
 
-
-
 function IGS.SignPrice(iPrice) -- 10 Alc
 	return math.Truncate(tonumber(iPrice),2) .. " " .. IGS.C.CURRENCY_SIGN
 end
 
-local rubs = {"рубль", "рубля", "рублей"}
-PL_MONEY = PLUR(rubs)
-PL_IGS   = PLUR(IGS.C.CurrencyPlurals or rubs)
+PL_MONEY = PLUR(IGS.C.CurrencyPlurals)
 PL_DAYS  = PLUR({"день", "дня", "дней"})
 
-
-local PL_IGS_ORIGINAL
-hook.Add("IGS.OnSettingsUpdated","PL_IGS = PL_MONEY",function()
-	if not IGS.IsCurrencyEnabled() then -- Если донат валюта отключена
-		PL_IGS_ORIGINAL = PL_IGS -- а это не таблица случайно? Мб table.copy?
-		PL_IGS = PL_MONEY
-
-	-- Валюта уже отключалась. Сейчас включилась
-	elseif PL_IGS_ORIGINAL then
-		PL_IGS = PL_IGS_ORIGINAL
-	end
-end)
+-- #TODO: ОБРАТНАЯ СОВМЕСТИМОСТЬ. НЕ применяется в core.
+-- https://forum.gm-donate.net/t/cryptos-igs/1461/6
+PL_IGS = PL_MONEY

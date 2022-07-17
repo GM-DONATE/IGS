@@ -86,20 +86,8 @@ mods("modules")
 sv("processor_sv.lua") -- начинаем обработку всего серверного в конце
 
 
---[[------------------------------
-	Уродский кусок пост хуков
---------------------------------]]
-if SERVER then
-	hook.Add("IGS.ServersLoaded", "Loaded", function()
-		IGS.GetSettings(function(t)
-			IGS.UpdateMoneySettings(t["MinCharge"],t["CurrencyPrice"])
-			hook.Run("IGS.Loaded")
-		end)
-	end)
-else
-	hook.Add("IGS.OnSettingsUpdated","Loaded",function()
-		hook.Run("IGS.Loaded")
-	end)
-end
+hook.Add("IGS.ServersLoaded", "IGS.Loaded", function()
+	hook.Run("IGS.Loaded")
+end)
 
 hook.Run("IGS.Initialized") -- можно создавать итемы

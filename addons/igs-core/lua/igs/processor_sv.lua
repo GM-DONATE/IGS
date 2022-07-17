@@ -21,7 +21,7 @@ local function recalcTransactionsAndBonuses(pl, bGiveBonuses)
 		end
 
 		local prev_lvl = IGS.PlayerLVL(pl) or 0 -- не двигать под igs_lvl!
-		pl:SetIGSVar("igs_lvl",IGS.LVL.GetByCost( IGS.RealPrice(tt) ):LVL())
+		pl:SetIGSVar("igs_lvl",IGS.LVL.GetByCost( tt ):LVL())
 		pl:SetIGSVar("igs_total_transactions",tt)
 
 		if bGiveBonuses and IGS.PlayerLVL(pl) > prev_lvl then

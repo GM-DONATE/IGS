@@ -58,14 +58,14 @@ function IGS.WIN.InvLog()
 			end
 
 			for i,s64 in ipairs({r.owner, r.inflictor}) do
-				if player.GetBySteamID64(s64) then continue end -- игрок в сети, ник получен
+				if not player.GetBySteamID64(s64) then -- игрок не в сети, ник не получен
+					getNameBySid(function(name_)
+						if not name_ then return end
 
-				getNameBySid(function(name_)
-					if not name_ then return end
-
-					local btn_owner = line.columns[i] -- 1, 2 колонка
-					btn_owner:SetText(name_)
-				end, s64)
+						local btn_owner = line.columns[i] -- 1, 2 колонка
+						btn_owner:SetText(name_)
+					end, s64)
+				end
 			end
 
 			line.DoClick = function()

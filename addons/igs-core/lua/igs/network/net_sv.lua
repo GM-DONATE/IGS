@@ -59,11 +59,11 @@ end
 local function IGS_Purchase(pl, uid, cb)
 	local ITEM = IGS.GetItemByUID(uid)
 
-	local curr_price = ITEM:PriceInCurrency()
+	local price = ITEM:GetPrice(pl)
 
 	local err =
 		ITEM:IsHidden() and "Как вы меня нашли?"
-		or not IGS.CanAfford(pl,curr_price) and ("Для покупки нужно " .. PL_IGS(curr_price))
+		or not IGS.CanAfford(pl, price) and ("Для покупки нужно " .. PL_MONEY(price))
 		or IGS.IsInventoryOverloaded(pl) and "У вас перегруз в донат инвентаре. А еще вы один из немногих, кто видел это!"
 		or pl.igs_unfinished_purchase and "Запрос на покупку в процессе. Подождите, пожалуйста" -- в цикле с клиента вызов функции покупки
 
@@ -86,7 +86,7 @@ local function IGS_Purchase(pl, uid, cb)
 	end
 
 	pl.igs_unfinished_purchase = true
-	pl:AddIGSFunds(-curr_price, "P: " .. uid, function()
+	pl:AddIGSFunds(-price, "P: " .. uid, function()
 
 		-- ложит в инвентарь или регает сразу как покупку если тот отключен
 		IGS.PlayerPurchasedItem(pl, ITEM, function(invDbID_) -- nil if disabled
@@ -216,17 +216,14 @@ end)
 --[[-------------------------------------------------------------------------
 	ССЫЛКИ
 ---------------------------------------------------------------------------]]
-local hostname = assert(GetConVar("hostname"), "Error fetching server name")
-
 net_ReceiveProtected("IGS.GetPaymentURL", function(pl)
 	local sum  = net.ReadDouble()
-	local desc = "Пожертвование " .. IGS.SignPrice( IGS.PriceInCurrency(sum) ) ..  " на " .. hostname:GetString()
 
 	IGS.GetPaymentURL(function(url)
 		net.Start("IGS.GetPaymentURL")
 			net.WriteString(url)
 		net.Send(pl)
-	end, pl:SteamID64(), sum, desc)
+	end, pl:SteamID64(), sum)
 end)
 
 

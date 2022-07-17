@@ -41,11 +41,9 @@ local function addServerLocally(id, serv_name, enabled)
 	IGS.SERVERS.MAP[id] = serv_name
 end
 
-local function addCurrentServerLocally(id, serv_name, sock_port)
+local function addCurrentServerLocally(id, serv_name)
 	IGS.SERVERS.CURRENT = id
 	addServerLocally(id, serv_name, true)
-
-	IGS.C.SOCKETPORT = sock_port
 
 	-- было в registerCurrentServer до https://t.me/c/1353676159/17695
 	bib.set("igs:serverid", id)
@@ -58,18 +56,9 @@ local function registerCurrentServer(local_ip,port, fOnSuccess)
 			"HACTPOuKu B gm-donate.net/panel/projects/" .. IGS.C.ProjectID
 		)
 
-		local sock_port = port + 10
 		local serv_name = GetConVarString("hostname")
-		addCurrentServerLocally(id, serv_name, sock_port) -- нужно снаружи SetServerSocketPort для IGS.SERVERS:ID()
+		addCurrentServerLocally(id, serv_name) -- нужно снаружи для IGS.SERVERS:ID()
 		IGS.SetServerName( serv_name )
-		IGS.SetServerSocketPort(sock_port, function()
-			fOnSuccess()
-
-			IGS.print(
-				"COKET CEPBEPA HACTpOEH. nOPT: " .. sock_port .. "\n" ..
-				"ECJIu C4ET nOnOJIH9ETC9 HE MrHOBEHHO, TO CMEHuTE IP HA 6OJIEE 6JIU3Kuu K nOPTy CEPBEPA"
-			)
-		end)
 	end)
 end
 
@@ -82,14 +71,14 @@ local function loadServersOrRegisterCurrent(d, local_ip)
 
 	local maxVisibleServerId = 0 -- больший ид может быть архивированным
 	local isCurrentDisabled
-	for _,v in ipairs(d) do -- -- `ID`,`Name`,`IP`,`Port`,`SocketPort`,`Disabled`
+	for _,v in ipairs(d) do -- -- `ID`,`Name`,`IP`,`Port`,`Disabled`
 		local disabled = tobool(v.Disabled)
 		maxVisibleServerId = math.max(v.ID, maxVisibleServerId)
 
 		-- Текущий сервер
 		if v.IP == local_ip and v.Port == serv_port then
 			if disabled then isCurrentDisabled = true end
-			addCurrentServerLocally(v.ID, v.Name, v.SocketPort) -- sock may be nil
+			addCurrentServerLocally(v.ID, v.Name)
 		else
 			addServerLocally(v.ID, v.Name, not disabled)
 		end

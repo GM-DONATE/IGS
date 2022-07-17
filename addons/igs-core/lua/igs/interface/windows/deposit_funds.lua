@@ -10,7 +10,6 @@ function IGS.WIN.Deposit(iRealSum)
 	surface.PlaySound("ambient/weather/rain_drip1.wav")
 	hook.Run("IGS.OnDepositWinOpen",iRealSum)
 
-	local cd = not IGS.IsCurrencyEnabled() -- cd = currency disabled. Bool
 	local realSum = math.max(IGS.GetMinCharge(), niceSum(iRealSum, 0))
 
 	m = uigs.Create("igs_frame", function(self)
@@ -30,9 +29,9 @@ function IGS.WIN.Deposit(iRealSum)
 			Левая колонка. Реальная валюта
 		---------------------------------------]]
 		uigs.Create("DLabel", function(real)
-			real:SetSize(cd and 450 or 180,25)
-			real:SetPos(cd and 0 or 10,self:GetTitleHeight())
-			real:SetText(cd and "Введите ниже сумму пополнения счета" or "Рубли")
+			real:SetSize(450, 25)
+			real:SetPos(0, self:GetTitleHeight())
+			real:SetText("Введите ниже сумму пополнения счета")
 			real:SetFont("igs.22")
 			real:SetTextColor(IGS.col.HIGHLIGHTING)
 			real:SetContentAlignment(2)
@@ -40,42 +39,15 @@ function IGS.WIN.Deposit(iRealSum)
 
 		self.real_m = uigs.Create("DTextEntry", self)
 		self.real_m:SetPos(10,50)
-		self.real_m:SetSize(cd and 450 - 10 - 10 or 180,30)
+		self.real_m:SetSize(450 - 10 - 10, 30)
 		self.real_m:SetNumeric(true)
-		self.real_m.OnChange = function(s)
-			if cd then return end
-			self.curr_m:SetValue(IGS.PriceInCurrency( niceSum(s:GetValue(),0) )) -- бля
+		self.real_m.Think = function(s)
+			local sum = tonumber(s:GetValue())
+			self.purchase:SetText("Пополнить счет на " .. niceSum(sum, 0) .. " руб")
+			self.purchase:SetActive(sum and sum > 0)
 		end
-		self.real_m.Think = function()
-			local rub = tonumber(self.real_m:GetValue())
-			if cd then
-				self.purchase:SetText(
-					"Пополнить счет на " .. niceSum(rub,0) .. " руб"
-				)
-			else
-				local igs = tonumber(self.curr_m:GetValue())
-				self.purchase:SetText(
-					"Пополнить на " .. IGS.SignPrice( niceSum(igs,0) ) ..
-					" за " .. niceSum(rub,0) .. " руб"
-				)
-			end
-
-			self.purchase:SetActive(rub and rub > 0)
-		end
-
-		--[[-------------------------------------
-			Середина. Знак равности и кнопка покупки
-		---------------------------------------]]
-		if not cd then
-			uigs.Create("DLabel", function(eq)
-				eq:SetSize(50,30)
-				eq:SetPos(200,50)
-				eq:SetText("=")
-				eq:SetFont("igs.40")
-				eq:SetTextColor(IGS.col.TEXT_HARD)
-				eq:SetContentAlignment(5)
-			end,self)
-		end
+		self.real_m:SetValue( realSum )
+		self.real_m:OnChange()
 
 		self.purchase = uigs.Create("igs_button", function(p)
 			local _,ry = self.real_m:GetPos()
@@ -109,33 +81,6 @@ function IGS.WIN.Deposit(iRealSum)
 			end
 		end, self)
 
-		--[[-------------------------------------
-			Правая колонка. Донат валюта
-		---------------------------------------]]
-		if not cd then
-			uigs.Create("DLabel", function(curr)
-				curr:SetSize(180,25)
-				curr:SetPos(self:GetWide() - 10 - curr:GetWide(),self:GetTitleHeight())
-				curr:SetText(IGS.C.CURRENCY_NAME)
-				curr:SetFont("igs.22")
-				curr:SetTextColor(IGS.col.HIGHLIGHTING)
-				curr:SetContentAlignment(2)
-			end, self)
-
-			self.curr_m = uigs.Create("DTextEntry", self)
-			self.curr_m:SetPos(self:GetWide() - 10 - self.real_m:GetWide(),50)
-			self.curr_m:SetSize(self.real_m:GetWide(),self.real_m:GetTall())
-			self.curr_m:SetNumeric(true)
-			self.curr_m.OnChange = function(s)
-				self.real_m:SetValue(IGS.RealPrice( niceSum(s:GetValue(),0) )) -- тоже бля
-			end
-		end
-
-		--[[-------------------------------------------------------------------------
-			Должно быть после self.curr_m
-		---------------------------------------------------------------------------]]
-		self.real_m:SetValue( realSum )
-		self.real_m:OnChange()
 
 
 		--[[-------------------------------------------------------------------------
@@ -201,7 +146,7 @@ function IGS.WIN.Deposit(iRealSum)
 		end, self)
 
 
-		local coupon = uigs.Create("igs_button", function(btn)
+		uigs.Create("igs_button", function(btn)
 			local _,log_y = self.log:GetPos()
 
 			btn:SetSize(170, 30)
@@ -241,11 +186,9 @@ end
 
 
 hook.Add("IGS.PaymentStatusUpdated","UpdatePaymentStatus",function(dat)
-	local extra_inf = IGS.IsCurrencyEnabled() and (" (" .. PL_MONEY( IGS.RealPrice(dat.orderSum) ) .. ")") or ""
-
 	local text =
 		dat.method == "check" and ("Проверка возможности платежа через " .. dat.paymentType) or
-		dat.method == "pay"   and ("Начислено " .. PL_IGS(dat.orderSum) ..  extra_inf) or
+		dat.method == "pay"   and ("Начислено " .. PL_MONEY(dat.orderSum)) or
 		dat.method == "error" and ("Ошибка пополнения счета: " .. dat.errorMessage) or
 		"С сервера пришел неизвестный метод " .. tostring(dat.method) .. " и возникла ошибка"
 

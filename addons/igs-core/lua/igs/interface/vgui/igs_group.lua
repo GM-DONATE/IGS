@@ -24,7 +24,7 @@ function PANEL:SetGroup(ITEM_GROUP)
 
 	local min,max = math.huge,0 -- минимальная и максимальная цены итемов
 	for _,v in ipairs(visible_items) do
-		local price = v.item:PriceInCurrency()
+		local price = v.item:GetPrice( LocalPlayer() )
 
 		if price < min then
 			min = price

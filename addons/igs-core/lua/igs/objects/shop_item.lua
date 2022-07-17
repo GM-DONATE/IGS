@@ -47,8 +47,22 @@ function STORE_ITEM:SetPrice(iPrice)
 	return set(self,"price",iPrice)
 end
 
+-- TODO УСТАРЕЛО. БУДЕТ УДАЛЕНО В БЛИЖАЙШИХ ВЕРСИЯХ
+-- Подробнее: https://forum.gm-donate.net/t/kak-sdelat-skidku-na-moder-esli-u-igroka-vip/1441/18?u=gmd
 function STORE_ITEM:Price()
 	return self.price
+end
+
+
+-- function(pl, self) return pl:IsUserGroup("vip") and 50 end
+-- если return ничего не вернул, то будет стандартная цена
+function STORE_ITEM:SetGetPrice(fGetPrice)
+	return set(self,"getprice",fGetPrice)
+end
+
+function STORE_ITEM:GetPrice(pl)
+	local getprice = self.getprice and self.getprice(pl)
+	return getprice or self.price
 end
 
 -- Сбрасывает текущее описание и устанавливает указанное, если не указать bAppand
@@ -280,10 +294,6 @@ function STORE_ITEM:Insert(to, key)
 	return key
 end
 
-function STORE_ITEM:PriceInCurrency()
-	return IGS.PriceInCurrency(self.price)
-end
-
 
 --[[-------------------------------------------------------------------------
 	CORE
@@ -327,7 +337,7 @@ function IGS.AddItem(sName, sUID, iPrice)
 	-- Чтобы счетчик не набивался
 	local ITEM = IGS.ITEMS.MAP[sUID]
 	if ITEM then
-		ITEM:SetPrice(iPrice or ITEM:Price()) -- обновляем цену, вдруг изменилась
+		ITEM:SetPrice(iPrice or ITEM.price) -- обновляем цену, вдруг изменилась
 		ITEM.name = sName -- и имя
 
 		return ITEM
