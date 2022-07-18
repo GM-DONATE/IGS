@@ -14,8 +14,8 @@ end
 concommand.Add("igs_verbose", function(pl)
 	if SERVER and IsValid(pl) then return end
 
-	local enable = cookie.GetNumber("igsverbose", 0) == 0
-	cookie.Set("igsverbose", enable and 1 or 0)
+	local enable = cookie.GetNumber("igs_verbose", 0) == 0
+	cookie.Set("igs_verbose", enable and 1 or 0)
 	print("IGS Logging " .. (enable and "enabled" or "disabled"))
 end)
 
