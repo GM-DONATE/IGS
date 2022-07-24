@@ -13,9 +13,16 @@ kupol = kupol or {
 
 
 local log = kupol.log
-log.setFormat("{time} polling {message}")
 log.setCvar("kupol_logging_level")
 
+log.format = function(fmt, ...)
+	fmt = fmt:gsub("{}", "%%s") -- обратная совместимость
+	return os.date("%H:%M:%S ") .. fmt:format(...):gsub("(app/..)[%w_]*(../)", "%1*****%2")
+end
+
+local safestr = function(str) -- hide uid from logZ
+	return str:gsub("(..)[%w_]*(..)", "%1*****%2")
+end
 
 local function get_updates(base_url, uid, sleep, ts, fOnResponse)
 	local url = base_url .. uid .. "/getUpdates?sleep=" .. (sleep or "") .. "&ts=" .. (ts or "")
@@ -58,7 +65,7 @@ function kupol.new(sUrl, uid, iTimeout)
 
 		local ts_diff = remote_ts - requested_ts
 		if #res.updates > 0 then
-			log.info("From uid {} received {} new messages. Ts diff: {} items", o.uid, #res.updates, ts_diff)
+			log.info("From uid {} received {} new messages. Ts diff: {} items", safestr(o.uid), #res.updates, ts_diff)
 		end
 
 		for _,upd in ipairs(res.updates) do
@@ -83,7 +90,7 @@ function kupol.new(sUrl, uid, iTimeout)
 	o.consume_updates = function()
 		local previous_ts = bib.getNum("lp:ts:" .. o.uid) or 0
 
-		-- log.info("Polling uid: {}. Timeout {} sec. Requested Ts {}", uid, sleep, previous_ts)
+		-- log.info("Polling uid: {}. Timeout {} sec. Requested Ts {}", safestr(uid), sleep, previous_ts)
 		o.poll(previous_ts, function(res, err)
 			if o.checkStopping() then return end
 
