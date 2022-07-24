@@ -1,10 +1,6 @@
 -- 2021.01.18 Logging library
 -- Author https://amd-nick.me/about
 
--- Inspired by Python
--- https://docs.python.org/3/howto/logging-cookbook.html
--- https://docs.python.org/3/library/logging.html?highlight=relativecreated#logrecord-attributes
-
 lolib = {}
 
 -- https://colorswall.com/palette/3/
@@ -24,34 +20,11 @@ lolib.LEVELS = {
 	{"D", COLOR_DEBUG,   COLOR_DEBUG},
 	{"I", COLOR_INFO,    COLOR_FADED},
 	{"W", COLOR_WARNING, COLOR_FADED},
-	{"E", COLOR_ERROR,   COLOR_FADED},
+	{"E", COLOR_ERROR,   COLOR_WARNING},
 }
 
 local function echo(pref_col, pref, text_col, text)
 	MsgC(pref_col, pref, text_col, " " .. text .. "\n")
-end
-
-local function format(patt, ...)
-	local args = {...}
-	local count = 0
-	patt = patt:gsub("{}", function()
-		count = count + 1
-		local replacement_val = (args[count] ~= nil) and args[count]
-		if isnumber(replacement_val) or isstring(replacement_val) then
-			return replacement_val
-		end
-
-		if replacement_val == nil then
-			return "nil_value"
-		end
-
-		-- #todo hardcoded
-		PrintTable({replacement_val = replacement_val})
-		debug.Trace()
-		return "INVALID_REPLACEMENT_VALUE"
-	end)
-
-	return patt
 end
 
 local function fp(a)
@@ -67,14 +40,41 @@ function lolib.new()
 		pattern = "{message}"
 	}
 
-	logger.log = function(iLevel, patt, ...)
-		if iLevel < logger.level or logger.level == 0 then return end
+	logger.build_message = function(fmt, ...)
+		local args = {...}
+		local count = 0
+		return fmt:gsub("{}", function()
+			count = count + 1
+			local replacement_val = (args[count] ~= nil) and args[count]
+			if istable(replacement_val) then
+				return util.TableToJSON(replacement_val)
+			else
+				return tostring(replacement_val)
+			end
+		end)
+	end
 
-		local message = format(patt, ...)
+	logger.format = function(fmt, ...)
+		local text = logger.build_message(fmt, ...)
 
-		local text = logger.pattern
+		-- invalid capture index error. "foo %9 bar" > "foo %%9 bar"
+		text = text:gsub("%%", "%%%%%")
+		-- text = text:gsub("%%(%d)", "%%%%%1")
+
+		return logger.pattern
 			:gsub("{time}", os.date("%H:%M:%S"))
-			:gsub("{message}", message)
+			:gsub("{message}", text)
+	end
+
+	logger.filter = function(tRecord)
+		if tRecord.level < logger.level or logger.level == 0 then return end
+		return true
+	end
+
+	logger.log = function(iLevel, fmt, ...)
+		if not logger.filter({level = iLevel}) then return end
+
+		local text = logger.format(fmt, ...)
 
 		local level_data = lolib.LEVELS[iLevel]
 		echo(level_data[2], "[" .. level_data[1] .. "]", level_data[3], text)
@@ -104,8 +104,6 @@ function lolib.new()
 		return cvar
 	end
 
-	-- {time}, message
-	-- #todo filename, funcname, linen, filepath, levelname(?)
 	logger.setFormat = function(sPattern)
 		logger.pattern = sPattern
 	end
@@ -116,7 +114,6 @@ end
 --[[
 local log = lolib.new()
 log.setLevel(lolib.LEVELS.INFO)
-log.setFormat("{time} name {message}")
 
 log.debug("debug value: {}", 123)
 log.info("info value: {}", 123)

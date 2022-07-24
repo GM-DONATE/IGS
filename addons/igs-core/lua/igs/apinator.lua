@@ -167,12 +167,11 @@ function IGS.GetPlayerTransactions(fCallback, s64) -- новые сверху
 end
 -- IGS.GetPlayerTransactions(PRINT,sid)
 
--- Последние транзакции проекта.
--- Если не указать лимит, то вернет ВСЕ, даже если их тысячи. Осторожно
+-- Последние транзакции проекта. Без лимита вернет 255
 function IGS.GetLatestTransactions(fCallback, iLimit_)
 	IGS.GetTransactions(fCallback, nil, true, iLimit_)
 end
--- IGS.GetLatestTransactions(10, PRINT)
+-- IGS.GetLatestTransactions(PRINT, 10)
 
 
 

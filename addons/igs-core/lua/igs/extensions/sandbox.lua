@@ -29,6 +29,78 @@ function STORE_ITEM:SetWeapon(sWepClass,tAmmo)
 	return self
 end
 
+
+function STORE_ITEM:SetPlayerModel(mdl)
+	return self:SetMeta("player_model", mdl):AddServerHook("PlayerSetModel", function(pl)
+		local override = hook.Run("IGS.PlayerSetModel", pl, self)
+		if override ~= false then
+			pl:SetModel(mdl)
+			pl:SetupHands()
+			return true
+		end
+	end)
+end
+
+--[[
+IGS("Alyx", "custom_model", 300)
+	:SetDescription("Вы будете спавниться всегда с моделькой Аликс")
+	:SetTerm(30) -- 30 дней
+	:SetPlayerModel("models/player/alyx.mdl")
+
+
+-- Если у игрока куплена моделька alyx.mdl, то выдавать ее только за профессию бомжа
+hook.Add("IGS.PlayerSetModel", "SetPlayerModel_filter", function(pl, ITEM)
+	local mdl = ITEM:GetMeta("player_model")
+	if mdl == "models/player/alyx.mdl" and pl:Team() ~= TEAM_HOBO then
+		return false
+	end
+end)
+--]]
+
+
+local prop_limiters_exists = nil -- optimization
+
+function STORE_ITEM:IncreasePlayerPropLimit(iAmount)
+	prop_limiters_exists = true
+	return self:SetInstaller(function(pl)
+		local current_extra = pl:GetVar("igs_extra_props_limit", 0)
+		pl:SetVar("igs_extra_props_limit", current_extra + iAmount)
+	end):SetMeta("prop_limit", iAmount)
+end
+
+if SERVER then
+	hook.Add("PlayerCheckLimit", "IGS", function(pl, type, current_spawned, general_limit)
+		if not prop_limiters_exists or type ~= "props" then return end
+
+		local extra_props_purchased = pl:GetVar("igs_extra_props_limit", 0)
+		local general_limit_reached = current_spawned >= general_limit
+		local extra_limit_reached   = current_spawned <= extra_props_purchased + general_limit
+
+		-- первое, чтобы не выбрасывать true лишний раз
+		if general_limit_reached and (not extra_limit_reached) then
+			return true
+		end
+	end)
+
+	hook.Add("IGS.PlayerPurchasesLoaded", "IGS.LoadExtraPropsLimit", function(pl, purchases_)
+		if not purchases_ or not prop_limiters_exists then return end
+
+		local extra = 0
+		for uid in pairs(purchases_) do
+			local ITEM = IGS.GetItemByUID(uid)
+			if ITEM:GetMeta("prop_limit") then
+				extra = extra + ITEM:GetMeta("prop_limit")
+			end
+		end
+
+		if extra ~= 0 then
+			pl:SetVar("igs_extra_props_limit", extra)
+		end
+	end)
+
+	-- hook.Add("PlayerCheckLimit", "asd", PRINT)
+end
+
 if CLIENT then -- :SetWeapon only
 hook.Add("IGS.OnItemInfoOpen","CheckGiveWeaponOnSpawn",function(ITEM, fr)
 	if not (ITEM.swep and LocalPlayer():HasPurchase(ITEM:UID())) then return end
@@ -233,47 +305,6 @@ end, HOOK_HIGH)
 --[[-------------------------------------------------------------------------
 	/Машины
 ---------------------------------------------------------------------------]]
-local prop_limiters_exists = nil -- optimization
-
-function STORE_ITEM:IncreasePlayerPropLimit(iAmount)
-	prop_limiters_exists = true
-	return self:SetInstaller(function(pl)
-		local current_extra = pl:GetVar("igs_extra_props_limit", 0)
-		pl:SetVar("igs_extra_props_limit", current_extra + iAmount)
-	end):SetMeta("prop_limit", iAmount)
-end
-
-hook.Add("PlayerCheckLimit", "IGS", function(pl, type, current_spawned, general_limit)
-	if not prop_limiters_exists or type ~= "props" then return end
-
-	local extra_props_purchased = pl:GetVar("igs_extra_props_limit", 0)
-	local general_limit_reached = current_spawned >= general_limit
-	local extra_limit_reached   = current_spawned <= extra_props_purchased + general_limit
-
-	-- первое, чтобы не выбрасывать true лишний раз
-	if general_limit_reached and (not extra_limit_reached) then
-		return true
-	end
-end)
-
-hook.Add("IGS.PlayerPurchasesLoaded", "IGS.LoadExtraPropsLimit", function(pl, purchases_)
-	if not purchases_ or not prop_limiters_exists then return end
-
-	local extra = 0
-	for uid in pairs(purchases_) do
-		local ITEM = IGS.GetItemByUID(uid)
-		if ITEM:GetMeta("prop_limit") then
-			extra = extra + ITEM:GetMeta("prop_limit")
-		end
-	end
-
-	if extra ~= 0 then
-		pl:SetVar("igs_extra_props_limit", extra)
-	end
-end)
-
-
--- hook.Add("PlayerCheckLimit", "asd", PRINT)
 
 
 -- DARKRP ONLY
@@ -290,32 +321,5 @@ hook.Add("canDropWeapon","IGS",function(pl,wep)
 	-- Пушка продается, но чел ее не покупал
 	-- Т.е. по сути возможность дропа контроллируется другими хуками
 end, HOOK_HIGH)
-end)
 
-
-function STORE_ITEM:SetPlayerModel(mdl)
-	return self:SetMeta("player_model", mdl):AddHook("PlayerSetModel", function(pl)
-		local override = hook.Run("IGS.PlayerSetModel", pl, self)
-		if override ~= false then
-			pl:SetModel(mdl)
-			pl:SetupHands()
-			return true
-		end
-	end)
-end
-
---[[
-IGS("Alyx", "custom_model", 300)
-	:SetDescription("Вы будете спавниться всегда с моделькой Аликс")
-	:SetTerm(30) -- 30 дней
-	:SetPlayerModel("models/player/alyx.mdl")
-
-
--- Если у игрока куплена моделька alyx.mdl, то выдавать ее только за профессию бомжа
-hook.Add("IGS.PlayerSetModel", "SetPlayerModel_filter", function(pl, ITEM)
-	local mdl = ITEM:GetMeta("player_model")
-	if mdl == "models/player/alyx.mdl" and pl:Team() ~= TEAM_HOBO then
-		return false
-	end
-end)
---]]
+end) -- timer.Simple(0

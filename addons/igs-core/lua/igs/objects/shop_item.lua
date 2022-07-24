@@ -294,6 +294,26 @@ function STORE_ITEM:Insert(to, key)
 	return key
 end
 
+-- Должно использовать только те хуки,
+-- где первым аргументом в колбеке идет игрок
+-- ITEM:AddHook("PlayerLoadout", funciton(pl) pl:GiveAmmos() end)
+function STORE_ITEM:AddHook(sHook, fCallback)
+	local uid = self:UID()
+	hook.Add(sHook, "item." .. uid, function(pl, ...)
+		if pl:HasPurchase(uid) then
+			return fCallback(pl, ...)
+		end
+	end)
+	return self
+end
+
+function STORE_ITEM:AddServerHook(sHook, fCallback)
+	return SERVER and self:AddHook(sHook, fCallback) or self
+end
+
+function STORE_ITEM:AddClientHook(sHook, fCallback)
+	return CLIENT and self:AddHook(sHook, fCallback) or self
+end
 
 --[[-------------------------------------------------------------------------
 	CORE
