@@ -294,7 +294,6 @@ function STORE_ITEM:Insert(to, key)
 	return key
 end
 
-
 -- Должно использовать только те хуки,
 -- где первым аргументом в колбеке идет игрок
 -- ITEM:AddHook("PlayerLoadout", funciton(pl) pl:GiveAmmos() end)
