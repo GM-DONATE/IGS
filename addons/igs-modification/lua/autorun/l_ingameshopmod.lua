@@ -14,21 +14,54 @@ end
 
 checkRunString() -- сразу может быть, а потом пропасть
 
-
-
-local function wrapFetch(url, cb)
-	local patt = "IGS Не может выполнить HTTP запрос и загрузить скрипт\nURL: %s\nError: %s\n"
-	timer.Simple(0, function()
-		http.Fetch(url, cb, function(err)
-			error(patt:format(url, err))
-		end)
+-- http либа работает не сразу
+local fetchDelayed = function(delay, url, fOk, fErr, tHeaders)
+	timer.Simple(delay, function()
+		http.Fetch(url, fOk, fErr, tHeaders)
 	end)
 end
 
-local function downloadSuperfile(version, cb)
+local replaceGithubUrl = function(original)
+	return original
+		:gsub("^https://api.github.com", "https://gh.gm-donate.net/api")
+		:gsub("^https://github.com",     "https://gh.gm-donate.net")
+end
+
+local function wrapFetch(url, cb, retry_)
+	local retry3Times = function()
+		retry_ = retry_ or 1
+		if retry_ < 3 then
+			wrapFetch(url, cb, retry_ + 1)
+		elseif retry_ == 3 then -- last chance
+			local newurl = replaceGithubUrl(url)
+			wrapFetch(newurl or url, cb, retry_ + 1)
+		else
+			return true
+		end
+	end
+
+	local patt = "IGS Не может выполнить HTTP запрос и загрузить скрипт\nURL: %s\nError: %s\n"
+	fetchDelayed((retry_ or 0) * 5, url, cb, function(err) -- timeout, unsuccessful
+		local fault = retry3Times()
+		if not fault then return end -- пытается дальше
+		-- попытки исчерпались
+
+		error(patt:format(url, err))
+	end)
+end
+
+
+local function downloadSuperfile(version, cb, _failure)
 	local url = "https://github.com/" .. IGS_REPO .. "/releases/download/" .. version .. "/superfile.json"
+	if _failure then ErrorNoHalt("[IGS] #" .. _failure .. " повторение загрузки", url) end
+
 	wrapFetch(url, function(superfile)
 		local dat = util.JSONToTable(superfile)
+		if not dat and (_failure or 0) < 3 then
+			downloadSuperfile(version, cb, (_failure or 0) + 1)
+			return
+		end
+
 		local err =
 			not dat and "superfile.json получен не в правильном формате"
 			or dat.error and ("Ошибка от GitHub: " .. dat.error)
