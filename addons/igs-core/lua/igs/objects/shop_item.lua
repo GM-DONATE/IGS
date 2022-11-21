@@ -61,7 +61,7 @@ function STORE_ITEM:SetGetPrice(fGetPrice)
 end
 
 function STORE_ITEM:GetPrice(pl)
-	local getprice = self.getprice and self.getprice(pl)
+	local getprice = self.getprice and self.getprice(pl, self)
 	return getprice or self.price
 end
 
@@ -293,6 +293,7 @@ function STORE_ITEM:Insert(to, key)
 	end
 	return key
 end
+
 
 -- Должно использовать только те хуки,
 -- где первым аргументом в колбеке идет игрок
