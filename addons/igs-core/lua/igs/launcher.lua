@@ -15,6 +15,7 @@ sh("dependencies/scc.lua")
 sv("dependencies/resources.lua") -- иконки, моделька дропнутого итема
 sh("dependencies/bib.lua")
 sh("dependencies/permasents.lua")
+cl("dependencies/matex.lua")
 
 -- #todo сделать через require
 -- lua/includes/modules отсюда
@@ -29,7 +30,6 @@ sh("dependencies/dash/nw.lua")
 -- if not dash then
 sh("dependencies/dash/hash.lua")
 sh("dependencies/dash/misc.lua")
-cl("dependencies/dash/wmat.lua")
 
 sh("settings/config_sh.lua")
 sv("settings/config_sv.lua") -- для фетча project key (Генерация подписи)

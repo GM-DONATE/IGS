@@ -1,57 +1,49 @@
---[[-------------------------------------------------------------------------
-	Запрещено использовать DOCK.
-	Размер должен быть указан единоразово и четко
+--[[
+Если ссылку обновить, то картинка обновится
+Если размер панели изменится, то картинка адаптируется
+]]
 
-	:SetURL указывать ПОСЛЕ :SetSize
----------------------------------------------------------------------------]]
 local PANEL = {}
 
-
-function PANEL:GetTexture()
-	return texture.Get(self.url)
+local default_matex
+function PANEL:Init()
+	if not default_matex then
+		-- print("Loading default matex")
+		default_matex = matex.url(IGS.C.DefaultIcon)
+	end
 end
 
-function PANEL:GetURL()
-	return self.url
-end
-
-function PANEL:RenderTexture()
-	self.Rendering = true
-
-	-- print("Render",self:GetURL())
-	-- print("Size",self:GetSize())
-
-	texture.Delete(self:GetURL())
-	texture.Create(self:GetURL())
-		:SetSize(self:GetSize())
-		:SetFormat(self:GetURL():sub(-3) == "jpg" and "jpg" or "png")
-		:Download(self:GetURL(), function()
-			if not IsValid(self) then return end
-
-			self.Rendering 	= false
-			self.LastURL 	= self:GetURL()
-		end, function()
-			if not IsValid(self) then return end
-
-			self.Rendering = false
-		end)
-end
-
-function PANEL:Paint(w,h)
-	if (not self:GetTexture() and not self.Rendering) or (self:GetURL() ~= self.LastURL and not self.Rendering) then
-		self:RenderTexture()
-
-	elseif self:GetTexture() then
-		surface.SetDrawColor(IGS.col.ICON)
-		surface.SetMaterial( self:GetTexture() )
-		surface.DrawTexturedRect(0,0,w,h)
+function PANEL:Paint(w, h)
+	local mater = (self.matex and self.matex.material) or (default_matex and default_matex.material)
+	if mater then
+		surface.SetDrawColor( IGS.col.ICON )
+		surface.SetMaterial( mater )
+		surface.DrawTexturedRect(0, 0, w, h)
 	end
 end
 
 function PANEL:SetURL(sUrl)
-	self.url = sUrl or IGS.C.DefaultIcon
+	if not sUrl then
+		self.matex = nil -- fallback to default
+		return
+	end
+
+	-- print("igs_wmat:SetURL('" .. sUrl .. "') size: ", self:GetWide())
+
+	local url_resized = string.format(IGS.C.ImgProxyPattern or "https://imgkit.gmod.app/?image=%s&size=%d", sUrl:URLEncode(), self:GetWide())
+	self.matex = matex.url( url_resized )
+	self.url = sUrl
+	self.size = self:GetWide()
 end
 
+function PANEL:PerformLayout(new_w) -- size changed
+	-- print("igs_wmat:PerformLayout()")
 
-vgui.Register("igs_wmat",PANEL,"Panel")
+	-- Если есть что обновлять и есть смысл обновлять (иконка расширилась)
+	if self.url and new_w > (self.size or 0) then
+		self:SetURL(self.url)
+	end
+end
+
+vgui.Register("igs_wmat", PANEL, "Panel")
 -- IGS.UI()

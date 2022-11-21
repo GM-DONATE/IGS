@@ -14,21 +14,23 @@ local function loadTab(activity,sidebar,dat)
 		hook.Remove("IGS.PlayerPurchasedItem","UpdateInventoryView")
 	end
 
-	local act_tall = activity:GetTall() - activity.tabBar:GetTall()
+	-- local act_tall = activity:GetTall() - activity.tabBar:GetTall()
 
 	local infpan = uigs.Create("igs_iteminfo", function(p)
-		p:SetSize(300,act_tall) -- Dock(LEFT) SetWide(300)
-		p:SetPos(0,0)
-		p:SetIcon()
+		-- p:SetSize(300,act_tall) -- \/
+		-- p:SetPos(0,0)
+		p:Dock(LEFT) p:SetWide(300)
+		p:SetIcon(IGS.C.DefaultIcon)
 		p:SetName("")
 		p:SetDescription("Здесь будет отображена информация о вашей покупке, когда вы ее сделаете")
 	end, bg)
 
 	local scr = uigs.Create("igs_scroll", bg)
-	scr:SetSize(activity:GetWide() - infpan:GetWide(),act_tall)
-	scr:SetPos(infpan:GetWide(),0) -- Dock(FILL)
+	scr:Dock(FILL) scr:SetWide(activity:GetWide() - infpan:GetWide())
+	-- scr:SetSize(activity:GetWide() - infpan:GetWide(),act_tall)
+	-- scr:SetPos(infpan:GetWide(),0)
 
-	IGS.AddTextBlock(scr,"Ваш инвентарь","Что-то тут пустовато. Надо бы купить че-нить, правда?")
+	IGS.AddTextBlock(scr, "Ваш инвентарь", "Что-то тут пустовато...")
 
 	scr:AddItem( uigs.Create("DIconLayout", function(icons)
 		icons:SetWide(scr:GetWide())
