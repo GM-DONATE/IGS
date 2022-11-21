@@ -35,8 +35,8 @@ local function get_updates(base_url, uid, sleep, ts, fOnResponse)
 		else
 			fOnResponse(false, t and t.description or "response is not a json")
 		end
-	end, function()
-		fOnResponse(false)
+	end, function(http_err)
+		fOnResponse(false, http_err)
 	end)
 end
 
