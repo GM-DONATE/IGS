@@ -321,5 +321,4 @@ hook.Add("canDropWeapon","IGS",function(pl,wep)
 	-- Пушка продается, но чел ее не покупал
 	-- Т.е. по сути возможность дропа контроллируется другими хуками
 end, HOOK_HIGH)
-
 end) -- timer.Simple(0
