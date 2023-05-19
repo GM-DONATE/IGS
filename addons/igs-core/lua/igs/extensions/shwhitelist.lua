@@ -1,5 +1,6 @@
 -- Автор @Joch
--- https://forum.gm-donate.net/t/sh-whitelist-dobavlenie-professii/2129/7
+-- Тут и пример использования
+-- https://forum.gm-donate.net/t/2129/7
 
 local ITEM = FindMetaTable("IGSItem")
 
@@ -9,7 +10,7 @@ function ITEM:SetSHWhitelist(team_cmd)
 			return "Вы в вайтлисте"
 		end
 	end):AddHook("SH_WHITELIST.CanBecomeJob", function(pl, job)
-		return job.command == team_cmd
+		if job.command == team_cmd then return true end
 	end):SetValidator(function(pl)
 		return SH_WHITELIST:CanBecomeJob(pl, DarkRP.getJobByCommand(team_cmd))
 	end)
