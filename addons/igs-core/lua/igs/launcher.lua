@@ -28,7 +28,6 @@ sh("dependencies/lolib.lua") -- должна быть перед kupol
 sh("dependencies/dash/nw.lua")
 
 -- if not dash then
-sh("dependencies/dash/hash.lua")
 sh("dependencies/dash/misc.lua")
 
 sh("settings/config_sh.lua")

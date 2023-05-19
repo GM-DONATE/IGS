@@ -21,13 +21,12 @@ function IGS.GetSign(tParams, secret)
 		s = s .. tostring(v):Trim() .. DELIMITER
 	end
 
-	return hash.SHA256(s .. (secret or IGS.C.ProjectKey))
+	return util.SHA256(s .. (secret or IGS.C.ProjectKey))
 end
 
 function IGS.DoRequest(project_id, secret, sMethod, tParams, fSucc, fErr)
 	tParams = map(tParams, tostring)
 
-	-- prt({"Sign: %s" .. IGS.GetSign(tParams), tParams})
 	local api_url = IGS_API_ENDPOINT or "https://gm-donate.net/api"
 	http.Post(api_url .. sMethod, tParams, fSucc, fErr, {
 		sign    = IGS.GetSign(tParams, secret),
@@ -61,7 +60,8 @@ local function wrapResponse(sMethod, tParams, fOnSuccess, fOnError)
 		else
 			fOnSuccess(d)
 		end
-	end, function()
+	end, function(err)
+		IGS.print(Color(255,0,0), "HTTP Error: " .. err)
 		fOnError("http_error")
 	end)
 end
