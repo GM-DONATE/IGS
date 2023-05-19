@@ -127,28 +127,28 @@ timer.Simple(1, function() -- http.Fetch
 			return tonumber(a.tag_name) > tonumber(b.tag_name)
 		end)
 
-		local current_tag      = cookie.GetNumber("igs_version") or 0 -- or 0 для постоянных напоминаний про обнову, если локальная установка
-		local freshest_version = math.floor(releases[1].tag_name)
-		local current_version  = math.floor(current_tag)
+		local current_ver    = cookie.GetNumber("igs_version") or 0 -- or 0 для постоянных напоминаний про обнову, если локальная установка
+		local freshest_major = math.floor(releases[1].tag_name)
+		local current_major  = math.floor(current_ver)
 
-		if freshest_version > current_version then
-			local info_url = "https://github.com/" .. IGS_REPO .. "/releases/tag/" .. math.floor(freshest_version)
-			print("IGS Доступна новая версия: " .. freshest_version .. ". Установлена: " .. current_version .. "\nИнформация здесь: " .. info_url)
+		if freshest_major > current_major then
+			local info_url = "https://github.com/" .. IGS_REPO .. "/releases/tag/" .. freshest_major
+			print("IGS Доступна новая версия: " .. freshest_major .. ". Установлена: " .. current_major .. "\nИнформация здесь: " .. info_url)
 		else
 			print("IGS Major обновлений нет")
 		end
 
-		local freshest_suitable
+		local freshest_suitable -- "123.2"
 		for _,release in ipairs(releases) do -- от свежайших
-			if current_tag == release.tag_name then break end -- 123.1 current and 123.1 suitable
-			if math.floor(release.tag_name) == current_version then
+			if current_ver == tonumber(release.tag_name) then break end -- 123.1 current and 123.1 suitable
+			if math.floor(release.tag_name) == current_major then -- (123).1 == (123).2
 				freshest_suitable = release.tag_name
 				break
 			end
 		end
 
 		if freshest_suitable then
-			print("IGS Найдено новое soft обновление. Текущая версия, новая:", current_tag, freshest_suitable)
+			print("IGS Найдено новое soft обновление. Текущая версия, новая:", current_ver, freshest_suitable)
 			local url = "https://github.com/" .. IGS_REPO .. "/releases/download/" .. freshest_suitable .. "/superfile.json"
 			http.Fetch(url, function(superfile)
 				print("IGS Обновление загружено. Перезагрузите сервер для применения")
