@@ -253,13 +253,14 @@ end
 	ССЫЛКИ
 >----------------------------<
 ]]
-function IGS.GetPaymentURL(fCallback, s64, iSum)
+function IGS.GetPaymentURL(fCallback, s64, iSum, sExtra)
 	IGS.Query("/url/getPayment",{
 		sid   = s64,
-		sum   = iSum
-	},fCallback) -- ссылка
+		sum   = iSum,
+		extra = sExtra or nil, -- опционально. Если указать, то в хуке IGS.PaymentStatusUpdated (после оплаты) будет параметр .extraData с вашим значением
+	}, fCallback) -- ссылка
 end
--- IGS.GetPaymentURL(PRINT,sid,10)
+-- IGS.GetPaymentURL(PRINT, sid, 10, "test")
 
 
 --[[
