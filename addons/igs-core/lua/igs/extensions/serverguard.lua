@@ -1,4 +1,4 @@
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 local is_on_sale_ranks = {}
 

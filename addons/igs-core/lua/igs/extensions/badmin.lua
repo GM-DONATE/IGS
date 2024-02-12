@@ -1,4 +1,4 @@
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 function STORE_ITEM:SetBAdminGroup(rank)
 	return self:SetInstaller(function(pl)
@@ -21,5 +21,5 @@ function STORE_ITEM:SetBAdminGroup(rank)
 			self:Setup(pl)
 
 		end
-	end):SetMeta("bagroup", rank)
+	end):SetMeta("bagroup", sUserGroup)
 end

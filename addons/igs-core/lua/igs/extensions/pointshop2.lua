@@ -1,4 +1,4 @@
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 function STORE_ITEM:SetPremiumPoints(iAmount)
 	return self:SetInstaller(function(pl)

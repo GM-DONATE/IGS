@@ -4,7 +4,7 @@ IGS.ITEMS.ULX = IGS.ITEMS.ULX or {
 }
 
 
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 function STORE_ITEM:SetULXGroup(sUserGroup, iGroupWeight)
 	self:SetCanActivate(function(pl) -- invDbID

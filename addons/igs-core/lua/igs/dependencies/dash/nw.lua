@@ -13,7 +13,7 @@ local callbacks = {}
 local NETVAR   = {}
 NETVAR.__index = NETVAR
 
-debug.getregistry().IGSVar = NETVAR
+MT_IGSNetVar = NETVAR
 
 local bitmap = {
 	[3]	  = 3,

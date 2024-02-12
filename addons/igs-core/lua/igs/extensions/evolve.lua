@@ -1,4 +1,4 @@
-local ITEM = FindMetaTable("IGSItem")
+local ITEM = MT_IGSItem
 
 function ITEM:SetEvolveRank(rank)
 	return self:SetInstaller(function(pl)

@@ -16,7 +16,7 @@ ITEM_GROUP.__tostring = function(self)
 	-- "ITEM GROUP (Name Of Group) [i]"
 	return "IGS GROUP (" .. self:Name() .. ")[" .. #self:Items() .. "]"
 end
-debug.getregistry().IGSGroup = ITEM_GROUP
+-- MT_IGSGroup = getmetatable( IGS.NewGroup("") )
 
 
 

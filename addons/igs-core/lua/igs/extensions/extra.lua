@@ -1,4 +1,4 @@
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 function STORE_ITEM:SetMaxGlobalPurchases(iMax)
 	IGS.nw.Register("total_purchases_" .. self:UID()) -- только внутри хука юз

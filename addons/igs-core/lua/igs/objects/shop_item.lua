@@ -9,9 +9,9 @@ setmetatable(IGS,{
 	МАКСИМАЛЬНОЕ КОЛ-ВО УЛУЧШЕНИЙ 255
 ---------------------------------------------------------------------------]]
 
-local STORE_ITEM = FindMetaTable("IGSItem") or {}
+local STORE_ITEM = MT_IGSItem or {}
 STORE_ITEM.__index = STORE_ITEM
-debug.getregistry().IGSItem = STORE_ITEM
+MT_IGSItem = STORE_ITEM
 
 local function set(self,var,val)
 	self[var] = val
@@ -61,6 +61,9 @@ function STORE_ITEM:SetGetPrice(fGetPrice)
 end
 
 function STORE_ITEM:GetPrice(pl)
+	local price_override = hook.Run("IGS.ItemPriceOverride", self, pl)
+	if price_override then return price_override end
+
 	local getprice = self.getprice and self.getprice(pl, self)
 	return getprice or self.price
 end

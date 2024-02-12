@@ -2,7 +2,7 @@
 -- Тут и пример использования
 -- https://forum.gm-donate.net/t/2129/7
 
-local ITEM = FindMetaTable("IGSItem")
+local ITEM = MT_IGSItem
 
 function ITEM:SetSHWhitelist(team_cmd)
 	return self:SetCanActivate(function(pl)

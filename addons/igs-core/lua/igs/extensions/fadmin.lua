@@ -1,6 +1,6 @@
 -- Кто-то использует FAdmin, как отдельный аддон к другим гейммодам? О_о
 
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 function STORE_ITEM:SetFAdminGroup(sGroup, iWeight)
 	return self:SetInstaller(function(pl)

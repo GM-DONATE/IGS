@@ -5,7 +5,7 @@
 -- 	:SetInfAmmo()
 -- 	:SetTerm(10)
 
-local ITEM = FindMetaTable("IGSItem")
+local ITEM = MT_IGSItem
 
 local function setInfAmmo(pl)
 	local weapon = pl:GetActiveWeapon()

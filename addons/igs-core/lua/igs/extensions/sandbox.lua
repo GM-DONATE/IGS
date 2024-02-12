@@ -6,7 +6,7 @@ IGS.ITEMS.SB = IGS.ITEMS.SB or {
 }
 
 
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 -- Тулы
 function STORE_ITEM:SetTool(sToolName)
@@ -321,5 +321,4 @@ hook.Add("canDropWeapon","IGS",function(pl,wep)
 	-- Пушка продается, но чел ее не покупал
 	-- Т.е. по сути возможность дропа контроллируется другими хуками
 end, HOOK_HIGH)
-
 end) -- timer.Simple(0

@@ -1,4 +1,4 @@
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 function STORE_ITEM:SetSAMGroup(sUserGroup)
 	IGS.SAM_GROUPS = IGS.SAM_GROUPS or {}

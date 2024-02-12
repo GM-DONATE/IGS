@@ -4,7 +4,7 @@ IGS.ITEMS.DRP = IGS.ITEMS.DRP or {
 }
 
 
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 -- Делает итем в магазине покупаемым только за донат
 -- Это может быть ящик оружия, отдельная пушка или даже отдельная энтити

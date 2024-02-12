@@ -2,7 +2,7 @@
 	Поддержка вот этого говнокода:
 	https://github.com/vrondakis/Leveling-System
 ---------------------------------------------------------------------------]]
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 function STORE_ITEM:SetLevels(iAmount)
 	return self:SetInstaller(function(pl)

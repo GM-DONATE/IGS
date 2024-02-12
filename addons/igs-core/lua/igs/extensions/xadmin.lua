@@ -1,6 +1,6 @@
 IGS.ITEMS.XADMIN_USERS = IGS.ITEMS.XADMIN_USERS or {} -- by kip https://t.me/c/1353676159/1673
 
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 function STORE_ITEM:SetXAdminGroup(sUserGroup)
 	return self:SetInstaller(function(pl)

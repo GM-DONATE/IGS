@@ -1,6 +1,6 @@
 IGS.ITEMS.Whitelist = IGS.ITEMS.Whitelist or {}
 
-local STORE_ITEM = FindMetaTable("IGSItem")
+local STORE_ITEM = MT_IGSItem
 
 local function team_id(team_cmd)
 	return DarkRP.getJobByCommand(team_cmd).team
