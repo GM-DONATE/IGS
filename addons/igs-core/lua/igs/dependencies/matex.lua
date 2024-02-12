@@ -58,3 +58,4 @@ hook.Add("HUDPaint", "mater", function()
 	surface.DrawTexturedRect(35, 35, 570, 460)
 end)
 -- hook.Remove("HUDPaint", "mater")
+*/

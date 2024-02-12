@@ -1,6 +1,6 @@
 IGS.sh("shared.lua")
 
--- https://forum.gm-donate.net/t/kak-izmenit-imya-donat-nps/1086
+-- https://forum.gm-donate.net/t/igs-izmenenie-modeli-nadpisi-npc/2268
 ENT.TextAboveNPC = "Донат услуги"
 
 -- #todo сделать такое же для подарка?

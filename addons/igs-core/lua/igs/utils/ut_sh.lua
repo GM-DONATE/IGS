@@ -66,7 +66,8 @@ function IGS.PlayerPurchases(pl)
 	return CLIENT and (pl:GetIGSVar("igs_purchases") or {}) or pl:GetVar("igs_purchases",{})
 end
 
--- Сумма в донат валюте всех операций пополнения счета (включая купоны и выдачу денег администратором)
+-- Сумма всех положительных операций по счету игрока
+-- (включая пополнения, активацию купонов купоны и выдачу денег администратором)
 function IGS.TotalTransaction(pl)
 	return pl:GetIGSVar("igs_total_transactions") or 0
 end

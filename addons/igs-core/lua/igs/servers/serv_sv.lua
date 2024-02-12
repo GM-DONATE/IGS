@@ -132,7 +132,7 @@ local function ipToInt(ip)
 end
 
 local function maskHasIP(mask, ip)
-	local maskip,bits = mask:match("(%d+.%d+.%d+.%d+)/(%d+)")
+	local maskip,bits = mask:match("(%d+%.%d+%.%d+%.%d+)/(%d+)")
 	maskip = ipToInt(maskip)
 
 	local netmask = bit.lshift(0xFFFFFFFF, 32 - bits)
@@ -181,6 +181,7 @@ local function renewAddressAndReloadServers(ip)
 	end)
 end
 
+-- #todo кажется, не используется
 hook.Add("IGS.OnApiError","UpdateIPIfChanged",function(_, error_uid)
 	if error_uid == "ip_not_whitelisted" then
 		IGS.print(Color(250,50,50), "IIoxo}{e IP xocTa cMeHuJIc9. O6HoBJI9eM B IIaHeJIu")
