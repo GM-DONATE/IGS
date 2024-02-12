@@ -24,8 +24,8 @@ end
 ---------------------------------------------------------------------------]]
 function IGS.LoadPlayerPurchases(pl,cb)
 	-- Список покупок
-	IGS.GetPlayerPurchases(pl:SteamID64(),function(dat)
-		if #dat == 0 then
+	IGS.GetPlayerPurchases(pl:SteamID64(), function(dat)
+		if #dat == 0 and IsValid(pl) then
 			hook.Run("IGS.PlayerPurchasesLoaded",pl)
 			pl:SetIGSVar("igs_purchases", {}) -- для хука. Ниже описано
 			return
@@ -43,16 +43,19 @@ function IGS.LoadPlayerPurchases(pl,cb)
 			end
 		end
 
-		-- UID = Amount Of Purchases
-		pl:SetVar("igs_purchases",purchases)
+		if IsValid(pl) then
+			-- UID = Amount Of Purchases
+			pl:SetVar("igs_purchases",purchases)
 
-		-- print("IGS.GetPlayerPurchases processed",pl)
-		IGS.nw.WaitForPlayer(pl, function()
-			-- print("IGS.nw.WaitForPlayer INSIDE",pl)
-			pl:SetIGSVar("igs_purchases", networked)
-		end)
+			-- print("IGS.GetPlayerPurchases processed",pl)
+			IGS.nw.WaitForPlayer(pl, function()
+				-- print("IGS.nw.WaitForPlayer INSIDE",pl)
+				pl:SetIGSVar("igs_purchases", networked)
+			end)
 
-		hook.Run("IGS.PlayerPurchasesLoaded",pl,purchases)
+			hook.Run("IGS.PlayerPurchasesLoaded",pl,purchases)
+		end
+
 		if cb then cb(purchases) end
 	end)
 end
@@ -96,7 +99,7 @@ function IGS.PlayerPurchasedItem(pl, ITEM, cb)
 		local id = invDbID_or_iPurchID
 		ITEM:Buy(pl) -- внутри хук
 		hook.Run("IGS.PlayerPurchasedItem", pl, ITEM, id)
-		cb(id)
+		if cb then cb(id) end
 	end
 
 	if IGS.C.Inv_Enabled then
