@@ -6,15 +6,46 @@ for command in pairs(IGS.C.COMMANDS or {}) do
 	scc.add(command, IGS.UI)
 end
 
+--[[-------------------------------------------------------------------------
+	Консольная команда igs_info
+---------------------------------------------------------------------------]]
+local print_info = function()
+	local info = {
+		server_id = bib.get("igs:serverid"),
+		server_ip = game.GetIPAddress(),
+		igs_version = cookie.GetString("igs_version") or "unset",
+		is_unpacked = file.Exists("igs/apinator.lua", "LUA"),
+		-- log_tail = (file.Read("igs_errors.txt") or ""):sub(-1000)
+	}
+	local luainf do
+		local inf = debug.getinfo(IGS.GetSign)
+		luainf = {
+			line_def = inf.linedefined,
+			source = inf.source,
+			short_src = inf.short_src,
+		}
+	end
+	info.funcinfo = luainf
+	print("\n\n" .. util.TableToJSON(info, true) .. "\n\n")
 
-
+	print("Log Tail:")
+	local log_lines = (file.Read("igs_errors.txt") or ""):Split("\n")
+	for i = #log_lines - 100, #log_lines do
+		print(i, log_lines[i])
+	end
+end
+-- print_info()
+concommand.Add("igs_info", function(pl)
+	if IsValid(pl) and not pl:IsSuperAdmin() then return end
+	print_info()
+end)
 
 --[[-------------------------------------------------------------------------
 	Консольная команда начисления денег
 ---------------------------------------------------------------------------]]
 local n = function(pl, msg)
 	if IsValid(pl) then
-		IGS.Notify(pl,msg)
+		IGS.Notify(pl, msg)
 	else
 		print(msg)
 	end
