@@ -43,39 +43,32 @@ end)
 --[[-------------------------------------------------------------------------
 	Консольная команда начисления денег
 ---------------------------------------------------------------------------]]
-local n = function(pl, msg)
-	if IsValid(pl) then
-		IGS.Notify(pl, msg)
-	else
-		print(msg)
-	end
-end
-
-concommand.Add("addfunds",function(pl,_,_,argss)
+concommand.Add("addfunds", function(pl, _, _, argss)
 	if IsValid(pl) then
 		IGS.print(Color(240, 173, 78), pl:Nick() .. " пытался выполнить addfunds " .. argss .. " через игровую консоль")
-		n(pl, "Команда работает только с серверной консоли")
+		IGS.Notify(pl, "Команда работает только с серверной консоли")
 		return
 	end
 
-	local _,endpos, sid,amount = argss:find("^(STEAM_%d:%d:%d+) (%d+)")
+	local sid, amount, note = argss:match("(STEAM_%d:%d:%d+) (%d+) ?(.*)")
+	amount = tonumber(amount)
+	if note == "" then note = nil end
 
-	if not endpos then
-		return n(pl,"Формат команды нарушен\nПример: addfunds STEAM_0:1:2345678 10 А вот это отметка транзакции")
+	if not amount then
+		print("Формат команды нарушен\nПример: addfunds STEAM_0:1:2345678 10 Опциональное примечание")
+		return
 	end
-
-	local note = argss:sub(endpos + 2)
 
 	local targ = player.GetBySteamID(sid)
 	if targ then
-		targ:AddIGSFunds(amount,note,function()
-			n(pl,"Транзакция успешно проведена. Баланс игрока: " .. PL_MONEY(targ:IGSFunds()))
+		targ:AddIGSFunds(amount, note, function()
+			print("Транзакция успешно проведена. Баланс игрока: " .. PL_MONEY( targ:IGSFunds() ))
 		end)
 
 	-- Игрок оффлайн
 	else
-		IGS.Transaction(util.SteamIDTo64(sid),amount,note,function()
-			n(pl,"Транзакция успешно проведена, но игрок не на сервере")
+		IGS.Transaction(util.SteamIDTo64(sid), amount, note, function()
+			print("Транзакция успешно проведена, но игрок не на сервере")
 		end)
 
 	end
