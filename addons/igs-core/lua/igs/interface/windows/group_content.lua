@@ -41,7 +41,7 @@ function IGS.WIN.Group(sGroupUID)
 		bg.scroll:AddItem( getSpacePanel() ) -- из-за паддинга #1
 		for _,v in pairs(GROUP:Items()) do
 			local ITEM = v.item
-			if not v.item:IsHidden() then -- еще в main_cl
+			if v.item:CanSee( LocalPlayer() ) then -- еще в main_cl
 				bg:AddIGSItem(ITEM, v.name)
 			end
 		end

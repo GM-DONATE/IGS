@@ -44,7 +44,7 @@ hook.Add("IGS.CatchActivities","purchases",function(activity,sidebar)
 
 				while true do
 					local random_ITEM = table.Random(IGS.GetItems())
-					if not random_ITEM:IsHidden() then
+					if random_ITEM:CanSee( LocalPlayer() ) then
 						IGS.WIN.Item(random_ITEM:UID())
 						break
 					end

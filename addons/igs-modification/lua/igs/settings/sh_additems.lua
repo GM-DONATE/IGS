@@ -11,7 +11,8 @@
 		:SetHighlightColor()  --> Цвет заголовка
 		:SetDiscountedFrom()  --> Скидка
 		:SetOnActivate()      --> Свое действие при активации
-		:SetHidden()          --> Скрытый предмет
+		:SetCanSee(false)     --> Скрытый предмет
+		:SetCanSee(function(pl) return pl:HasPurchase("vip") end) --> Альтернативное применение
 
 	Полезное:
 		gm-donate.net/docs    -->  Подробнее о методах и все остальные
@@ -43,6 +44,12 @@ IGS("Отмычка", "otmichka") -- второй параметр не долж
 
 	-- БАННЕР 1000х400 (Не обязательно). Отобразится в подробностях итема
 	:SetImage("http://i.imgur.com/RqsP5nP.png")
+
+	-- Этот предмет будут видеть только те, кто купил group_vip_30d. У group_vip_30d должен быть :SetNetworked(true)
+	:SetCanSee(function(pl) return pl:HasPurchase("group_vip_30d") end)
+
+	-- Для разработчиков. С этим методом :HasPurchase("uid") будет работать не только на SERVER, но и на CLIENT
+	:SetNetworked(true)
 --]]
 
 --[[-------------------------------------------------------------------------
@@ -84,7 +91,7 @@ IGS("Доступ к Лебёдке","lebedka_navsegda"):SetTool("winch")
 local HEAL = IGS("Аптечка", "heal_10hp", 0)
 	:SetDescription("Добавляет вам 10 хп")
 	:SetStackable()
-	:SetHidden()
+	:SetCanSee(false) -- скрытый предмет (не отображается в магазине)
 	:SetOnActivate(function(pl) pl:SetHealth(pl:Health() + 10) end)
 
 IGS("Набор аптечек", "heal_x5", 20)

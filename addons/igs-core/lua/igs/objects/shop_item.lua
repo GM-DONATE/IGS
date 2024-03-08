@@ -146,14 +146,31 @@ function STORE_ITEM:IMG()
 	return self.image_url
 end
 
--- Нельзя купить, но можно активировать с инвентаря.
--- Полезно, чтобы "удалять" ненужные, но еще активные у людей итемы
-function STORE_ITEM:SetHidden(b)
-	return set(self,"hidden",b ~= false)
+function STORE_ITEM:SetCanSee(func_or_bool)
+	return set(self, "cansee", func_or_bool)
 end
 
+function STORE_ITEM:CanSee(pl)
+	if self.cansee ~= nil then
+		if type(self.cansee) == "boolean" then
+			return self.cansee
+		end
+		return self.cansee(pl) ~= false
+	end
+	return true
+end
+
+-- Нельзя купить, но можно активировать с инвентаря.
+-- Полезно, чтобы "удалять" ненужные, но еще активные у людей итемы.
+-- #deprecated. Use SetCanSee instead
+function STORE_ITEM:SetHidden(b)
+	return self:SetCanSee(function() return b ~= false end)
+end
+
+-- #depecated
 function STORE_ITEM:IsHidden()
-	return self.hidden
+	print("[IGS] ФУНКЦИЯ ITEM:IsHidden() УСТАРЕЛА. ИСПОЛЬЗУЙТЕ ITEM:CanSee(pl)")
+	return self:CanSee(CLIENT and LocalPlayer())
 end
 
 -- Для удобной установки метаданных итему вместо ITEM.key = val (полезно внутри функций, типа GROUP:Add(ITEM))
@@ -387,6 +404,7 @@ local null = IGS.Item("null", "null"):SetPrice(0)
 	:SetImage("http://i.imgur.com/32iTOFi.jpg")
 	:SetCanBuy(function() return "Этого предмета на сервере нет. Как вы нашли его?" end)
 	:SetCanActivate(function() return "Этого предмета на сервере нет. Можете уничтожить его" end) -- например купил в инвентарь, а потом uid сменился
+	:SetCanSee(false) -- чтобы не отображался в магазине
 
 null.isnull = true -- для проверки во время активации
 null.id = 0 -- на всякий

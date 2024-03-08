@@ -14,7 +14,7 @@ function PANEL:SetGroup(ITEM_GROUP)
 
 	local visible_items = {}
 	for _,GROUP_ITEM in ipairs(ITEM_GROUP:Items()) do
-		if not GROUP_ITEM.item:IsHidden() then
+		if GROUP_ITEM.item:CanSee( LocalPlayer() ) then
 			table.insert(visible_items, GROUP_ITEM)
 		end
 	end

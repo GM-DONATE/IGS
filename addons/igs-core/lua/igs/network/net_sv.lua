@@ -62,7 +62,7 @@ local function IGS_Purchase(pl, uid, cb)
 	local price = ITEM:GetPrice(pl)
 
 	local err =
-		ITEM:IsHidden() and "Как вы меня нашли?"
+		not ITEM:CanSee( pl ) and "Как вы меня нашли?"
 		or not IGS.CanAfford(pl, price) and ("Для покупки нужно " .. PL_MONEY(price))
 		or IGS.IsInventoryOverloaded(pl) and "У вас перегруз в донат инвентаре. А еще вы один из немногих, кто видел это!"
 		or pl.igs_unfinished_purchase and "Запрос на покупку в процессе. Подождите, пожалуйста" -- в цикле с клиента вызов функции покупки

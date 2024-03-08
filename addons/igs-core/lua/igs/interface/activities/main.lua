@@ -70,7 +70,7 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 
 		local check_skip = function(ITEM)
 			return ITEM.isnull  -- пустышка
-				or ITEM.hidden  -- еще в IGS.WIN.Group
+				or (not ITEM:CanSee( LocalPlayer() ))  -- еще в IGS.WIN.Group
 				or ITEM:Group() -- группированные итемы засунуты в группу выше
 				or (fItemsFilter and fItemsFilter(ITEM) == false)
 		end
@@ -99,7 +99,7 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 	--[[-------------------------------------------------------------------------
 		Теги (Быстрый выбор категории)
 	---------------------------------------------------------------------------]]
-	bg.tags:AddTag("Сброс фильтров",function() bg.categs:Clear() addItems() end)
+	bg.tags:AddTag("Сброс фильтров", function() bg.categs:Clear() addItems() end)
 		:SetActive(true)
 
 	for categ in pairs(cats) do
