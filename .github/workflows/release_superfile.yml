@@ -8,13 +8,14 @@ on:
 jobs:
   superfile:
     runs-on: ubuntu-24.04
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
+    - id: checkout
+      uses: actions/checkout@v4
     - id: changelog
       uses: zhaojh329/auto-changelog@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-    - id: checkout
-      uses: actions/checkout@v4
     - name: Download lua
       uses: leafo/gh-actions-lua@v10
       with:
