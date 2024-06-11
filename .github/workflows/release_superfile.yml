@@ -1,20 +1,22 @@
 name: Release superfile
 
-on: push
+on:
+  push:
+    branches: [ 'main' ]
+    tags: [ '*' ]
 
 jobs:
   superfile:
-    runs-on: ubuntu-20.04
-    if: "startsWith(github.event.head_commit.message, 'RELEASE')"
+    runs-on: ubuntu-24.04
     steps:
     - id: changelog
       uses: zhaojh329/auto-changelog@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
     - id: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Download lua
-      uses: leafo/gh-actions-lua@v8.0.0
+      uses: leafo/gh-actions-lua@v10
       with:
         luaVersion: "5.3.5"
     - id: superfile
@@ -25,15 +27,11 @@ jobs:
       run: |
         cd addons
         zip -x "*.DS_Store" -r igs-mod.zip igs-modification/
-    - id: parse_version
-      run: |
-        VERSION="${{ github.event.head_commit.message }}"
-        echo ::set-output name=parsed_version::${VERSION:8}
     - id: release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         body: ${{steps.changelog.outputs.changelog}}
-        tag_name: ${{ steps.parse_version.outputs.parsed_version }}
+        # tag_name: asdasd
         #draft: true
         prerelease: false
         files: |
