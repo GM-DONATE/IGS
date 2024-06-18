@@ -50,12 +50,12 @@ local function dep() IGS.WIN.Deposit() end
 local mf -- антидубликат
 function IGS.UI()
 	if not IGS.IsLoaded() then
-		LocalPlayer():ChatPrint("[IGS] Автодонат не загружен")
+		LocalPlayer():ChatPrint(IGS.GetPhrase("autodonateisnotloaded"))
 		return
 	end
 
 	if not IGS.C then -- Проблема AddCSLua. В консоли клиента должны быть ошибки инклюда нескольких базовых файлов
-		LocalPlayer():ChatPrint("[IGS] Автодонат установлен неправильно. Сообщите администрации")
+		LocalPlayer():ChatPrint(IGS.GetPhrase("autodonateinstalledwrong"))
 		return
 	end
 
@@ -85,13 +85,13 @@ function IGS.UI()
 	uigs.Create("igs_button", function(self)
 		function self:UPDBalance()
 			self.bal = LocalPlayer():IGSFunds()
-			self:SetText("Баланс: " .. IGS.SignPrice(self.bal))
+			self:SetText(IGS.GetPhrase("balance") .. " " .. IGS.SignPrice(self.bal))
 		end
 
 		self:SetPos(20,0)
 		self:SetSize(150,27)
 		self:UPDBalance()
-		self:SetTooltip("Открыть список покупок")
+		self:SetTooltip(IGS.GetPhrase("openpurchases"))
 		self.Think = function(s)
 			if s.bal ~= LocalPlayer():IGSFunds() then
 				s:UPDBalance()
@@ -102,7 +102,7 @@ function IGS.UI()
 		add:SetPos(20 + 150 + 2,0)
 		add:SetSize(27,27)
 		add:SetText("+")
-		add:SetTooltip("Пополнение счета")
+		add:SetTooltip(IGS.GetPhrase("profileaddmoney"))
 		add:SetActive(true)
 
 		 add.DoClick = dep

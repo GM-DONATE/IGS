@@ -1,14 +1,7 @@
 local function loadTab(activity,sidebar,dat)
-	local bg = sidebar:AddPage("Действия над итемом")
+	local bg = sidebar:AddPage(IGS.GetPhrase("invitemact"))
 	IGS.AddTextBlock(bg.side, nil, #dat > 0 and
-		"Выберите предмет, чтобы получить по нему список действий" or
-
-		"Купленные предметы будут находится здесь." ..
-		"\n\nБлагодаря инвентарю вы можете поделиться покупкой со своим другом, у которого не хватает денег на покупку услуги. " ..
-			"Просто купите ее вместо него и бросьте на пол. После активации предмета он появится у него в инвентаре." ..
-		"\n\nДобрые саморитяне используют инвентарь для устраивания классных конкурсов. " ..
-			"Они набивают свой инвентарь предметами, а затем при каких-то условиях их раздают"
-	)
+		IGS.GetPhrase("invchoose") or IGS.GetPhrase("invchooselong"))
 
 	bg.OnRemove = function()
 		hook.Remove("IGS.PlayerPurchasedItem","UpdateInventoryView")
@@ -22,7 +15,7 @@ local function loadTab(activity,sidebar,dat)
 		p:Dock(LEFT) p:SetWide(300)
 		p:SetIcon(IGS.C.DefaultIcon)
 		p:SetName("")
-		p:SetDescription("Здесь будет отображена информация о вашей покупке, когда вы ее сделаете")
+		p:SetDescription(IGS.GetPhrase("invinfofpurc"))
 	end, bg)
 
 	local scr = uigs.Create("igs_scroll", bg)
@@ -30,7 +23,7 @@ local function loadTab(activity,sidebar,dat)
 	-- scr:SetSize(activity:GetWide() - infpan:GetWide(),act_tall)
 	-- scr:SetPos(infpan:GetWide(),0)
 
-	IGS.AddTextBlock(scr, "Ваш инвентарь", "Что-то тут пустовато...")
+	IGS.AddTextBlock(scr, IGS.GetPhrase("yourinv"), IGS.GetPhrase("yourinvisempty"))
 
 	scr:AddItem( uigs.Create("DIconLayout", function(icons)
 		icons:SetWide(scr:GetWide())
@@ -51,7 +44,7 @@ local function loadTab(activity,sidebar,dat)
 			item:SetSize(icons:GetWide(),60)
 			item:SetIcon(ITEM:ICON())
 			item:SetName(ITEM:Name())
-			item:SetSign("Действует " .. IGS.TermToStr(ITEM:Term()))
+			item:SetSign(IGS.GetPhrase("validto") .. " " .. IGS.TermToStr(ITEM:Term()))
 			item.DoClick = function()
 				infpan:Reset()
 				infpan:SetIcon(ITEM:ICON())
@@ -74,10 +67,10 @@ local function loadTab(activity,sidebar,dat)
 					end)
 				end).button
 				act_btn:SetActive(true)
-				act_btn:SetText("Активировать")
+				act_btn:SetText(IGS.GetPhrase("activate"))
 
 				if IGS.C.Inv_AllowDrop then
-					IGS.AddButton(bg.side,"Бросить на пол",function()
+					IGS.AddButton(bg.side,IGS.GetPhrase("droponfloor"),function()
 						IGS.DropItem(dbID,function()
 							removeFromCanvas(item)
 						end)
@@ -101,7 +94,7 @@ local function loadTab(activity,sidebar,dat)
 		end_margin:SetTall(5)
 	end))
 
-	activity:AddTab("Инвентарь",bg,"materials/icons/fa32/cart-arrow-down.png")
+	activity:AddTab(IGS.GetPhrase("inventory"),bg,"materials/icons/fa32/cart-arrow-down.png")
 end
 
 hook.Add("IGS.CatchActivities","inventory",function(activity,sidebar)

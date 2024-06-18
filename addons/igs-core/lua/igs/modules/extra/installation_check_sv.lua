@@ -19,11 +19,11 @@ end
 hook.Add("IGS.Initialized", "installation_check", function()
 	local path = "igs/launcher.lua"
 	if isUnpacked(path) then
-		IGS.print("Похоже, что автодонат распакован в /addons. Автоматические обновления недоступны")
+		IGS.print(IGS.GetPhrase("isunpacked"))
 	end
 
 	if isWorkshopped(path) and isDownloaded(path) then
-		IGS.print("Удалите автодонат из вашей коллекции в воркшопе. Обновления работают через GitHub")
+		IGS.print(IGS.GetPhrase("isworkshop"))
 	end
 end)
 

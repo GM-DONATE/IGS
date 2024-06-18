@@ -26,7 +26,7 @@ function ENT:Draw()
 
 	local ITEM = IGS.GetItemByUID(self:GetUID())
 	local t1 = ITEM:Name()
-	local t2 = "Действует " .. IGS.TermToStr(ITEM:Term())
+	local t2 = IGS.GetPhrase("validuntil") .. " " .. IGS.TermToStr(ITEM:Term())
 
 	drawSide(pos,ang,t1,t2)
 	ang:RotateAroundAxis(ang:Right(), 180)

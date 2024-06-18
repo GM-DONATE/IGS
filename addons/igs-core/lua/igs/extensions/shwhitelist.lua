@@ -7,7 +7,7 @@ local ITEM = MT_IGSItem
 function ITEM:SetSHWhitelist(team_cmd)
 	return self:SetCanActivate(function(pl)
 		if SH_WHITELIST:CanBecomeJob(pl, DarkRP.getJobByCommand(team_cmd)) then
-			return "Вы в вайтлисте"
+			return IGS.GetPhrase("youinawhitelist")
 		end
 	end):AddHook("SH_WHITELIST.CanBecomeJob", function(pl, job)
 		if job.command == team_cmd then return true end

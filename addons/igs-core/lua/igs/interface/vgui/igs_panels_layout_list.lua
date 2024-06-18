@@ -7,7 +7,7 @@ end
 
 -- Одиночное добавление
 function PANEL:Add(panel,sCategory)
-	local cat = sCategory or "Разное"
+	local cat = sCategory or IGS.GetPhrase("other")
 
 	if not self.list[cat] then
 		self.list[cat] = uigs.Create("igs_panels_layout", self)

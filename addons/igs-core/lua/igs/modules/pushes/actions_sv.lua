@@ -25,7 +25,7 @@ hook.Add("IGS.IncomingMessage","GivePurchase",function(d, method)
 	if not pl then return end
 
 	local ITEM = IGS.GivePurchase(pl,d.Item) -- выдает покупку без сохранения в БД
-	IGS.Notify(pl,"Вам выдана новая услуга: " .. ITEM:Name())
+	IGS.Notify(pl, IGS.GetPhrase("panelgaveitem") .. " " .. ITEM:Name())
 end)
 
 -- Перенос услуги (в т.ч. отключение)
@@ -37,9 +37,9 @@ hook.Add("IGS.IncomingMessage","MovePurchase",function(d, method)
 
 	-- Просто перезагружаем данные
 	-- Если перенос был на этот сервер, то услуга будет выдана (или забрана. С :HasPurchase)
-	IGS.Notify(pl, "Перезагрузка списка покупок из-за переноса или отключения услуг")
+	IGS.Notify(pl, IGS.GetPhrase("panelmoveordisableitem"))
 	IGS.LoadPlayerPurchases(pl,function()
-		IGS.Notify(pl,"Список перезагружен")
+		IGS.Notify(pl, IGS.GetPhrase("paneltableresetted"))
 	end)
 end)
 
@@ -57,9 +57,9 @@ hook.Add("IGS.IncomingMessage","InventoryActions",function(d, method)
 	local pl = getPlayer(d)
 	if not pl then return end
 
-	IGS.Notify(pl, "Перезагрузка инвентаря")
+	IGS.Notify(pl, IGS.GetPhrase("panelinvreset"))
 	IGS.LoadInventory(pl,function()
-		IGS.Notify(pl, "Инвентарь перезагружен")
+		IGS.Notify(pl, IGS.GetPhrase("panelinvresetted"))
 	end)
 end)
 
@@ -77,7 +77,7 @@ hook.Add("IGS.IncomingMessage","DisableServer",function(d, method)
 		endl = " на " .. IGS.SERVERS(d.Server)
 	end
 
-	IGS.NotifyAll("Автодонат временно отключен" .. endl)
+	IGS.NotifyAll(IGS.GetPhrase("autodonatedisabled") .. endl)
 end)
 
 -- nomr
@@ -90,6 +90,6 @@ hook.Add("IGS.IncomingMessage", "nomr", function(d, method)
 	if IGS.C.DisableAntiMultirun then return end
 
 	if d.Server and d.Server ~= IGS.SERVERS:ID() then
-		pl:Kick("Транзакция на другом сервере")
+		pl:Kick(IGS.GetPhrase("transactiononotherserver"))
 	end
 end)

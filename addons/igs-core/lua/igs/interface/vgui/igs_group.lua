@@ -1,6 +1,6 @@
 local PANEL = {}
 
-local PL_VARIANTS = PLUR({"вариант", "варианта", "вариантов"})
+local PL_VARIANTS = PLUR(IGS.LANG[IGS.C.LANG].PL_VARIANTS)
 function PANEL:SetGroup(ITEM_GROUP)
 	self.group = ITEM_GROUP
 
@@ -36,9 +36,9 @@ function PANEL:SetGroup(ITEM_GROUP)
 	end
 
 	if min == max then
-		self:SetBottomText("Все по " .. IGS.SignPrice(min))
+		self:SetBottomText(IGS.GetPhrase("allfrom") .. " " .. IGS.SignPrice(min))
 	else
-		self:SetBottomText("От " .. min .. " до " .. IGS.SignPrice(max))
+		self:SetBottomText(IGS.GetPhrase("from") .. " " .. min .. IGS.GetPhrase("to") .. IGS.SignPrice(max))
 	end
 
 	return self

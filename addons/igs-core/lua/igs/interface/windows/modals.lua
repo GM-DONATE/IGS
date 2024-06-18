@@ -116,25 +116,25 @@ end
 
 local null = function() end
 function IGS.ShowNotify(sText, sTitle, fOnClose)
-	local m = IGS.BoolRequest(sTitle or "[IGS] Оповещение", sText, fOnClose or null)
+	local m = IGS.BoolRequest(sTitle or "[IGS] " .. IGS.GetPhrase("notification"), sText, fOnClose or null)
 	m.btnCan:Remove() -- оставляем только 1 кнопку
 
 	local _,y = m.btnOK:GetPos()
-	m.btnOK:SetText("ОК")
+	m.btnOK:SetText("OK")
 	m.btnOK:SetPos((m:GetWide() - m.btnOK:GetWide()) / 2, y)
 
 	return m
 end
 
 function IGS.WIN.ActivateCoupon()
-	IGS.StringRequest("Активация купона",
-		"Если у вас есть донат купон, то введите его ниже",
+	IGS.StringRequest(IGS.GetPhrase("couponactivation"),
+		IGS.GetPhrase("couponactivationexp"),
 	nil,function(val)
 		IGS.UseCoupon(val,function(errMsg)
 			if errMsg then
 				IGS.ShowNotify(errMsg, "Ошибка активации купона")
 			else
-				IGS.ShowNotify("Деньги начислены на ваш счет. Можете посмотреть на это в транзакциях, переоткрыв донат меню", "Успешная активации купона")
+				IGS.ShowNotify(IGS.GetPhrase("couponactivationsuccess"), IGS.GetPhrase("couponactivationsuccesstitle"))
 			end
 		end)
 	end)

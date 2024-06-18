@@ -1,8 +1,8 @@
-local actions = setmetatable({},{__index = function() return "Ошибка" end})
-actions[1] = "Покупка"
-actions[2] = "Активация"
-actions[3] = "Дроп"
-actions[4] = "Пик"
+local actions = setmetatable({},{__index = function() return IGS.GetPhrase("error") end})
+actions[1] = IGS.GetPhrase("buy")
+actions[2] = IGS.GetPhrase("activation")
+actions[3] = IGS.GetPhrase("drop")
+actions[4] = IGS.GetPhrase("pick")
 
 local function beautyS64(s64)
 	local pl = player.GetBySteamID64(s64)
@@ -26,7 +26,7 @@ end
 
 function IGS.WIN.InvLog()
 	return uigs.Create("igs_frame", function(bg)
-		bg:SetTitle("Операции с инвентарем")
+		bg:SetTitle(IGS.GetPhrase("actionswithinv"))
 		bg:SetSize(800, 600)
 		bg:Center()
 		bg:MakePopup()
@@ -48,7 +48,7 @@ function IGS.WIN.InvLog()
 
 		function bg:AddLine(sOwner, sInfli, sItem, sAction, sDate, r)
 			local line = bg.table:AddLine(sOwner, sInfli, sItem, r.gift_id, sAction, sDate)
-			line:SetTooltip("ID операции: " .. r.action_id .. ". Перед ником глобальный Score игрока")
+			line:SetTooltip(Format(IGS.GetPhrase("r.action_id"), r.action_id))
 
 			local btn_giftid = line.columns[4]
 			btn_giftid.text_color = IGS_IL_ROW_SOLID_COLOR or HSVToColor(((r.gift_id * 10) * 5) % 360, 1, 1)
@@ -70,12 +70,12 @@ function IGS.WIN.InvLog()
 
 			line.DoClick = function()
 				local m = DermaMenu(line)
-				m:AddOption("Копировать SID владельца",function() SetClipboardText(r.owner) end)
-				m:AddOption("Копировать SID исполнителя",function() SetClipboardText(r.inflictor) end)
-				m:AddOption("Действия игрока",function() bg:SearchSteamID(r.owner) end)
-				m:AddOption("Действия с " .. sItem,function() bg:SearchGiftUID(r.gift_uid) end)
-				if sAction == "Активация" then -- а таких записях написан ID покупки, а не гифта (аве шиткодинг!)
-					m:AddOption("Отключить", function()
+				m:AddOption(IGS.GetPhrase("plinvlogcopysidowner"),function() SetClipboardText(r.owner) end)
+				m:AddOption(IGS.GetPhrase("plinvlogcopysidinfl"),function() SetClipboardText(r.inflictor) end)
+				m:AddOption(IGS.GetPhrase("plinvlogactions"),function() bg:SearchSteamID(r.owner) end)
+				m:AddOption(IGS.GetPhrase("plinvlogactionswith") .. sItem,function() bg:SearchGiftUID(r.gift_uid) end)
+				if sAction == IGS.GetPhrase("plinvactivation") then -- а таких записях написан ID покупки, а не гифта (аве шиткодинг!)
+					m:AddOption(IGS.GetPhrase("plinvdisable"), function()
 						IGS.DeactivateItem(r.gift_id)
 					end)
 				end
@@ -115,14 +115,14 @@ function IGS.WIN.InvLog()
 			pnl:DockMargin(5,5,5,5)
 			-- pnl:SetSize(790, 565)
 
-			pnl:SetTitle("Действия")
+			pnl:SetTitle(IGS.GetPhrase("doninvlogactions"))
 
-			pnl:AddColumn("Владелец",120)
-			pnl:AddColumn("Исполнитель",120)
-			pnl:AddColumn("Предмет")
-			pnl:AddColumn("ID гифта", 65)
-			pnl:AddColumn("Действие",110)
-			pnl:AddColumn("Дата",130)
+			pnl:AddColumn(IGS.GetPhrase("doninvlogowner"),120)
+			pnl:AddColumn(IGS.GetPhrase("doninvloginfl"),120)
+			pnl:AddColumn(IGS.GetPhrase("doninvlogitem"))
+			pnl:AddColumn(IGS.GetPhrase("doninvloggiftid"), 65)
+			pnl:AddColumn(IGS.GetPhrase("doninvlogaction"),110)
+			pnl:AddColumn(IGS.GetPhrase("doninvlogdate"),130)
 		end, bg)
 
 		local bottom = uigs.Create("Panel", function(self)
@@ -134,7 +134,7 @@ function IGS.WIN.InvLog()
 		local entry = uigs.Create("DTextEntry", function(self)
 			self:Dock(LEFT)
 			self:SetWide(200)
-			self:SetValue("SteamID или UID итема")
+			self:SetValue(IGS.GetPhrase("doninvsearch"))
 			self.OnEnter = function()
 				local val = self:GetValue():Trim()
 				local s64 = anyTo64(val)
@@ -153,7 +153,7 @@ function IGS.WIN.InvLog()
 			self:Dock(LEFT)
 			self:SetWide(150)
 			self:DockMargin(5,0,0,0)
-			self:SetText("Найти")
+			self:SetText(IGS.GetPhrase("doninvfind"))
 			self.DoClick = entry.OnEnter
 		end, bottom)
 
@@ -166,10 +166,10 @@ function IGS.WIN.InvLog()
 			end
 			self.UpdateLoaded = function(_, iLoaded, iTotal)
 				if iLoaded == iTotal then
-					self:SetText("Все загружено (" .. iTotal .. ")")
+					self:SetText(Format(IGS.GetPhrase("doninvallloaded"), iTotal))
 					self:SetActive(false)
 				else
-					self:SetText("Загрузить еще (" .. iLoaded .. "/" .. iTotal .. ")")
+					self:SetText(Format(IGS.GetPhrase("doninvloadmore"), iLoaded, iTotal))
 					self:SetActive(true)
 				end
 			end

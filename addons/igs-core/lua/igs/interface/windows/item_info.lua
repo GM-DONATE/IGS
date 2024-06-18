@@ -5,7 +5,7 @@ local function purchase(ITEM, buy_button)
 		if not IsValid(buy_button) then return end
 
 		if errMsg then
-			IGS.ShowNotify(errMsg, "Ошибка покупки")
+			IGS.ShowNotify(errMsg, IGS.GetPhrase("purchaseerror"))
 			surface.PlaySound("ambient/voices/citizen_beaten1.wav") -- еще есть
 			return
 		end
@@ -15,19 +15,19 @@ local function purchase(ITEM, buy_button)
 
 
 		if ITEM:IsStackable() then
-			buy_button:SetText("Куплено " .. buy_button.purchased .. " шт")
+			buy_button:SetText(IGS.GetPhrase("purchased") .. " " .. buy_button.purchased .. " " .. IGS.GetPhrase("profilenumoftranspcs"))
 		else
 			if IsValid(m) then
 				m:Close()
 			end
 
 			if not IGS.C.Inv_Enabled then
-				IGS.ShowNotify("Спасибо за покупку. Это было просто, правда? :)", "Успешная покупка")
+				IGS.ShowNotify(IGS.GetPhrase("purchasethanks"), IGS.GetPhrase("purchasedone"))
 				return
 			end
 
-			IGS.BoolRequest("Успешная покупка",
-				"Спасибо за покупку. Она находится в вашем /donate инвентаре.\n\nАктивировать ее сейчас?",
+			IGS.BoolRequest(IGS.GetPhrase("purchasedone"),
+				IGS.GetPhrase("purchasethxandact"),
 			function(yes)
 				if not yes then return end
 
@@ -117,7 +117,7 @@ function IGS.WIN.Item(uid)
 
 		p:Dock(FILL)
 		p:SetIcon(ITEM:ICON())
-		p:SetName("Действует " .. IGS.TermToStr(ITEM:Term()))
+		p:SetName(IGS.GetPhrase("validto") .. " " .. IGS.TermToStr(ITEM:Term()))
 		p:SetImage(ITEM:IMG())
 		p:SetSubNameButton(ITEM:Group() and ITEM:Group():Name(), function()
 			IGS.WIN.Group(ITEM:Group():UID())
@@ -131,7 +131,7 @@ function IGS.WIN.Item(uid)
 
 			buy:Dock(TOP)
 			buy:SetTall(20)
-			buy:SetText( "Купить за " .. PL_MONEY(price) )
+			buy:SetText( IGS.GetPhrase("buyfor") .. " " .. PL_MONEY(price) )
 			buy:SetActive( IGS.CanAfford(LocalPlayer(), price) )
 			buy.DoClick = function(s)
 				if not s:IsActive() then
@@ -139,8 +139,8 @@ function IGS.WIN.Item(uid)
 
 					surface.PlaySound("ambient/voices/citizen_beaten1.wav") -- еще есть
 					IGS.BoolRequest(
-						"Недостаточно денег",
-						("Вам не хватает %s для покупки %s.\nЖелаете мгновенно пополнить счет?"):format( PL_MONEY(need), ITEM:Name()),
+						IGS.GetPhrase("notenoughmoney"),
+						(IGS.GetPhrase("notenoughmoneyexp")):format( PL_MONEY(need), ITEM:Name()),
 						function(yes)
 							if yes then
 								IGS.WIN.Deposit(price, true)

@@ -32,7 +32,7 @@ end
 STORE_ITEM.SetDarkRPTeam = STORE_ITEM.SetDarkRPTeams -- обратная совместимость (20.03.2019)
 
 function STORE_ITEM:SetDarkRPMoney(iSum)
-	self:SetDescription("Мгновенно и без проблем пополняет баланс игровой валюты на " .. string.Comma(iSum) .. " валюты")
+	self:SetDescription(Format(IGS.GetPhrase("drpmoneydesc"), string.Comma(iSum)))
 	self:SetInstaller(function(pl) pl:addMoney(iSum,"IGS") end)
 	self:SetStackable()
 
@@ -44,7 +44,7 @@ hook.Add("canBuyShipment", "IGS", function(pl, tItem)
 	local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.DRP.ITEMS[tItem.entity])
 	if ITEM ~= nil then -- донатный итем
 		local allow, message = hook.Run("IGS.canBuyShipment", pl, tItem)
-		return allow or tobool(ITEM), false, message or "Это для донатеров (/donate)"
+		return allow or tobool(ITEM), false, message or IGS.GetPhrase("itsonlyfordonater")
 	end
 end)
 
@@ -52,7 +52,7 @@ hook.Add("canBuyPistol", "IGS", function(pl, tItem)
 	local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.DRP.ITEMS[tItem.entity])
 	if ITEM ~= nil then -- донатный итем
 		local allow, message = hook.Run("IGS.canBuyPistol", pl, tItem)
-		return allow or tobool(ITEM), false, message or "Это для донатеров (/donate)"
+		return allow or tobool(ITEM), false, message or IGS.GetPhrase("itsonlyfordonater")
 	end
 end)
 
@@ -62,7 +62,7 @@ hook.Add("canBuyCustomEntity", "IGS", function(pl, tItem)
 	local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.DRP.ITEMS[tItem.ent])
 	if ITEM ~= nil then -- донатный итем
 		local allow, message = hook.Run("IGS.canBuyCustomEntity", pl, tItem)
-		return allow or tobool(ITEM), false, message or "Это для донатеров (/donate)"
+		return allow or tobool(ITEM), false, message or IGS.GetPhrase("itsonlyfordonater")
 	end
 end)
 
@@ -73,7 +73,7 @@ hook.Add("playerCanChangeTeam", "IGS", function(pl, iTeam, bForce)
 	local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.DRP.JOBS[TEAM.command])
 	if ITEM ~= nil then -- донатный итем
 		local allow, message = hook.Run("IGS.playerCanChangeTeam", pl, iTeam, bForce)
-		return allow or tobool(ITEM), message or "Это для донатеров (/donate)"
+		return allow or tobool(ITEM), message or IGS.GetPhrase("itsonlyfordonater")
 	end
 end)
 

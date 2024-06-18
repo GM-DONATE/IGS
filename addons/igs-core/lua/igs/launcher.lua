@@ -1,4 +1,5 @@
 IGS.C = IGS.C or {} -- config
+IGS.LANG = IGS.LANG or {} -- языки
 
 local function sh(path) return IGS.sh("igs/" .. path) end
 local function sv(path) return IGS.sv("igs/" .. path) end
@@ -7,7 +8,7 @@ local function cl(path) return IGS.cl("igs/" .. path) end
 local function dir(path, fIncluder) return IGS.include_files("igs/" .. path, fIncluder) end
 local function mods(path) return IGS.load_modules("igs/" .. path) end
 
-
+sh("language_sh.lua")
 sh("dependencies/plurals.lua")
 sh("dependencies/chatprint.lua")
 sv("dependencies/stack.lua")

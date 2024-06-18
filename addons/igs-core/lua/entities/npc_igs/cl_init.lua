@@ -1,7 +1,7 @@
 IGS.sh("shared.lua")
 
 -- https://forum.gm-donate.net/t/igs-izmenenie-modeli-nadpisi-npc/2268
-ENT.TextAboveNPC = "Донат услуги"
+ENT.TextAboveNPC = IGS.GetPhrase("npctext")
 
 -- #todo сделать такое же для подарка?
 

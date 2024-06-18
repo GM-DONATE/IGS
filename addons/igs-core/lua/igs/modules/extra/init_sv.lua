@@ -101,7 +101,7 @@ end)
 hook.Add("IGS.PlayerPurchasedItem","IGS.BroadcastPurchase",function(pl, ITEM)
 	if IGS.C.BroadcastPurchase == false then return end -- TODO сделать модулем
 
-	IGS.NotifyAll(pl:Nick() .. " купил " .. ITEM:Name())
+	IGS.NotifyAll(pl:Nick() .. " " .. IGS.GetPhrase("buyed") .. " " .. ITEM:Name())
 end)
 
 
@@ -113,12 +113,10 @@ end)
 hook.Add("IGS.PlayerDonate", "ThanksForDonate", function(pl, rub)
 	local score = pl.igs_score -- TODO: make netvar
 
-	IGS.Notify(pl, Format("Спасибо вам за пополнение счета. " ..
-		"Ваш новый Score на всех проектах - %d. " ..
-		"Что такое Score: vk.cc/caHTZi", score))
+	IGS.Notify(pl, Format(IGS.GetPhrase("pldonatedthanks"), score))
 
 	local rub_str  = PL_MONEY(rub)
-	local full_str = Format("%s пополнил счет на %s. Его новый Score: %s", pl:Nick(), rub_str, score)
+	local full_str = Format(IGS.GetPhrase("pldonated"), pl:Nick(), rub_str, score)
 
 	IGS.NotifyAll(full_str)
 end)
@@ -128,8 +126,8 @@ hook.Add("IGS.PlayerPurchasesLoaded", "BalanceRemember", function(pl)
 	if balance >= 10 then
 		timer.Simple(10, function()
 			if not IsValid(pl) then return end
-			IGS.Notify(pl, "Вы можете потратить " .. IGS.SignPrice(balance) .. " через /donate")
-			IGS.Notify(pl, "Ваш Score " .. (pl.igs_score or 0) .. ". Подробнее: vk.cc/caHTZi") -- or 0 на всякий случай
+			IGS.Notify(pl, Format(IGS.GetPhrase("youcanspend"), IGS.SignPrice(balance)))
+			IGS.Notify(pl, Format(IGS.GetPhrase("yourscore"), pl.igs_score or 0)) -- or 0 на всякий случай
 		end)
 	end
 end)
@@ -141,11 +139,11 @@ end)
 	Поиск новых версий
 ---------------------------------------------------------------------------]]
 timer.Simple(1, function() -- http.Fetch
-	print("IGS Поиск обновлений")
+	print("IGS Poisk obnovlenyi")
 	if not IGS_REPO then return end
 	http.Fetch("https://api.github.com/repos/" .. IGS_REPO .. "/releases", function(json)
 		local releases = util.JSONToTable(json)
-		assert(releases[1], "Релизов нет. Нужно запустить CI") -- форк
+		assert(releases[1], "Relizov net Nuzhno zapustit CI") -- форк
 
 		table.sort(releases, function(a, b)
 			return tonumber(a.tag_name) > tonumber(b.tag_name)
@@ -157,9 +155,9 @@ timer.Simple(1, function() -- http.Fetch
 
 		if freshest_major > current_major then
 			local info_url = "https://github.com/" .. IGS_REPO .. "/releases/tag/" .. freshest_major
-			print("IGS Доступна новая версия: " .. freshest_major .. ". Установлена: " .. current_major .. "\nИнформация здесь: " .. info_url)
+			print("IGS Novaya versiya dostupna: " .. freshest_major .. ". Ustanovlena: " .. current_major .. "\nInformacia: " .. info_url)
 		else
-			print("IGS Major обновлений нет")
+			print("IGS Major net obnovleniy")
 		end
 
 		local freshest_suitable -- "123.2"
@@ -172,15 +170,15 @@ timer.Simple(1, function() -- http.Fetch
 		end
 
 		if freshest_suitable then
-			print("IGS Найдено новое soft обновление. Текущая версия, новая:", current_ver, freshest_suitable)
+			print("IGS Naideno novoe soft obnovlenie Tekushchaia versiia novaia:", current_ver, freshest_suitable)
 			local url = "https://github.com/" .. IGS_REPO .. "/releases/download/" .. freshest_suitable .. "/superfile.json"
 			http.Fetch(url, function(superfile)
-				print("IGS Обновление загружено. Перезагрузите сервер для применения")
+				print("IGS Obnovlenie zagruzheno Perezagruzite server dlya primeneniya")
 				file.Write("igs/superfile.txt", superfile)
 				cookie.Set("igs_version", freshest_suitable)
 			end, error)
 		else
-			print("IGS  Soft обновлений нет")
+			print("IGS Soft obnovleniy net")
 		end
 	end, error)
 end)
