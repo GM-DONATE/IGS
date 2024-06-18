@@ -3,7 +3,7 @@ local etoGlavnayaVkladkaBlya = true
 
 hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 	-- Зона прокрутки последних покупок http://joxi.ru/12MQQBlfzPnw2J
-	local bg = sidebar:AddPage("Последние покупки")
+	local bg = sidebar:AddPage(IGS.GetPhrase("latestpurch"))
 
 	-- Панель тегов и готовая кнопка сброса фильтров
 	local tagspan = uigs.Create("Panel", bg)
@@ -88,8 +88,8 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 		end
 
 		for _,pnl in ipairs(rows) do
-			bg.categs:Add(pnl,pnl.category or "Разное").title:SetTextColor(IGS.col.TEXT_HARD) -- http://joxi.ru/Y2LqqyBh5BODA6
-			cats[pnl.category or "Разное"] = true
+			bg.categs:Add(pnl,pnl.category or IGS.GetPhrase("other")).title:SetTextColor(IGS.col.TEXT_HARD) -- http://joxi.ru/Y2LqqyBh5BODA6
+			cats[pnl.category or IGS.GetPhrase("other")] = true
 		end
 	end
 	addItems()
@@ -99,7 +99,7 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 	--[[-------------------------------------------------------------------------
 		Теги (Быстрый выбор категории)
 	---------------------------------------------------------------------------]]
-	bg.tags:AddTag("Сброс фильтров", function() bg.categs:Clear() addItems() end)
+	bg.tags:AddTag(IGS.GetPhrase("resetfilter"), function() bg.categs:Clear() addItems() end)
 		:SetActive(true)
 
 	for categ in pairs(cats) do
@@ -108,9 +108,9 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 
 			-- #todo переписать это говнище
 			addItems(function(ITEM)
-				return self.categ == "Разное" and not ITEM:Category() or (ITEM:Category() == self.categ)
+				return self.categ == IGS.GetPhrase("other") and not ITEM:Category() or (ITEM:Category() == self.categ)
 			end,function(GROUP)
-				return self.categ == "Разное" and not GROUP:Items()[1].item:Category() or (GROUP:Items()[1].item:Category() == self.categ)
+				return self.categ == IGS.GetPhrase("other") and not GROUP:Items()[1].item:Category() or (GROUP:Items()[1].item:Category() == self.categ)
 			end)
 		end).categ = categ
 	end
@@ -172,13 +172,13 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 				end
 			end, b)
 
-			pnl:AddRow("Купил: ",v.nick or "NoName")
+			pnl:AddRow(IGS.GetPhrase("buyedwho") .. " ", v.nick or "NoName")
 			if IGS.SERVERS.TOTAL > 1 then
-				pnl:AddRow("На: ",IGS.ServerName(v.server))
+				pnl:AddRow(IGS.GetPhrase("whatserver") .. " ",IGS.ServerName(v.server))
 			-- else
 			-- 	pnl:AddRow("UID: ",v.item)
 			end
-			pnl:AddRow("До: ",IGS.TimestampToDate(v.expire) or "навсегда")
+			pnl:AddRow(IGS.GetPhrase("forwhat") .. " ",IGS.TimestampToDate(v.expire) or IGS.GetPhrase("forever"))
 
 			bg.side:AddItem(b)
 		end
@@ -191,7 +191,7 @@ hook.Add("IGS.CatchActivities","main",function(activity,sidebar)
 		end
 	end)
 
-	activity:AddTab("Услуги",bg,"materials/icons/fa32/rub.png",etoGlavnayaVkladkaBlya)
+	activity:AddTab(IGS.GetPhrase("store"),bg,"materials/icons/fa32/rub.png",etoGlavnayaVkladkaBlya)
 end)
 
 -- local p = IGS.UI()

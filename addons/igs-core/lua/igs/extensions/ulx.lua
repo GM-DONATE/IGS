@@ -9,7 +9,7 @@ local STORE_ITEM = MT_IGSItem
 function STORE_ITEM:SetULXGroup(sUserGroup, iGroupWeight)
 	self:SetCanActivate(function(pl) -- invDbID
 		if pl:IsUserGroup(sUserGroup) then
-			return "У вас уже действует эта услуга"
+			return IGS.GetPhrase("youalrhavethat")
 		end
 	end)
 	self:SetInstaller(function(pl)
@@ -25,7 +25,7 @@ function STORE_ITEM:SetULXGroup(sUserGroup, iGroupWeight)
 		end
 
 		if not valid then
-			IGS.NotifyAll("Автовосстановление " .. self:Name() .. " для " .. pl:Name())
+			IGS.NotifyAll(Format(IGS.GetPhrase("autorecovery"), self:Name(), pl:Name()))
 			return false
 		end
 	end)

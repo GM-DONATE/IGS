@@ -8,9 +8,13 @@ IGS.C.TopDon_Echo = true
 -- %H - раз в час, %d - раз в день, %u - раз в неделю. %m - раз в месяц
 IGS.C.TopDon_Periodicity = "%u" -- %m
 
-IGS.C.TopDon_TextRecord   = "$nick побил рекорд доната в этом месяце, пополнив счет на $sum руб.\nПредыдущий рекорд установил $nick_prev, пополнив счет на $sum_prev руб"
-IGS.C.TopDon_TextFirstDon = "$nick стал первым, кто задонатил в этом месяце. $nick умничка. Будь как $nick - /donate" -- доступен шаблон $sum
 
+--#### ПЕРЕЕХАЛ В LANGUAGE ####
+
+-- IGS.C.TopDon_TextRecord   = "$nick побил рекорд доната в этом месяце, пополнив счет на $sum руб.\nПредыдущий рекорд установил $nick_prev, пополнив счет на $sum_prev руб"
+-- IGS.C.TopDon_TextFirstDon = "$nick стал первым, кто задонатил в этом месяце. $nick умничка. Будь как $nick - /donate" -- доступен шаблон $sum
+
+--#### ПЕРЕЕХАЛ В LANGUAGE ####
 
 
 
@@ -76,7 +80,7 @@ local function charge(pl, sum)
 	if sum > (getHugeCharge(true) or 0) then
 		local pr = getHugeCharge() -- Previous Record
 
-		local s = pr.nick and IGS.C.TopDon_TextRecord or IGS.C.TopDon_TextFirstDon
+		local s = pr.nick and IGS.GetPhrase("TopDon_TextRecord") or IGS.GetPhrase("TopDon_TextFirstDon")
 
 		-- Не первый донат
 		if pr.nick then

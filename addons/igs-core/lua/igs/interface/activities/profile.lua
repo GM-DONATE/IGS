@@ -6,7 +6,7 @@ local LP
 hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 	LP = LP or LocalPlayer()
 
-	local bg = sidebar:AddPage("Информация профиля")
+	local bg = sidebar:AddPage(IGS.GetPhrase("profileinfo"))
 	local ava_bg = uigs.Create("Panel", function(self)
 		local y = 5
 
@@ -84,12 +84,12 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 	local mybal  = LP:IGSFunds()
 	local next_lvl = not lvl and IGS.LVL.MAP[1] or lvl:GetNext()
 
-	ava_bg:AddRow("Статус",lvl and lvl:Name() or "Никто :(")
+	ava_bg:AddRow(IGS.GetPhrase("profilestatus"),lvl and lvl:Name() or IGS.GetPhrase("profilenobody"))
 	if next_lvl then
 		local next_desc = next_lvl:Description()
 
-		ava_bg:AddRow("След. статус", next_lvl:Name() .. (next_desc and ("\n\n%s"):format(next_desc) or ""))
-		ava_bg:AddRow("Нужно", IGS.SignPrice(next_lvl:Cost() - IGS.TotalTransaction(LP)) )
+		ava_bg:AddRow(IGS.GetPhrase("profilenextstatus"), next_lvl:Name() .. (next_desc and ("\n\n%s"):format(next_desc) or ""))
+		ava_bg:AddRow(IGS.GetPhrase("profileneedenforstat"), IGS.SignPrice(next_lvl:Cost() - IGS.TotalTransaction(LP)) )
 	end
 
 	bg.side:AddItem(ava_bg)
@@ -101,19 +101,19 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 		pnl:Dock(FILL)
 		pnl:DockMargin(5,5,5,5)
 
-		pnl:SetTitle("Транзакции")
+		pnl:SetTitle(IGS.GetPhrase("profiletransactions"))
 
 		local multisv = IGS.SERVERS.TOTAL > 1
 		if multisv then
-			pnl:AddColumn("Сервер",100)
+			pnl:AddColumn(IGS.GetPhrase("profileserver"),100)
 		else
 			pnl:AddColumn("#",40)
 		end
 
-		pnl:AddColumn("Сумма",60)
-		pnl:AddColumn("Баланс",60)
-		pnl:AddColumn("Действие")
-		pnl:AddColumn("Дата",130)
+		pnl:AddColumn(IGS.GetPhrase("profileammount"),60)
+		pnl:AddColumn(IGS.GetPhrase("profilebalance"),60)
+		pnl:AddColumn(IGS.GetPhrase("profileaction"))
+		pnl:AddColumn(IGS.GetPhrase("profiledate"),130)
 
 		-- Обновление списка транзакций и информации в сайдбаре
 		IGS.GetMyTransactions(function(dat)
@@ -121,7 +121,7 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 
 			local bit_num_limit = 2 ^ IGS.BIT_TX - 1
 			if #dat == bit_num_limit then
-				pnl:SetTitle("Последние " .. bit_num_limit .. " транзакций")
+				pnl:SetTitle(Format(IGS.GetPhrase("profilelasttransactions"), bit_num_limit))
 			end
 
 			for i,v in ipairs(dat) do
@@ -135,8 +135,8 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 				-- Если покупка, то пишем ее название или пишем с чем связана транзакция
 				local note =
 					v.note:StartWith("P: ") and name_or_uid(v.note:sub(4)) or
-					v.note:StartWith("A: ") and ("Пополнение счета (" .. v.note:sub(4) .. ")") or
-					v.note:StartWith("C: ") and ("Купон " .. v.note:sub(4,13) .. "...") or
+					v.note:StartWith("A: ") and (IGS.GetPhrase("profileaddmoney") .. " " .. "(" .. v.note:sub(4) .. ")") or
+					v.note:StartWith("C: ") and (IGS.GetPhrase("profilecoupon") .. v.note:sub(4,13) .. "...") or
 					v.note
 
 				pnl:AddLine(
@@ -146,10 +146,10 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 					math.Truncate(mybal,2), -- не представляю как, но временами получались очень большие копейки
 					note,
 					IGS.TimestampToDate(v.date,true)
-				):SetTooltip(("%s\n\nID транзакции в системе: %i%s"):format(
+				):SetTooltip(("%s\n\n" .. IGS.GetPhrase("profiletransid") .. " " .. "%i%s"):format(
 					note,
 					v.id,
-					note ~= v.note and ("\nОригинальная отметка: " .. v.note) or ""
+					note ~= v.note and ("\n" .. IGS.GetPhrase("profileoriglabel")  .. v.note) or ""
 				))
 
 				mybal = mybal - v.sum
@@ -158,11 +158,11 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 			local spent = IGS.isUser(LP) and (IGS.TotalTransaction(LP) - mybal) or 0
 
 			local first = dat[ #dat ]
-			ava_bg:AddRow("## Операций",#dat .. " шт.")
-			ava_bg:AddRow("∑ Операций",IGS.SignPrice(spent))
-			ava_bg:AddRow("1 Операция",first and IGS.TimestampToDate(first.date) or "Не было")
+			ava_bg:AddRow("## " .. IGS.GetPhrase("profilenumoftrans") ,#dat .. " " .. IGS.GetPhrase("profilenumoftranspcs"))
+			ava_bg:AddRow("∑ " .. IGS.GetPhrase("profilenumoftrans"),IGS.SignPrice(spent))
+			ava_bg:AddRow(IGS.GetPhrase("profiletransic"),first and IGS.TimestampToDate(first.date) or IGS.GetPhrase("profilenotrans"))
 
-			IGS.AddButton(bg.side,"Активировать купон",IGS.WIN.ActivateCoupon) --.button:SetActive(true)
+			IGS.AddButton(bg.side,IGS.GetPhrase("activatecoupon"),IGS.WIN.ActivateCoupon) --.button:SetActive(true)
 
 			bg.side:AddItem(uigs.Create("Panel", function(s)
 				s:SetTall(5)
@@ -171,7 +171,7 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 		end)
 	end, bg)
 
-	activity:AddTab("Профиль",bg,"materials/icons/fa32/user.png")
+	activity:AddTab(IGS.GetPhrase("profile"),bg,"materials/icons/fa32/user.png")
 end)
 
 -- IGS.UI()
