@@ -130,7 +130,7 @@ end
 
 function IGS.DropItem(iID,fCallback) -- энтити в каллбэке
 	if not IGS.C.Inv_AllowDrop then
-		IGS.ShowNotify("Дроп предметов отключен администратором", "Ошибка")
+		IGS.ShowNotify(IGS.GetPhrase("dropdisabled"), "Ошибка")
 		return
 	end
 

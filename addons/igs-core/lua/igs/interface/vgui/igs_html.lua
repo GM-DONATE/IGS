@@ -5,7 +5,7 @@ function PANEL:Init()
 	self.text_color = Color(c.r,c.g,c.b,c.a)
 end
 
-local LOADING_TEXT = "Загрузочка..."
+local LOADING_TEXT = IGS.GetPhrase("loading")
 local ICO          = Material("materials/icons/fa32/usd.png", "smooth")
 
 function PANEL:Paint(w,h)

@@ -18,7 +18,7 @@ function IGS.WIN.Deposit(iRealSum)
 
 		-- Вы, конечно, можете удалить наш копирайт. Чтобы вы не перенапряглись, я даже подготовил чуть ниже строчку для этого
 		-- Но прежде, чем ты это сделаешь, ответь себе на вопрос. Зачем? Так мешает?
-		self:SetTitle("Автодонат от gm-donate.net")
+		self:SetTitle(IGS.GetPhrase("autodonatecopyright"))
 		-- self:SetTitle("Владелец этого сервера не ценит чужой труд")
 
 		self:MakePopup()
@@ -31,7 +31,7 @@ function IGS.WIN.Deposit(iRealSum)
 		uigs.Create("DLabel", function(real)
 			real:SetSize(450, 25)
 			real:SetPos(0, self:GetTitleHeight())
-			real:SetText("Введите ниже сумму пополнения счета")
+			real:SetText(IGS.GetPhrase("depositsum"))
 			real:SetFont("igs.22")
 			real:SetTextColor(IGS.col.HIGHLIGHTING)
 			real:SetContentAlignment(2)
@@ -43,7 +43,7 @@ function IGS.WIN.Deposit(iRealSum)
 		self.real_m:SetNumeric(true)
 		self.real_m.Think = function(s)
 			local sum = tonumber(s:GetValue())
-			self.purchase:SetText("Пополнить счет на " .. niceSum(sum, 0) .. " руб")
+			self.purchase:SetText(Format(IGS.GetPhrase("depositbtn"), niceSum(sum, 0)))
 			self.purchase:SetActive(sum and sum > 0)
 		end
 		self.real_m:SetValue( realSum )
@@ -59,23 +59,23 @@ function IGS.WIN.Deposit(iRealSum)
 			p.DoClick = function()
 				local want_money = niceSum(self.real_m:GetValue())
 				if not want_money then
-					self.log:AddRecord("Указана некорректная сумма пополнения", false)
+					self.log:AddRecord(IGS.GetPhrase("depostisumerr"), false)
 					return
 
 				elseif want_money < realSum then
-					self.log:AddRecord("Минимальная сумма пополнения " .. PL_MONEY(realSum), false)
+					self.log:AddRecord(IGS.GetPhrase("depostiminimal") .. " " .. PL_MONEY(realSum), false)
 					return
 				end
 
-				self.log:AddRecord("Запрос цифровой подписи запроса от сервера...")
+				self.log:AddRecord(IGS.GetPhrase("depositsafekey"))
 
 				IGS.GetPaymentURL(want_money,function(url)
-					IGS.OpenURL(url,"Процедура пополнения счета")
+					IGS.OpenURL(url, IGS.GetPhrase("deposittitle"))
 					if not IsValid(self) then return end
-					self.log:AddRecord("Подпись получена. начинаем процесс оплаты")
+					self.log:AddRecord(IGS.GetPhrase("depositgotkey"))
 
 					timer.Simple(.7,function()
-						self.log:AddRecord("Счет пополнится моментально или после перезахода")
+						self.log:AddRecord(IGS.GetPhrase("depositfundsauto"))
 					end)
 				end)
 			end
@@ -129,7 +129,7 @@ function IGS.WIN.Deposit(iRealSum)
 
 			log_title:SetSize(self.log:GetWide(),22)
 			log_title:SetPos(log_x,log_y - log_title:GetTall())
-			log_title:SetText("Лог операций")
+			log_title:SetText(IGS.GetPhrase("depositlog"))
 			log_title:SetTextColor(IGS.col.HIGHLIGHTING)
 			log_title:SetFont("igs.22")
 			log_title:SetContentAlignment(1)
@@ -151,7 +151,7 @@ function IGS.WIN.Deposit(iRealSum)
 
 			btn:SetSize(170, 30)
 			btn:SetPos(self:GetWide() - 10 - btn:GetWide(),log_y - 20)
-			btn:SetText("Активировать купон")
+			btn:SetText(IGS.GetPhrase("activatecoupon"))
 			btn.DoClick = function()
 				IGS.WIN.ActivateCoupon()
 			end
@@ -176,9 +176,9 @@ function IGS.WIN.Deposit(iRealSum)
 			end)
 		end
 
-		log(0,"Открыт диалог пополнения счета",nil)
-		log(math.random(3),"Соединение установлено!",true) -- пустышка, которая добавляет чувство безопасностти сделке
-		log(math.random(20,40),"Деньги будут зачислены мгновенно и автоматически",nil)
+		log(0, IGS.GetPhrase("depositopened"),nil)
+		log(math.random(3),IGS.GetPhrase("depositconnected"),true) -- пустышка, которая добавляет чувство безопасностти сделке
+		log(math.random(20,40),IGS.GetPhrase("depositfastestfund"),nil)
 	end)
 
 	return m
@@ -187,13 +187,13 @@ end
 
 hook.Add("IGS.PaymentStatusUpdated","UpdatePaymentStatus",function(dat)
 	local text =
-		dat.method == "check" and ("Проверка возможности платежа через " .. dat.paymentType) or
-		dat.method == "pay"   and ("Начислено " .. PL_MONEY(dat.orderSum)) or
-		dat.method == "error" and ("Ошибка пополнения счета: " .. dat.errorMessage) or
-		"С сервера пришел неизвестный метод " .. tostring(dat.method) .. " и возникла ошибка"
+		dat.method == "check" and (IGS.GetPhrase("deposticheckfrom") .. " " .. dat.paymentType) or
+		dat.method == "pay"   and (IGS.GetPhrase("depostiadded") .. " " .. PL_MONEY(dat.orderSum)) or
+		dat.method == "error" and (IGS.GetPhrase("depositerror") .. " " .. dat.errorMessage) or
+		IGS.GetPhrase("depositerror1") .. " " .. tostring(dat.method) .. " " .. IGS.GetPhrase("depositerror2")
 
 	if not IsValid(m) then
-		IGS.ShowNotify(text,"Обновление статуса платежа")
+		IGS.ShowNotify(text, IGS.GetPhrase("depositupdate"))
 		return
 	end
 

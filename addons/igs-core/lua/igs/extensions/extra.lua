@@ -35,7 +35,7 @@ hook.Add("IGS.CanPlayerBuyItem", "GlobalLimit", function(_, ITEM)
 		local purchased = bib.getNum("igs:total_purchases:" .. ITEM:UID(), 0)
 
 		if purchased >= limit then
-			return false, "Этот предмет закончился"
+			return false, IGS.GetPhrase("thisitemisover")
 		end
 	end
 end)
@@ -66,7 +66,7 @@ function STORE_ITEM:SetMaxPlayerPurchases(iLimit)
 			local key = string.format("igs:purchases:%s:%s", pl:UniqueID(), self:UID())
 			local now_purchased = bib.getNum(key, 0) + 1
 			bib.setNum(key, now_purchased)
-			IGS.Notify(pl, "Вы купили " .. self:Name() .. " " .. now_purchased .. " раз из " .. limit)
+			IGS.Notify(pl, Format(IGS.GetPhrase("limitedbuy"), self:Name(), now_purchased, limit))
 		end
 	end):SetMeta("purchasesLimit", iLimit)
 end
@@ -77,7 +77,7 @@ hook.Add("IGS.CanPlayerBuyItem", "PlayerLimit", function(pl, ITEM)
 		local limit = ITEM:GetMeta("purchasesLimit")
 		local key   = string.format("igs:purchases:%s:%s", pl:UniqueID(), ITEM:UID())
 		if bib.getNum(key, 0) >= limit then
-			return false, "Этот предмет можно купить только " .. limit .. " раз(а)"
+			return false, Format(IGS.GetPhrase("limitederr"), limit)
 		end
 	end
 end)
@@ -99,7 +99,7 @@ hook.Add("IGS.PlayerActivatedItem", "IGS.GlobalPurchase", function(pl, ITEM)
 			end
 		end
 
-		IGS.Notify(pl, "Предмет выдан на " .. IGS.SERVERS.TOTAL .. " серверах")
+		IGS.Notify(pl, Format(IGS.GetPhrase("itemgivenon"), IGS.SERVERS.TOTAL))
 	end
 end)
 
@@ -112,7 +112,7 @@ local function giveRandomItem(pl, tItems)
 	local WINNED_ITEM = table.Random(tItems)
 
 	IGS.PlayerActivateItem(pl, WINNED_ITEM:UID(), function()
-		IGS.Notify(pl, "Вы получили " .. WINNED_ITEM:Name())
+		IGS.Notify(pl, IGS.GetPhrase("yourecieved") .. " " .. WINNED_ITEM:Name())
 	end)
 end
 
@@ -130,7 +130,7 @@ local function giveItemsSet(pl, tItems)
 		IGS.AddToInventory(pl, ITEM:UID(), function()
 			added = added + 1
 			if added == #tItems then
-				IGS.Notify(pl, "В ваш инвентарь добавлено " .. added .. " предметов")
+				IGS.Notify(pl, IGS.GetPhrase("yourecieveditems"), added)
 			end
 		end)
 	end

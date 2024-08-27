@@ -1,9 +1,9 @@
 -- bib.setNum("igs:lasttimeitems", 85)
 
 -- 18, 23, 245
-local PL_POYAVILSA = PLUR({"появился","появилось","появилось"})
-local PL_NEW       = PLUR({"новый", "новых", "новых"})
-local PL_ITEMS     = PLUR({"предмет", "предмета", "предметов"})
+local PL_POYAVILSA = PLUR(IGS.LANG[IGS.C.LANG].PL_POYAVILSA) -- Это переехало в LANGUAGE
+local PL_NEW       = PLUR(IGS.LANG[IGS.C.LANG].PL_NEW) -- Это переехало в LANGUAGE
+local PL_ITEMS     = PLUR(IGS.LANG[IGS.C.LANG].PL_ITEMS) -- Это переехало в LANGUAGE
 
 hook.Add("IGS.Loaded", "NewItemsNotify", function()
 	-- local ip,port = game.GetIPAddress():match("(.+):(.+)")
@@ -25,10 +25,9 @@ hook.Add("IGS.Loaded", "NewItemsNotify", function()
 		local _,sItems  = PL_ITEMS(new)
 		local _,sAppear = PL_POYAVILSA(new)
 
-		local message =
-			"В нашем /donate магазине " .. sAppear .. " " .. new .. " " .. sNew .. " " .. sItems .. ". Желаете взглянуть?"
+		local message = Format(IGS.GetPhrase("new_items"), sAppear, new, sNew, sItems)
 
-		IGS.BoolRequest("Пополнение магазина", message, function(aga)
+		IGS.BoolRequest(IGS.GetPhrase("new_items_title"), message, function(aga)
 			if aga then
 				IGS.UI()
 			end

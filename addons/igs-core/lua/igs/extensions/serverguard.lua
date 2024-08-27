@@ -7,7 +7,7 @@ function STORE_ITEM:SetSGGroup(sUserGroup)
 
 	return self:SetInstaller(function(pl)
 		local rankData = serverguard.ranks:GetRank(sUserGroup)
-		assert(rankData, "IGS: В SetSGGroup указана несуществующая группа")
+		assert(rankData, IGS.GetPhrase("setssgrouperr"))
 		serverguard.player:SetRank(pl, sUserGroup, 0)
 		serverguard.player:SetImmunity(pl, rankData.immunity)
 		serverguard.player:SetTargetableRank(pl, rankData.targetable)

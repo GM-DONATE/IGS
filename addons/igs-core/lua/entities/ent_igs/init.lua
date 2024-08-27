@@ -29,15 +29,15 @@ end
 
 function ENT:PlayerUse(pl)
 	if IGS.IsInventoryOverloaded(pl) then
-		IGS.Notify(pl, "У вас слишком много предметов в инвентаре")
+		IGS.Notify(pl, IGS.GetPhrase("invoverloaded"))
 		return
 	end
 
 	if self.Busy or self.Removed then -- хз нужно ли именно здесь, но я добавил
 		-- https://vk.com/gim143836547?sel=383010676&msgid=90338
 		if CurTime() - self.Busy > 5 then
-			IGS.Notify(pl, "Предмет в процессе перемещения в инвентарь")
-			IGS.Notify(pl, "Если процесс бесконечный, то поскорее сделайте доказательства и сообщите администратору")
+			IGS.Notify(pl, IGS.GetPhrase("itemmoving"))
+			IGS.Notify(pl, IGS.GetPhrase("iferror"))
 		end
 		return
 	end
@@ -48,7 +48,7 @@ function ENT:PlayerUse(pl)
 		self.Removed = true
 		self:Remove()
 
-		IGS.Notify(pl, "Предмет помещен в /donate инвентарь")
+		IGS.Notify(pl, IGS.GetPhrase("itemmoved"))
 
 		-- вставлять новый ID не совсем корректно
 		-- Думаю, надо кешировать тот ИД, что был при покупке
