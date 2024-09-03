@@ -97,8 +97,11 @@ end
 -- 	return self
 -- end
 
-function PANEL:SetIcon(sIco,bIsModel) -- :SetIcon() для сброса
+function PANEL:SetIcon(sIco, sMode) -- :SetIcon() для сброса
 	if not sIco then return self end
+
+	local bIsModel = sMode == true or sMode == "model"
+	local bIsMaterial = sMode == "material"
 
 	if bIsModel and not file.Exists(sIco, "GAME") then
 		sIco = "models/props_lab/huladoll.mdl"
@@ -138,6 +141,8 @@ function PANEL:SetIcon(sIco,bIsModel) -- :SetIcon() для сброса
 
 	if bIsModel then
 		self.icon:SetModel(sIco)
+	elseif bIsMaterial then
+		self.icon:SetMaterial(sIco)
 	else
 		self.icon:SetURL(sIco)
 	end

@@ -2,7 +2,7 @@
 	Для веб загрузки не подходит PermaProps аддон с воркшопа,
 	поскольку он работает на InitPostEntity, который нельзя вызвать после веб загрузки
 
-	Или можно..
+	Вообще-то можно, но я решил так
 ---------------------------------------------------------------------------]]
 
 local function getIndex()
@@ -105,15 +105,15 @@ if SERVER then
 		end
 
 		local map = getIndex()
-		for uid,class in pairs(map) do
+		for uid, class in pairs(map) do
 			if scripted_ents.GetStored(class) then
 				local dat = util.JSONToTable(cookie.GetString("perma_" .. class .. "_" .. uid))
 				local ent = SpawnSent(class, util.StringToType(dat[1], "Vector"), util.StringToType(dat[2], "Angle"))
 				ent.permaSentUID = uid
 
-				print("IGS.PermaSents: Заспавнили " .. class)
+				IGS.dprint("PermaSents: Заспавнили ", class)
 			else
-				print("IGS.PermaSents: " .. class .. " не существует на сервере")
+				IGS.dprint("PermaSents: ", class, " не существует на сервере")
 			end
 		end
 	end)

@@ -21,7 +21,7 @@ function STORE_ITEM:SetEntity(sEntClass)
 end
 
 -- Пушки
-function STORE_ITEM:SetWeapon(sWepClass,tAmmo)
+function STORE_ITEM:SetWeapon(sWepClass, tAmmo)
 	self:SetNetworked() -- для HasPurchase и отображения галочки
 
 	self.ammo = tAmmo
@@ -102,12 +102,12 @@ if SERVER then
 end
 
 if CLIENT then -- :SetWeapon only
-hook.Add("IGS.OnItemInfoOpen","CheckGiveWeaponOnSpawn",function(ITEM, fr)
+hook.Add("IGS.OnItemInfoOpen", "CheckGiveWeaponOnSpawn", function(ITEM, fr)
 	if not (ITEM.swep and LocalPlayer():HasPurchase(ITEM:UID())) then return end
 
 	uigs.Create("DCheckBoxLabel", function(self)
 		self:Dock(TOP)
-		self:DockMargin(0,5,0,0)
+		self:DockMargin(0, 5, 0, 0)
 		self:SetTall(20)
 
 		local should_give = LocalPlayer():GetNWBool("igs.gos." .. ITEM:ID()) -- #todo UID и избавиться от :ID()
@@ -155,9 +155,10 @@ else -- SV
 		pl:SetActiveWeapon(pl:GetWeapon(class))
 	end
 
-	local function giveItemAmmo(pl, ITEM)
-		for type,count in pairs(ITEM.ammo or {}) do
-			pl:SetAmmo(count,type)
+	local function giveAmmo(pl, ammo)
+		if not ammo then return end
+		for ammo_type, count in pairs(ammo) do
+			pl:SetAmmo(count, ammo_type)
 		end
 	end
 
@@ -168,13 +169,13 @@ else -- SV
 			local ITEM = IGS.GetItemByUID(uid)
 			if ITEM.swep and GetShouldPlayerReceiveWep(pl, ITEM) then
 				pl:Give(ITEM.swep)
-				giveItemAmmo(pl, ITEM)
+				giveAmmo(pl, ITEM.ammo)
 			end
 		end
 	end
 
-	net.Receive("IGS.GiveOnSpawnWep",function(_, pl)
-		local ITEM,bWant = net.ReadIGSItem(),net.ReadBool()
+	net.Receive("IGS.GiveOnSpawnWep", function(_, pl)
+		local ITEM, bWant = net.ReadIGSItem(), net.ReadBool()
 		if not pl:HasPurchase(ITEM:UID()) or not ITEM.swep then return end -- байпас
 
 		PlayerSetWantReceiveOnSpawn(pl, ITEM, bWant)
@@ -188,7 +189,7 @@ else -- SV
 		hook.Call("IGS_PlayerLoadout", IGS, pl)
 	end)
 
-	hook.Add("IGS.PlayerActivatedItem","IGS.PlayerLoadout",function(pl, ITEM)
+	hook.Add("IGS.PlayerActivatedItem", "IGS.PlayerLoadout", function(pl, ITEM)
 		if ITEM.swep then
 			PlayerSetWantReceiveOnSpawn(pl, ITEM, true) -- default give on spawn
 			hook.Call("IGS_PlayerLoadout", IGS, pl)
@@ -202,8 +203,28 @@ else -- SV
 			pl:ChatPrint("▲")
 
 			setActiveWeapon(pl, ITEM.swep)
-			giveItemAmmo(pl, ITEM)
+			giveAmmo(pl, ITEM.ammo)
 		end
+	end)
+
+	hook.Add("PlayerGiveSWEP", "IGS", function(pl, class)
+		local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.SB.SWEPS[class]) -- hasAccess if ITEM returned
+		if ITEM then
+			timer.Simple(.1, function() giveAmmo(pl, ITEM.ammo) end)
+			return true
+		end
+	end)
+
+	-- DARKRP ONLY
+	hook.Add("canDropWeapon", "IGS", function(pl, wep)
+		-- Пушка продается и чел купил ее
+		local ITEM = IsValid(wep) and IGS.PlayerHasOneOf(pl, IGS.ITEMS.SB.SWEPS[wep:GetClass()])
+		if ITEM then
+			return false
+		end
+
+		-- Пушка не продается или чел ее не покупал
+		-- Т.е. по сути возможность дропа контроллируется другими хуками
 	end)
 end
 
@@ -219,7 +240,7 @@ if CLIENT then return end
 -- \/ SERVER
 
 -- print( hook.Run("CanTool", player.Find("hell"), AMD():GetEyeTrace(), "rope") )
-hook.Add("CanTool","IGS",function(pl,_,tool)
+hook.Add("CanTool","IGS",function(pl, _, tool)
 	local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.SB.TOOLS[tool])
 	if ITEM ~= nil then -- donate
 		local allow = hook.Run("IGS.CanTool", pl, tool)
@@ -242,21 +263,8 @@ end)
 -- для HOOK_HIGH
 -- выше 2018.11.15 вынес и немного переписал две функции
 -- Если будет работать норм, то и с остальных снять
-timer.Simple(0,function()
-
-hook.Add("PlayerGiveSWEP","IGS",function(pl,class)
-	local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.SB.SWEPS[class]) -- hasAccess if ITEM returned
-	if ITEM then
-		timer.Simple(.1,function()
-			for type,count in pairs(ITEM.ammo or {}) do
-				pl:SetAmmo(count,type)
-			end
-		end)
-
-		return true -- #todo не ретурнить true!!. false or nil only
-	end
-end, HOOK_HIGH)
-
+-- 2024.08.31 вынес с таймера и убрал HOOK_HIGH еще с PlayerGiveSWEP и canDropWeapon
+timer.Simple(0, function()
 
 --[[-------------------------------------------------------------------------
 	Машины
@@ -266,12 +274,12 @@ local function getcount(pl, class)
 end
 
 local function counter(pl, class, incr)
-	pl:SetVar("vehicles_" .. class, getcount(pl,class) + incr)
+	pl:SetVar("vehicles_" .. class, getcount(pl, class) + incr)
 end
 
 -- разрешаем спавнить одну, но конструкция позволяет в будущем сделать поддержку спавна нескольких машин
 local function canSpawn(pl, class)
-	return getcount(pl,class) < 1
+	return getcount(pl, class) < 1
 end
 
 local function getVehClass(veh)
@@ -281,22 +289,22 @@ local function getVehClass(veh)
 end
 
 -- Считаем заспавненные и удаленные машины
-hook.Add("PlayerSpawnedVehicle","IGS",function(pl,veh)
+hook.Add("PlayerSpawnedVehicle", "IGS", function(pl, veh)
 	if IGS.PlayerHasOneOf(pl, IGS.ITEMS.SB.VEHS[getVehClass(veh)]) then -- чел покупал эту тачку, а теперь спавнит
 		counter(pl, getVehClass(veh), 1)
 
-		veh:CallOnRemove("ChangeCounter",function(ent)
+		veh:CallOnRemove("ChangeCounter", function(ent)
 			if not IsValid(pl) then return end
 			counter(pl, getVehClass(ent), -1)
 		end)
 	end
 end)
 
-hook.Add("PlayerSpawnVehicle","IGS",function(pl, _, class) -- model, class, table
-	if IGS.PlayerHasOneOf(pl,IGS.ITEMS.SB.VEHS[class]) then -- покупал машину
-		local can = canSpawn(pl,class)
+hook.Add("PlayerSpawnVehicle", "IGS", function(pl, _, class) -- model, class, table
+	if IGS.PlayerHasOneOf(pl, IGS.ITEMS.SB.VEHS[class]) then -- покупал машину
+		local can = canSpawn(pl, class)
 		if not can then
-			IGS.Notify(pl,"У вас есть заспавнена эта машина")
+			IGS.Notify(pl, "У вас есть заспавнена эта машина")
 		end
 
 		return can
@@ -306,19 +314,4 @@ end, HOOK_HIGH)
 	/Машины
 ---------------------------------------------------------------------------]]
 
-
--- DARKRP ONLY
-hook.Add("canDropWeapon","IGS",function(pl,wep)
-	-- Пушка не продается
-	if not IsValid(wep) or not IGS.ITEMS.SB.SWEPS[wep:GetClass()] then return end
-
-	-- Пушка продается и чел купил ее
-	local ITEM = IGS.PlayerHasOneOf(pl, IGS.ITEMS.SB.SWEPS[wep:GetClass()])
-	if ITEM then
-		return false
-	end
-
-	-- Пушка продается, но чел ее не покупал
-	-- Т.е. по сути возможность дропа контроллируется другими хуками
-end, HOOK_HIGH)
 end) -- timer.Simple(0

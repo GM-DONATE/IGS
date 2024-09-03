@@ -13,13 +13,24 @@ function PANEL:Init()
 	end
 end
 
+function PANEL:Think() -- ожидание загрузки matex материала. Для SetURL
+	if self.matex and self.matex.material then
+		self.material = self.matex.material
+		self.matex = nil
+	end
+end
+
 function PANEL:Paint(w, h)
-	local mater = (self.matex and self.matex.material) or (default_matex and default_matex.material)
+	local mater = self.material or (default_matex and default_matex.material)
 	if mater then
 		surface.SetDrawColor( IGS.col.ICON )
 		surface.SetMaterial( mater )
 		surface.DrawTexturedRect(0, 0, w, h)
 	end
+end
+
+function PANEL:SetMaterial(sMaterial) -- "models/debug/debugwhite"
+	self.material = sMaterial and Material(sMaterial, "noclamp smooth") or nil
 end
 
 function PANEL:SetURL(sUrl)

@@ -45,8 +45,8 @@ end)
 ---------------------------------------------------------------------------]]
 concommand.Add("addfunds", function(pl, _, _, argss)
 	if IsValid(pl) then
-		IGS.print(Color(240, 173, 78), pl:Nick() .. " пытался выполнить addfunds " .. argss .. " через игровую консоль")
-		IGS.Notify(pl, "Команда работает только с серверной консоли")
+		IGS.prints(Color(240, 173, 78), "", pl:Nick(),  " пытался выполнить ", ("addfunds " .. argss),  " через игровую консоль")
+		-- IGS.Notify(pl, "Команда работает только с серверной консоли")
 		return
 	end
 
@@ -55,20 +55,20 @@ concommand.Add("addfunds", function(pl, _, _, argss)
 	if note == "" then note = nil end
 
 	if not amount then
-		print("Формат команды нарушен\nПример: addfunds STEAM_0:1:2345678 10 Опциональное примечание")
+		IGS.prints("Формат команды нарушен. Пример:\n", "addfunds STEAM_0:1:2345678 10 Необязательное примечание")
 		return
 	end
 
 	local targ = player.GetBySteamID(sid)
 	if targ then
 		targ:AddIGSFunds(amount, note, function()
-			print("Транзакция успешно проведена. Баланс игрока: " .. PL_MONEY( targ:IGSFunds() ))
+			IGS.prints("Транзакция успешно проведена. ", "Баланс игрока: " .. PL_MONEY( targ:IGSFunds() ))
 		end)
 
 	-- Игрок оффлайн
 	else
 		IGS.Transaction(util.SteamIDTo64(sid), amount, note, function()
-			print("Транзакция успешно проведена, но игрок не на сервере")
+			IGS.prints("Транзакция успешно проведена, но игрок не на сервере")
 		end)
 
 	end
@@ -77,7 +77,7 @@ end)
 
 concommand.Add("igs_reload", function(pl, _, args)
 	if pl == NULL then -- console only
-		print(args[1]  and "Super Reload" or "Casual Reload")
+		IGS.prints(args[1] and "Super Reload" or "Casual Reload")
 		IGS.sh(args[1] and "autorun/l_ingameshop.lua" or "igs/launcher.lua")
 	end
 end)
@@ -87,7 +87,7 @@ end)
 	Открытие интерфейса кнопкой на клаве
 ---------------------------------------------------------------------------]]
 -- https://wiki.facepunch.com/gmod/Enums/KEY
-hook.Add("PlayerButtonDown","IGS.UI",function(pl, iButton)
+hook.Add("PlayerButtonDown", "IGS.UI", function(pl, iButton)
 	if iButton == IGS.C.MENUBUTTON then
 		scc.run(pl, "igs")
 	end
@@ -98,7 +98,7 @@ end)
 	Глобальное оповещение о покупке итемов
 	https://trello.com/c/SvZ8UE0F/472-сообщение-о-покупке
 ---------------------------------------------------------------------------]]
-hook.Add("IGS.PlayerPurchasedItem","IGS.BroadcastPurchase",function(pl, ITEM)
+hook.Add("IGS.PlayerPurchasedItem", "IGS.BroadcastPurchase", function(pl, ITEM)
 	if IGS.C.BroadcastPurchase == false then return end -- TODO сделать модулем
 
 	IGS.NotifyAll(pl:Nick() .. " купил " .. ITEM:Name())
@@ -134,14 +134,12 @@ hook.Add("IGS.PlayerPurchasesLoaded", "BalanceRemember", function(pl)
 	end
 end)
 
-
-
-
 --[[-------------------------------------------------------------------------
 	Поиск новых версий
 ---------------------------------------------------------------------------]]
+local COLOR_HIGHLIGHT = Color(50, 50, 255)
 timer.Simple(1, function() -- http.Fetch
-	print("IGS Поиск обновлений")
+	IGS.prints("Поиск обновлений")
 	if not IGS_REPO then return end
 	http.Fetch("https://api.github.com/repos/" .. IGS_REPO .. "/releases", function(json)
 		local releases = util.JSONToTable(json)
@@ -157,13 +155,16 @@ timer.Simple(1, function() -- http.Fetch
 
 		if freshest_major > current_major then
 			local info_url = "https://github.com/" .. IGS_REPO .. "/releases/tag/" .. freshest_major
-			print("IGS Доступна новая версия: " .. freshest_major .. ". Установлена: " .. current_major .. "\nИнформация здесь: " .. info_url)
+			IGS.prints("🆕 Доступна новая Major версия: ", freshest_major, ". Установлена: ", (current_major == 0 and "распакованная 🚨" or current_major), "\nИнформация про обновление здесь: ", info_url)
+			if current_major == 0 then
+				IGS.prints("Для автообновления в addons должен быть только ", "igs-modification")
+			end
 		else
-			print("IGS Major обновлений нет")
+			IGS.prints("Major обновлений нет")
 		end
 
 		local freshest_suitable -- "123.2"
-		for _,release in ipairs(releases) do -- от свежайших
+		for _, release in ipairs(releases) do -- от свежайших
 			if current_ver == tonumber(release.tag_name) then break end -- 123.1 current and 123.1 suitable
 			if math.floor(release.tag_name) == current_major then -- (123).1 == (123).2
 				freshest_suitable = release.tag_name
@@ -172,15 +173,15 @@ timer.Simple(1, function() -- http.Fetch
 		end
 
 		if freshest_suitable then
-			print("IGS Найдено новое soft обновление. Текущая версия, новая:", current_ver, freshest_suitable)
+			IGS.prints("🆕 Найдено новое soft обновление. Текущая версия: ", current_ver, ", новая: ", freshest_suitable)
 			local url = "https://github.com/" .. IGS_REPO .. "/releases/download/" .. freshest_suitable .. "/superfile.json"
 			http.Fetch(url, function(superfile)
-				print("IGS Обновление загружено. Перезагрузите сервер для применения")
+				IGS.prints(Color(100, 250, 100), "", "Обновление загружено! ", "Перезагрузите сервер для применения")
 				file.Write("igs/superfile.txt", superfile)
 				cookie.Set("igs_version", freshest_suitable)
 			end, error)
 		else
-			print("IGS  Soft обновлений нет")
+			IGS.prints("Soft обновлений нет")
 		end
 	end, error)
 end)

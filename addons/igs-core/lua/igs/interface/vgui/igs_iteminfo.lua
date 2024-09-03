@@ -30,9 +30,9 @@ function PANEL:SetName(sName)
 end
 
 -- Добавляет иконку рядом с названием инфо панели
-function PANEL:SetIcon(sIco, bIsModel) -- url, Material or Model path
-	-- bIsModel = true
-	-- sIco = "models/weapons/w_npcnade.mdl"
+function PANEL:SetIcon(sIco, sMode) -- url or Model path
+	local bIsModel = sMode == true or sMode == "model"
+	local bIsMaterial = sMode == "material"
 
 	self.icon_bg = self.icon_bg or uigs.Create("Panel", function(bg)
 		bg.Paint = IGS.S.RoundedPanel
@@ -44,16 +44,7 @@ function PANEL:SetIcon(sIco, bIsModel) -- url, Material or Model path
 		bg:InvalidateParent(true) -- true bg:GetSize()
 	end, self.head)
 
-	if IsValid(self.icon) and
-		((self.model and not bIsModel) or   -- Если раньше была установлена моделька, а сейчас надо поставить иконку
-		(not self.model and bIsModel)) then -- Наоборот. Нужно поставить модельку, но стаяла картинка
-
-		self.icon:Remove()
-		self.icon = nil
-	end
-
-	self.model = bIsModel and sIco
-	self.icon  = self.icon or (bIsModel and uigs.Create("DModelPanel", function(mdl)
+	self.icon = self.icon or (bIsModel and uigs.Create("DModelPanel", function(mdl)
 		mdl:SetSize(self.icon_bg:GetSize())
 		mdl:SetModel(sIco)
 
@@ -76,6 +67,8 @@ function PANEL:SetIcon(sIco, bIsModel) -- url, Material or Model path
 
 	if bIsModel then
 		self.icon:SetModel(sIco)
+	elseif bIsMaterial then
+		self.icon:SetMaterial(sIco)
 	else
 		self.icon:SetURL(sIco) -- nil = сброс
 	end

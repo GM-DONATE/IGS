@@ -1,6 +1,6 @@
 hook.Add("IGS.OnApiError", "LogError", function(sMethod, error_uid, tParams)
 	if error_uid == "http_error" then
-		IGS.print(Color(255,0,0), "CEPBEPA GMD BPEMEHHO HE9OCTynHbI. y}{e PEWAEM nPO6JIEMy")
+		IGS.prints(Color(255, 0, 0), "", "CEPBEPA GMD BPEMEHHO HE9OCTynHbI. y}{e PEWAEM nPO6JIEMy")
 	end
 
 	local sparams = "\n"
@@ -18,5 +18,5 @@ hook.Add("IGS.OnApiError", "LogError", function(sMethod, error_uid, tParams)
 		split .. "\n\n\n"
 
 	file.Append("igs_errors.txt",err_log)
-	IGS.dprint(err_log)
+	IGS.dprint(Color(250, 50, 50), err_log)
 end)

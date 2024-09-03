@@ -19,14 +19,13 @@ end
 hook.Add("IGS.Initialized", "installation_check", function()
 	local path = "igs/launcher.lua"
 	if isUnpacked(path) then
-		IGS.print("Похоже, что автодонат распакован в /addons. Автоматические обновления недоступны")
+		IGS.prints(Color(250, 100, 100), "Похоже, что автодонат распакован в /addons. ", "Автоматические обновления не работают 🚨")
 	end
 
 	if isWorkshopped(path) and isDownloaded(path) then
-		IGS.print("Удалите автодонат из вашей коллекции в воркшопе. Обновления работают через GitHub")
+		IGS.prints("Удалите автодонат из вашей коллекции в воркшопе. Обновления работают через GitHub")
 	end
 end)
-
 
 -- PRINT(file.Find("*", "LUA")) -- mediaplayer, wire
 -- PRINT(file.Find("lua/*", "THIRDPARTY")) -- mediaplayer, wire

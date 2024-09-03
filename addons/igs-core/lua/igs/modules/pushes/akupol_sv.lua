@@ -26,9 +26,9 @@ end
 
 local function get_updates(base_url, uid, sleep, ts, fOnResponse)
 	local url = base_url .. uid .. "/getUpdates?sleep=" .. (sleep or "") .. "&ts=" .. (ts or "")
-	log.info("http.Fetch({})", url)
+	log.debug("kupol http.Fetch({})", url)
 	http.Fetch(url, function(json)
-		log.debug("Body: {}", json)
+		log.debug("kupol body: {}", json)
 		local t = util.JSONToTable(json)
 		if t and t.ok then
 			fOnResponse(t)
@@ -65,7 +65,7 @@ function kupol.new(sUrl, uid, iTimeout)
 
 		local ts_diff = remote_ts - requested_ts
 		if #res.updates > 0 then
-			log.info("From uid {} received {} new messages. Ts diff: {} items", safestr(o.uid), #res.updates, ts_diff)
+			log.debug("From uid {} received {} new messages. Ts diff: {} items", safestr(o.uid), #res.updates, ts_diff)
 		end
 
 		for _,upd in ipairs(res.updates) do

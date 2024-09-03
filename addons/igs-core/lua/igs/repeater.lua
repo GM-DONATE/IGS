@@ -49,7 +49,7 @@ local SHOULD_REPEAT_CASES = {
 -- https://t.me/c/1353676159/12486
 local function getBlankCallback(sMethod)
 	return function()
-		print("[IGS] Редкое сообщение. Выполнился " .. sMethod .. " без колбэка, который сначала 'упал'")
+		IGS.prints("", "Редкое сообщение. Выполнился ", sMethod, " без колбэка, который сначала 'упал'")
 	end
 end
 
@@ -69,7 +69,7 @@ hook.Add("IGS.OnApiError", "repeater", function(sMethod, error_uid, tParams, fOn
 
 		-- Был burst запросов и хук вызвался дважды
 		if not timer.Exists("IGS_REPEATER") then
-			IGS.dprint("Ошибка выполнения запроса: " .. error_uid .. ". Запущен репитер")
+			IGS.dprint(Color(250, 50, 50), "Ошибка выполнения запроса: ", error_uid, ". Запущен репитер")
 			timer.Create("IGS_REPEATER", 10, 1, function() R:ProcessNextQuery() end)
 		end
 	else

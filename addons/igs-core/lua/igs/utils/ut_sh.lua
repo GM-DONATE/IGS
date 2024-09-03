@@ -2,8 +2,9 @@
 -- https://trello.com/c/WfVYTIOF/544 (комменты)
 CreateConVar("igs_debug", 0, FCVAR_NOTIFY)
 cvars.AddChangeCallback("igs_debug", function(_, old, new)
-	IGS.DEBUG = tobool(new)
-	IGS.print("PEZuM OTJIA9Ku " .. (IGS.DEBUG and "AKTuBuPOBAH" or "BbIKJII04EH"))
+	IGS.DEBUG = tonumber(new) -- level. 0: disabled, 1: debug, 2: info, 3: warning, 4: error
+	if IGS.DEBUG == 0 then IGS.DEBUG = nil end
+	IGS.prints("PEZuM OTJIA9Ku ", (IGS.DEBUG and "AKTuBuPOBAH" or "BbIKJII04EH"), ". Level: ", (IGS.DEBUG or 0))
 end, "main")
 
 
@@ -124,7 +125,40 @@ function IGS.FormItemInfo(ITEM, pl)
 	}
 end
 
+-- Упрощенная в применении версия IGS.print. Использует 2 цвета: основной и для выделений
+-- Если первым указать цвет, то будет изменен цвет выделенного текста
+-- Если вторым указать цвет, то будет изменен цвет обычного текста
+-- Можно указать цвет текста, а первым аргументом использовать nil
+function IGS.prints(...)
+	local base_color = color_white
+	local highlight_color = Color(50, 50, 255)
 
+	local input = {...}
+	if not input[1] then input[1] = highlight_color end -- если кто-то хочет поменять только цвет текста
+	if istable( input[2] ) then base_color      = input[2] table.remove(input, 2) end
+	if istable( input[1] ) then highlight_color = input[1] table.remove(input, 1) end
+
+	local output = {}
+
+	for i, psc in ipairs(input) do
+		output[#output + 1] = (i % 2 == 0) and highlight_color or base_color
+		output[#output + 1] = psc
+	end
+
+	output[#output + 1] = "\n"
+	MsgC(Color(50, 200, 255), "[IGS] ", unpack(output))
+end
+
+-- Результат выполнения: https://file.def.pm/Jw9E7j7a.jpg
+-- IGS.prints("Одиночный текст базового (белого) цвета")
+-- IGS.prints(Color(200, 50, 50), "Выделенный цветом текст")
+-- IGS.prints("обычный, ", "выделенный, ", "обычный, ", "выделенный")
+-- IGS.prints("", "выделенный, ", "обычный, ", "выделенный, ", "обычный")
+-- IGS.prints(Color(150, 150, 150), "обычный, ", "выделенный цветной, ", "обычный, ", "выделенный")
+-- IGS.prints(Color(150, 150, 150), Color(255, 50, 50), "обычный, но красный, ", "выделенный серый, ", "красный, ", "серый")
+-- IGS.prints(nil, Color(255, 50, 50), "обычный, но красный, ", "выделенный стандарт, ", "обычный, ", "выделенный")
+
+-- #deprecated 01.09.2024, not used
 function IGS.print(...)
 	local args = {...}
 	if not IsColor(args[1]) then
@@ -137,7 +171,7 @@ end
 
 function IGS.dprint(...)
 	if IGS.DEBUG then
-		IGS.print("DEBUG: ", Color(50,250,50), ...)
+		IGS.prints(...)
 	end
 end
 

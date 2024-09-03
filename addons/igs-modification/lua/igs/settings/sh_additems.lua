@@ -7,7 +7,7 @@
 		:SetTerm()            --> Срок действия в днях (по умолчанию 0, т.е. одноразовая активация)
 		:SetStackable()       --> Разрешает покупать несколько одинаковых предметов
 		:SetCategory()        --> Группирует предметы
-		:SetIcon()            --> Картинка или модель в качестве иконки
+		:SetIcon()            --> Картинка, модель или материал в качестве иконки (пример в файле)
 		:SetHighlightColor()  --> Цвет заголовка
 		:SetDiscountedFrom()  --> Скидка
 		:SetOnActivate()      --> Свое действие при активации
@@ -40,10 +40,14 @@ IGS("Отмычка", "otmichka") -- второй параметр не долж
 	:SetCategory("Оружие") -- категория
 
 	-- квадратная ИКОНКА (Не обязательно). Отобразится на главной странице. Может быть с прозрачностью
-	:SetIcon("http://i.imgur.com/4zfVs9s.png")
+	:SetIcon("https://i.imgur.com/4zfVs9s.png")
+
+	-- иконку можно указать материалом, либо моделькой
+	:SetIcon("icon16/disk.png", "material") -- "material" в конце
+	:SetIcon("models/props_junk/Shoe001a.mdl", "model") -- "model" и путь к модельке
 
 	-- БАННЕР 1000х400 (Не обязательно). Отобразится в подробностях итема
-	:SetImage("http://i.imgur.com/RqsP5nP.png")
+	:SetImage("https://i.imgur.com/RqsP5nP.png")
 
 	-- Этот предмет будут видеть только те, кто купил group_vip_30d. У group_vip_30d должен быть :SetNetworked(true)
 	:SetCanSee(function(pl) return pl:HasPurchase("group_vip_30d") end)
@@ -59,7 +63,7 @@ IGS("Арбалет с HL", "wep_arbalet"):SetWeapon("weapon_crossbow")
 	:SetPrice(5000)
 	:SetTerm(30)
 	:SetDescription("Разрешает спавнить Арбалет через спавн меню в любое время")
-	:SetIcon("models/weapons/w_crossbow.mdl", true) -- true значит, что указана моделька, а не ссылка
+	:SetIcon("models/weapons/w_crossbow.mdl", "model") -- "model" значит, что указана моделька, а не ссылка
 
 IGS("Джип с HL", "veh_jeep"):SetVehicle("Jeep")
 	:SetPrice(2000)
@@ -162,3 +166,10 @@ IGS("PREMIUM навсегда", "premium_navsegda"):SetULXGroup("premium")
 -- Увеличение лимита пропов : https://forum.gm-donate.net/t/481/2
 -- Тестовая VIP и тд        : https://forum.gm-donate.net/t/369
 -- Доп. броня при спавне    : https://forum.gm-donate.net/t/395/10
+-- Различные купоны         : https://forum.gm-donate.net/t/14
+-- Изменения цветов меню    : https://forum.gm-donate.net/t/2500
+-- Для разработчиков        : https://forum.gm-donate.net/t/168
+-- Проблемы ваши и игроков  : https://forum.gm-donate.net/t/3305
+-- Отображать при условии   : https://forum.gm-donate.net/t/6060
+-- Динамичная цена итема    : https://forum.gm-donate.net/t/2125
+-- Прочие ништяки: https://forum.gm-donate.net/tag/рекомендуем

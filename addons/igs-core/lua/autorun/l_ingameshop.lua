@@ -7,7 +7,7 @@ IGS = IGS or {}
 
 local function log(patt, ...)
 	if cookie.GetNumber("igs_verbose", 0) == 1 then
-		print(string.format("[IGS] " .. patt, ...))
+		print(string.format("[IGS] " .. patt, ...)) -- не менять на printS. Некоторые логи слишком ранние
 	end
 end
 
@@ -16,7 +16,7 @@ concommand.Add("igs_verbose", function(pl)
 
 	local enable = cookie.GetNumber("igs_verbose", 0) == 0
 	cookie.Set("igs_verbose", enable and 1 or 0)
-	print("IGS Logging " .. (enable and "enabled" or "disabled"))
+	IGS.prints("IGS Logging " .. (enable and "enabled" or "disabled"))
 end)
 
 local i = {} -- lua files only
@@ -72,7 +72,7 @@ function IGS.cl(sPath) return incl("cl", sPath) end
 
 local function findKeys(arr, patt)
 	local found = {}
-	for key,val in pairs(arr) do
+	for key, val in pairs(arr) do
 		local match = key:match(patt)
 		if match then
 			table.insert(found, match)
@@ -85,7 +85,7 @@ end
 -- При выборке модулей и энтити элементы повторяются
 local function unique(arr)
 	local ret = {}
-	for _,v in ipairs(arr) do
+	for _, v in ipairs(arr) do
 		if not table.HasValue(ret, v) then
 			table.insert(ret, v)
 		end
@@ -99,10 +99,10 @@ end
 
 function IGS.include_files(sPath, fIncluder) -- igs/extensions
 	local data_files = findInMount("^" .. sPath:PatternSafe() .. "/(.*%.lua)$")
-	local lua_files  = file.Find(sPath .. "/*.lua","LUA")
+	local lua_files  = file.Find(sPath .. "/*.lua", "LUA")
 	table.Add(data_files, lua_files)
 
-	for _,fileName in ipairs(data_files) do
+	for _, fileName in ipairs(data_files) do
 		fIncluder(sPath .. "/" .. fileName)
 	end
 end
@@ -110,10 +110,10 @@ end
 function IGS.load_modules(sBasePath) -- igs/modules
 	local data_modules  = findInMount("^" .. sBasePath .. "/([^/]*)/_main%.lua$")
 	data_modules = unique(data_modules)
-	local _,lua_modules = file.Find(sBasePath .. "/*","LUA")
+	local _, lua_modules = file.Find(sBasePath .. "/*", "LUA")
 	table.Add(data_modules, lua_modules)
 
-	for _,mod in ipairs(data_modules) do
+	for _, mod in ipairs(data_modules) do
 		local sModPath = sBasePath .. "/" .. mod
 		iam_inside = sModPath
 		IGS.sh(sModPath .. "/_main.lua") -- igs/modules/inv_log/_main.lua
@@ -126,7 +126,7 @@ function IGS.load_entities()
 	local entities = findInMount("^entities/([^/]*)/(.*%.lua)$")
 	entities = unique(entities) -- {ent_igs, npc_igs}
 
-	for _,ent_class in ipairs(entities) do
+	for _, ent_class in ipairs(entities) do
 		iam_inside = "entities/" .. ent_class
 		ENT = {}
 		ENT.Folder = iam_inside
@@ -142,12 +142,12 @@ end
 
 
 concommand.Add("igs_flushversion", function(pl)
-	if IsValid(pl) then print("console only") return end
+	if IsValid(pl) then IGS.prints("console only") return end
 	cookie.Set("igs_version", nil)
-	print("OK. После перезагрузки сервер скачает новую версию")
+	IGS.prints("OK. После перезагрузки сервер скачает новую версию")
 end)
 
--- мб ему место в launcher?
+-- Используется только для передачи версии клиенту. На сервере использовать cookie.GetString("igs_version")
 local igs_version = CreateConVar("igs_version", "", {FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE})
 
 if SERVER and igs_version:GetString() == "" then

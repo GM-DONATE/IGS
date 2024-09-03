@@ -79,16 +79,16 @@ end
 
 -- Ссылка на картинку иконки товара 1:1. Желательно минимум 100 px
 -- Или же путь к модельке, но тогда вторым аргументом указать true
-function STORE_ITEM:SetIcon(sIcon, bIsModel)
+function STORE_ITEM:SetIcon(sIcon, sMode)
 	return CLIENT and set(self,"icon",{
-		icon    = sIcon,
-		isModel = bIsModel,
+		icon = sIcon,
+		mode = sMode,
 	}) or self
 end
 
 function STORE_ITEM:ICON()
 	if self.icon then
-		return self.icon["icon"], self.icon["isModel"]
+		return self.icon["icon"], self.icon["mode"]
 	end
 end
 
@@ -169,7 +169,7 @@ end
 
 -- #depecated
 function STORE_ITEM:IsHidden()
-	print("[IGS] ФУНКЦИЯ ITEM:IsHidden() УСТАРЕЛА. ИСПОЛЬЗУЙТЕ ITEM:CanSee(pl)")
+	IGS.prints("ФУНКЦИЯ ", "ITEM:IsHidden()", " УСТАРЕЛА. ИСПОЛЬЗУЙТЕ ", "ITEM:CanSee(pl)")
 	return self:CanSee(CLIENT and LocalPlayer())
 end
 
@@ -362,8 +362,8 @@ function IGS.AddItem(sName, sUID, iPrice)
 	-- Поле БД 32. Но с "P: " UID надо сокращать
 	-- P: entity_hpwand_spell_simple_wand
 	if #sUID > 28 then
-		IGS.print(Color(250,20,20),
-			"UID " .. sUID .. " имеет длину свыше 28 символов, что не допускается\n" ..
+		IGS.prints(Color(250,20,20), "",
+			"UID ", sUID, " имеет длину свыше 28 символов, что не допускается\n" ..
 			"Причиной также могут стать кириллические (русские) или иные (emoji) символы.\n" ..
 			"UniqueID предмета должен состоять из маленьких английских (латинских) букв без пробелов и быть короче 28 символов"
 		)
@@ -371,7 +371,7 @@ function IGS.AddItem(sName, sUID, iPrice)
 
 		local old = sUID
 		sUID = old:sub(1, 28)
-		IGS.print(Color(250,20,20), "UID " .. old .. " сокращен до " .. sUID .. "\n")
+		IGS.prints("UID ", old, " сокращен до ", sUID)
 	end
 
 	-- Защита от сбивания айдишников из-за рефреша файла с добавлением итемов
