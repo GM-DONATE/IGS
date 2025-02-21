@@ -93,20 +93,37 @@ function IGS.PlayerActivateItem(pl, sItemUID, fCallback)
 end
 IGS.PlayerActivatedItem = IGS.PlayerActivateItem -- #todo обратка 2020.07.16
 
--- После :CanBuy() проверок и списания средств
-function IGS.PlayerPurchasedItem(pl, ITEM, cb)
+-- Выполнять после :CanBuy() проверок и списания средств.
+-- Дергает SetOnBuy, вызывает хук покупки, ложит в инвентарь
+-- added 2024.12.04. На замену IGS.PlayerPurchasedItem
+-- cb всегда первым аргументом возвращает true, но в будущем может false (ошибка сохранения в БД например)
+function IGS.PlayerPurchasedItemByUID(pl, item_uid, cb)
 	local afterBuy = function(invDbID_or_iPurchID)
 		local id = invDbID_or_iPurchID
-		ITEM:Buy(pl) -- внутри хук
-		hook.Run("IGS.PlayerPurchasedItem", pl, ITEM, id)
-		if cb then cb(id) end
+
+		local ITEM = IGS.GetItem(item_uid)
+		if ITEM then
+			ITEM:Buy(pl)
+			hook.Run("IGS.PlayerPurchasedItem", pl, ITEM, id)
+		end
+
+		hook.Run("IGS.PlayerPurchasedItemUID", pl, item_uid, id) -- PlayerReceivedItem?
+		if cb then cb(true, id) end
 	end
 
 	if IGS.C.Inv_Enabled then
-		IGS.AddToInventory(pl, ITEM:UID(), afterBuy)
+		IGS.AddToInventory(pl, item_uid, afterBuy) -- inv_id
 	else
-		IGS.PlayerActivateItem(pl, ITEM:UID(), afterBuy)
+		IGS.PlayerActivateItem(pl, item_uid, afterBuy) -- purch_id
 	end
+end
+
+-- #deprecated 2024.12.04, так как появилась IGS.PlayerPurchasedItemByUID (выше)
+-- по UID можно оперировать несуществующими generic итемами, например ачивками или оформлениями чата
+function IGS.PlayerPurchasedItem(pl, ITEM, cb)
+	IGS.PlayerPurchasedItemByUID(pl, ITEM:UID(), function(_, err_or_id) -- ok не используется (первый в cb)
+		if cb then cb(err_or_id) end
+	end)
 end
 
 

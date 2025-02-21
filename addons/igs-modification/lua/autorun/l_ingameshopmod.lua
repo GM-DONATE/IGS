@@ -115,7 +115,7 @@ if SERVER then
 
 elseif CLIENT then
 	CreateConVar("igs_version", "", {FCVAR_REPLICATED})
-	local version = GetConVarString("igs_version")
-	assert(tonumber(version), "cvar igs_version не передался клиенту. " .. tostring(version) .. ": https://forum.gm-donate.net/t/1663")
+	local version = GetConVar("igs_version"):GetString()
+	assert(tonumber(version), "cvar igs_version не передался клиенту. " .. version .. ": https://forum.gm-donate.net/t/1663")
 	downloadSuperfile(version, loadFromFile)
 end

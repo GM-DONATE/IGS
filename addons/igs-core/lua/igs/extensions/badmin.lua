@@ -21,5 +21,5 @@ function STORE_ITEM:SetBAdminGroup(rank)
 			self:Setup(pl)
 
 		end
-	end):SetMeta("bagroup", sUserGroup)
+	end):SetMeta("bagroup", rank)
 end

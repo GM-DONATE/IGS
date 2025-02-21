@@ -59,7 +59,8 @@ IGS.C.NotifyAboutNewItems = true
 
 -- Эта иконка будет отображена для предмета, если для него не будет установлена кастомная через :SetIcon()
 -- Отображается вот тут: https://img.qweqwe.ovh/1494088609445.png
-IGS.C.DefaultIcon = "https://i.imgur.com/mLoHaCE.jpg"
+-- Хостинг картинок: https://t.me/cfr2bot
+IGS.C.DefaultIcon = "https://file.def.pm/42Hr9k9U.jpeg"
 
 
 

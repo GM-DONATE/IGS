@@ -1,13 +1,13 @@
 -- #todo нужно переделывать, но только так:
 -- https://trello.com/c/WfVYTIOF/544 (комменты)
-CreateConVar("igs_debug", 0, FCVAR_NOTIFY)
+CreateConVar("igs_debug", "0", FCVAR_NOTIFY)
 cvars.AddChangeCallback("igs_debug", function(_, old, new)
 	IGS.DEBUG = tonumber(new) -- level. 0: disabled, 1: debug, 2: info, 3: warning, 4: error
 	if IGS.DEBUG == 0 then IGS.DEBUG = nil end
 	IGS.prints("PEZuM OTJIA9Ku ", (IGS.DEBUG and "AKTuBuPOBAH" or "BbIKJII04EH"), ". Level: ", (IGS.DEBUG or 0))
 end, "main")
 
-
+--- @class Player
 local PLAYER = FindMetaTable("Player")
 
 function PLAYER:IGSFunds()
@@ -150,8 +150,10 @@ function IGS.prints(...)
 end
 
 -- Результат выполнения: https://file.def.pm/Jw9E7j7a.jpg
--- IGS.prints("Одиночный текст базового (белого) цвета")
--- IGS.prints(Color(200, 50, 50), "Выделенный цветом текст")
+-- IGS.prints("одиночный текст базового (белого) цвета")
+-- IGS.prints(nil, Color(255, 50, 50), "одиночный выделенным кастомным цветом текст")
+-- IGS.prints(Color(255, 50, 50), "", "одиночный выделенным кастомным цветом текст") -- аналогичный вариант верхней записи
+-- IGS.prints(Color(255, 50, 50), "обычный, ", "выделение кастомым цветом")
 -- IGS.prints("обычный, ", "выделенный, ", "обычный, ", "выделенный")
 -- IGS.prints("", "выделенный, ", "обычный, ", "выделенный, ", "обычный")
 -- IGS.prints(Color(150, 150, 150), "обычный, ", "выделенный цветной, ", "обычный, ", "выделенный")
@@ -177,7 +179,7 @@ end
 
 
 function IGS.SignPrice(iPrice) -- 10 Alc
-	return math.Truncate(tonumber(iPrice),2) .. " " .. IGS.C.CURRENCY_SIGN
+	return math.Truncate(tonumber(iPrice) or -1, 2) .. " " .. IGS.C.CURRENCY_SIGN
 end
 
 PL_MONEY = PLUR(IGS.C.CurrencyPlurals)

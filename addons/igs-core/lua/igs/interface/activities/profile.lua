@@ -134,9 +134,9 @@ hook.Add("IGS.CatchActivities","profile",function(activity,sidebar)
 
 				-- Если покупка, то пишем ее название или пишем с чем связана транзакция
 				local note =
-					v.note:StartWith("P: ") and name_or_uid(v.note:sub(4)) or
-					v.note:StartWith("A: ") and ("Пополнение счета (" .. v.note:sub(4) .. ")") or
-					v.note:StartWith("C: ") and ("Купон " .. v.note:sub(4,13) .. "...") or
+					v.note:StartsWith("P: ") and name_or_uid(v.note:sub(4)) or
+					v.note:StartsWith("A: ") and ("Пополнение счета (" .. v.note:sub(4) .. ")") or
+					v.note:StartsWith("C: ") and ("Купон " .. v.note:sub(4,13) .. "...") or
 					v.note
 
 				pnl:AddLine(

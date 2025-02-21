@@ -40,7 +40,7 @@ local function registerCurrentServer(local_ip,port, fOnSuccess)
 			"HACTPOuKu B ", "gm-donate.net/panel/projects/" .. IGS.C.ProjectID
 		)
 
-		local serv_name = GetConVarString("hostname")
+		local serv_name = GetConVar("hostname"):GetString()
 		addCurrentServerLocally(id, serv_name) -- нужно снаружи для IGS.SERVERS:ID()
 		IGS.SetServerName( serv_name )
 	end)
@@ -119,14 +119,6 @@ timer.Simple(0, function() -- фетч заработает только так 
 	dprint("Загрузка серверов")
 	IGS.GetExternalIP(getAndLoadServers)
 end)
-
-local function renewAddressAndReloadServers(ip)
-	IGS.UpdateServerAddress(IGS.SERVERS:ID(), ip, getHostPort(), function()
-		IGS.GetServers(function(dat)
-			loadServersOrRegisterCurrent(dat, ip)
-		end, true)
-	end)
-end
 
 hook.Add("IGS.OnApiError","NotifyAboutImpossibleLoading",function(sMethod)
 	if sMethod == "/servers/get" then

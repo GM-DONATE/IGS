@@ -46,7 +46,7 @@ local function net_ReceiveProtected(sName, fCallback)
 		if checkNotReady(pl) then return end
 
 		-- local iMsgID = net.ReadUInt(8) -- 255
-		fCallback(pl, iMsgID)
+		fCallback(pl)
 	end)
 end
 
@@ -61,7 +61,7 @@ local function IGS_Purchase(pl, uid, cb)
 
 	local price = ITEM:GetPrice(pl)
 
-	local err =
+	local err = -- не в ITEM:CanBuy, потому что в некоторых случаях эти проверки вредны, когда хочешь дать игроку итем, который ему не положен
 		not ITEM:CanSee( pl ) and "Как вы меня нашли?"
 		or not IGS.CanAfford(pl, price) and ("Для покупки нужно " .. PL_MONEY(price))
 		or IGS.IsInventoryOverloaded(pl) and "У вас перегруз в донат инвентаре. А еще вы один из немногих, кто видел это!"
@@ -89,16 +89,20 @@ local function IGS_Purchase(pl, uid, cb)
 	pl:AddIGSFunds(-price, "P: " .. uid, function()
 
 		-- ложит в инвентарь или регает сразу как покупку если тот отключен
-		IGS.PlayerPurchasedItem(pl, ITEM, function(invDbID_) -- nil if disabled
+		IGS.PlayerPurchasedItemByUID(pl, uid, function(ok, id_or_err) -- inv_db or purch_id or err string
 			pl.igs_unfinished_purchase = nil
+
+			if not ok then
+				cb(nil, id_or_err)
+				return
+			end
 
 			if IGS.C.Inv_Enabled then
 				IGS.Notify(pl, "Ваша покупка находится в /donate инвентаре")
 			end
 
-			cb(invDbID_)
+			cb(id_or_err)
 		end)
-
 	end)
 end
 

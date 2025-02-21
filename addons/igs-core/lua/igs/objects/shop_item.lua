@@ -400,8 +400,8 @@ end
 
 local null = IGS.Item("null", "null"):SetPrice(0)
 	:SetDescription("Этот предмет, скорее всего, когда-то существовал или существует на другом сервере, но не здесь")
-	:SetIcon("http://i.imgur.com/NfpcFdy.png")
-	:SetImage("http://i.imgur.com/32iTOFi.jpg")
+	:SetIcon("https://file.def.pm/A8j3oEEH.png")
+	:SetImage("https://file.def.pm/T1cWTW2m.jpeg")
 	:SetCanBuy(function() return "Этого предмета на сервере нет. Как вы нашли его?" end)
 	:SetCanActivate(function() return "Этого предмета на сервере нет. Можете уничтожить его" end) -- например купил в инвентарь, а потом uid сменился
 	:SetCanSee(false) -- чтобы не отображался в магазине

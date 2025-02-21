@@ -102,7 +102,7 @@ function SCROLLABLE:Init()
 end
 
 function SCROLLABLE:Reset()
-	self:GetCanvas():Clear(true)
+	self:GetCanvas():Clear()
 	self.yOffset = 0
 	self.ySpeed = 0
 	self.scrollSize = 1

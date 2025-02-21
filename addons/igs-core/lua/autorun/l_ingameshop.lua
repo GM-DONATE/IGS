@@ -15,7 +15,7 @@ concommand.Add("igs_verbose", function(pl)
 	if SERVER and IsValid(pl) then return end
 
 	local enable = cookie.GetNumber("igs_verbose", 0) == 0
-	cookie.Set("igs_verbose", enable and 1 or 0)
+	cookie.Set("igs_verbose", enable and "1" or "0")
 	IGS.prints("IGS Logging " .. (enable and "enabled" or "disabled"))
 end)
 
@@ -136,6 +136,7 @@ function IGS.load_entities()
 		scripted_ents.Register(ENT, ent_class)
 
 		iam_inside = nil
+
 		ENT = nil
 	end
 end
@@ -143,7 +144,7 @@ end
 
 concommand.Add("igs_flushversion", function(pl)
 	if IsValid(pl) then IGS.prints("console only") return end
-	cookie.Set("igs_version", nil)
+	cookie.Delete("igs_version")
 	IGS.prints("OK. После перезагрузки сервер скачает новую версию")
 end)
 

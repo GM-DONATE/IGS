@@ -1,5 +1,3 @@
--- #FUSC# --
-
 local function giveLvlBonuses(pl, from_lvl, to_lvl)
 	for i = from_lvl,to_lvl do
 		local lvl = IGS.LVL.Get(i)
@@ -73,7 +71,7 @@ hook.Add("PlayerInitialSpawn", "IGS.LoadPlayer", function(pl)
 	end)
 end)
 
-local function repairBrokenPurchases(pl,purchases)
+local function repairBrokenPurchases(pl, purchases)
 	for uid in pairs(purchases) do -- , count
 		local ITEM = IGS.GetItemByUID(uid)
 
@@ -84,23 +82,16 @@ local function repairBrokenPurchases(pl,purchases)
 end
 
 -- Восстановление слетевших прав
-hook.Add("IGS.PlayerPurchasesLoaded", "RestorePex", function(pl,purchases)
+hook.Add("IGS.PlayerPurchasesLoaded", "RestorePex", function(pl, purchases)
 	if purchases then
 		repairBrokenPurchases(pl, purchases)
 	end
 end)
 
-
--- Отладка начисления бонусов за лвл:
--- https://gist.github.com/1b41e1f869752d4750440619339e4085
-hook.Add("IGS.PaymentStatusUpdated","NoRejoiningCharge",function(pl,dat)
+hook.Add("IGS.PaymentStatusUpdated", "NoRejoiningCharge", function(pl, dat)
 	if dat.method ~= "pay" then return end
 
-	--timer.Simple(1,function() -- даем успеть в БД обновить данные
-
-		updateBalance(pl,function(new_bal, diff)
-			hook.Run("IGS.PlayerDonate", pl, diff, new_bal)
-		end, true) -- updateBalance with bGiveBonuses
-
-	--end) -- timer 1
+	updateBalance(pl, function(new_bal, diff)
+		hook.Run("IGS.PlayerDonate", pl, diff, new_bal)
+	end, true) -- updateBalance with bGiveBonuses
 end)

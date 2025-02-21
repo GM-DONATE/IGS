@@ -70,7 +70,7 @@ function IGS.WIN.Deposit(iRealSum)
 				self.log:AddRecord("Запрос цифровой подписи запроса от сервера...")
 
 				IGS.GetPaymentURL(want_money,function(url)
-					IGS.OpenURL(url,"Процедура пополнения счета")
+					IGS.OpenURL(url)
 					if not IsValid(self) then return end
 					self.log:AddRecord("Подпись получена. начинаем процесс оплаты")
 

@@ -37,7 +37,11 @@ hook.Add("IGS.PlayerPurchasesLoaded", "IGS_SAM", function(pl, purchases_)
 	-- Но его ранг не дефолтный и продается
 	-- Значит снимаем
 	if not purchased_groups[1] then
-		local current_pl_rank = pl:sam_getrank()
+		local current_pl_rank =
+			(pl.sam_getrank and pl:sam_getrank()) or -- до версии SAM 143 была такая функция. Потом пропала
+			(pl.sam_get_nwvar and pl:sam_get_nwvar("rank", "user")) -- обратная совместимость: https://forum.gm-donate.net/t/7730/9
+			or pl:GetUserGroup()
+
 		if current_pl_rank ~= "user" and IGS.SAM_GROUPS[current_pl_rank] then
 			pl:sam_set_rank("user") -- используется sam.player.set_rank(ply, rank, length), не путать с PLAYER:sam_setrank(name)
 		end

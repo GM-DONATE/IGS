@@ -40,14 +40,15 @@ IGS("Отмычка", "otmichka") -- второй параметр не долж
 	:SetCategory("Оружие") -- категория
 
 	-- квадратная ИКОНКА (Не обязательно). Отобразится на главной странице. Может быть с прозрачностью
-	:SetIcon("https://i.imgur.com/4zfVs9s.png")
+	-- хостинг картинок: https://t.me/cfr2bot
+	:SetIcon("https://file.def.pm/2o6vPVqA.png")
 
 	-- иконку можно указать материалом, либо моделькой
 	:SetIcon("icon16/disk.png", "material") -- "material" в конце
 	:SetIcon("models/props_junk/Shoe001a.mdl", "model") -- "model" и путь к модельке
 
 	-- БАННЕР 1000х400 (Не обязательно). Отобразится в подробностях итема
-	:SetImage("https://i.imgur.com/RqsP5nP.png")
+	:SetImage("https://file.def.pm/B2yfE47Z.png")
 
 	-- Этот предмет будут видеть только те, кто купил group_vip_30d. У group_vip_30d должен быть :SetNetworked(true)
 	:SetCanSee(function(pl) return pl:HasPurchase("group_vip_30d") end)
