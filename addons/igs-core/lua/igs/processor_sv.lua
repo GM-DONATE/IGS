@@ -41,8 +41,9 @@ local function updateBalance(pl, fOnFinish, bGiveBonuses)
 
 		if diff ~= 0 then -- баланс ~= nil и не 0 (? https://t.me/c/1353676159/45001)
 			pl:SetIGSVar("igs_balance", now_igs_) -- НЕ ДОЛЖНО ВЫПОЛНЯТЬСЯ НА НЕ_КЛИЕНТОВ
-			pl.igs_score = now_score_ -- #todo make netvar
 		end
+
+		pl.igs_score = now_score_ -- #todo make netvar
 
 		if now_igs_ then -- значит есть транзакции
 			recalcTransactionsAndBonuses(pl, bGiveBonuses)
