@@ -31,21 +31,21 @@ end
 
 -- Указать bGiveBonuses, если нужно пересчитать бонусы
 local function updateBalance(pl, fOnFinish, bGiveBonuses)
-	IGS.GetPlayer(pl:SteamID64(),function(pld_)
+	IGS.GetPlayer(pl:SteamID64(), function(pld_)
 		if not IsValid(pl) then return end
 		local now_igs_ = pld_ and pld_.Balance
 		local now_score_ = pld_ and pld_.Score
 
-		local was_igs = pl:IGSFunds()
+		local was_igs = pl:IGSFunds() -- fallback = 0 даже для тех, кто никогда не донил (фундаментальный проеб)
 		local diff = (now_igs_ or 0) - was_igs
 
-		if diff ~= 0 then -- баланс ~= nil и не 0 (? https://t.me/c/1353676159/45001)
-			pl:SetIGSVar("igs_balance", now_igs_) -- НЕ ДОЛЖНО ВЫПОЛНЯТЬСЯ НА НЕ_КЛИЕНТОВ
+		if diff ~= 0 then -- транзакция или есть стартовый баланс
+			pl:SetIGSVar("igs_balance", now_igs_) -- Должно выполняться ТОЛЬКО на донатеров (не на обычных игроках)
 		end
 
 		pl.igs_score = now_score_ -- #todo make netvar
 
-		if now_igs_ then -- значит есть транзакции
+		if now_igs_ then -- значит есть транзакции, реальный донатер, а не просто баланс 0
 			recalcTransactionsAndBonuses(pl, bGiveBonuses)
 		end
 
